@@ -1,0 +1,402 @@
+syntax = "proto3";
+
+package api.server.v1;
+
+import "google/api/annotations.proto";
+
+option go_package = "github.com/npanel-dev/NPanel-backend/api/server/v1;v1";
+option java_multiple_files = true;
+option java_package = "api.server.v1";
+
+// Server service - 节点服务器接口
+// 用于节点服务器与后端管理系统通信
+service Server {
+	// GetServerConfig 获取服务器配置
+	rpc GetServerConfig (GetServerConfigRequest) returns (GetServerConfigReply) {
+		option (google.api.http) = {
+			get: "/v1/server/config"
+		};
+	}
+
+	// GetServerUserList 获取用户列表
+	rpc GetServerUserList (GetServerUserListRequest) returns (GetServerUserListReply) {
+		option (google.api.http) = {
+			get: "/v1/server/user"
+		};
+	}
+
+	// PushUserTraffic 推送用户流量
+	rpc PushUserTraffic (PushUserTrafficRequest) returns (PushUserTrafficReply) {
+		option (google.api.http) = {
+			post: "/v1/server/push"
+			body: "*"
+		};
+	}
+
+	// PushServerStatus 推送服务器状态
+	rpc PushServerStatus (PushServerStatusRequest) returns (PushServerStatusReply) {
+		option (google.api.http) = {
+			post: "/v1/server/status"
+			body: "*"
+		};
+	}
+
+	// PushOnlineUsers 推送在线用户
+	rpc PushOnlineUsers (PushOnlineUsersRequest) returns (PushOnlineUsersReply) {
+		option (google.api.http) = {
+			post: "/v1/server/online"
+			body: "*"
+		};
+	}
+
+	// QueryServerProtocolConfig 查询服务器协议配置
+	rpc QueryServerProtocolConfig (QueryServerProtocolConfigRequest) returns (QueryServerProtocolConfigReply) {
+		option (google.api.http) = {
+			get: "/v2/server/{server_id}"
+		};
+	}
+
+	// SessionCheck 会话准入检查
+	rpc SessionCheck (SessionCheckRequest) returns (SessionCheckResponse) {
+		option (google.api.http) = {
+			post: "/v1/server/session/check"
+			body: "*"
+		};
+	}
+
+	// SessionRelease 会话释放
+	rpc SessionRelease (SessionReleaseRequest) returns (SessionReleaseResponse) {
+		option (google.api.http) = {
+			post: "/v1/server/session/release"
+			body: "*"
+		};
+	}
+}
+
+// ============================================================================
+// GetServerConfig - 获取服务器配置
+// ============================================================================
+
+// GetServerConfigRequest 获取服务器配置请求
+message GetServerConfigRequest {
+	int64 server_id = 1;      // 服务器ID
+	string protocol = 2;      // 协议类型
+	string secret_key = 3;    // 密钥
+}
+
+// ServerBasic 服务器基础配置
+message ServerBasic {
+	int64 push_interval = 1;       // 推送间隔（秒）
+	int64 pull_interval = 2;       // 拉取间隔（秒）
+	string device_count_mode = 3;  // 设备计数模式：“ip” 或 “connection”
+	bool device_admission_enabled = 4;  // 设备准入控制全局开关
+}
+
+// GetServerConfigReply 获取服务器配置响应
+message GetServerConfigReply {
+	int32 code = 1;           // 状态码
+	string message = 2;       // 消息内容
+	ServerBasic basic = 3;    // 基础配置
+	string protocol = 4;      // 协议类型
+	map<string, string> config = 5;  // 协议配置（JSON序列化）
+}
+
+// ============================================================================
+// GetServerUserList - 获取用户列表
+// ============================================================================
+
+// GetServerUserListRequest 获取用户列表请求
+message GetServerUserListRequest {
+	int64 server_id = 1;      // 服务器ID
+	string protocol = 2;      // 协议类型
+	string secret_key = 3;    // 密钥
+}
+
+// ServerUser 服务器用户信息
+message ServerUser {
+	int64 id = 1;             // 用户ID
+	string uuid = 2;          // UUID
+	int64 speed_limit = 3;    // 速度限制
+	int64 device_limit = 4;   // 设备限制
+}
+
+// GetServerUserListReply 获取用户列表响应
+message GetServerUserListReply {
+	int32 code = 1;           // 状态码
+	string message = 2;       // 消息内容
+	repeated ServerUser users = 3;  // 用户列表
+}
+
+// ============================================================================
+// PushUserTraffic - 推送用户流量
+// ============================================================================
+
+// UserTraffic 用户流量信息
+message UserTraffic {
+	int64 sid = 1;            // 订阅ID
+	int64 upload = 2;         // 上传流量
+	int64 download = 3;       // 下载流量
+}
+
+// PushUserTrafficRequest 推送用户流量请求
+message PushUserTrafficRequest {
+	int64 server_id = 1;      // 服务器ID
+	string protocol = 2;      // 协议类型
+	string secret_key = 3;    // 密钥
+	repeated UserTraffic traffic = 4;  // 流量数据
+}
+
+// PushUserTrafficReply 推送用户流量响应
+message PushUserTrafficReply {
+	int32 code = 1;           // 状态码
+	string message = 2;       // 消息内容
+}
+
+// ============================================================================
+// PushServerStatus - 推送服务器状态
+// ============================================================================
+
+// PushServerStatusRequest 推送服务器状态请求
+message PushServerStatusRequest {
+	int64 server_id = 1;      // 服务器ID
+	string protocol = 2;      // 协议类型
+	string secret_key = 3;    // 密钥
+	double cpu = 4;           // CPU使用率
+	double mem = 5;           // 内存使用率
+	double disk = 6;          // 磁盘使用率
+	int64 updated_at = 7;     // 更新时间戳
+}
+
+// PushServerStatusReply 推送服务器状态响应
+message PushServerStatusReply {
+	int32 code = 1;           // 状态码
+	string message = 2;       // 消息内容
+}
+
+// ============================================================================
+// PushOnlineUsers - 推送在线用户
+// ============================================================================
+
+// OnlineUser 在线用户信息
+message OnlineUser {
+	int64 sid = 1;            // 订阅ID
+	string ip = 2;            // IP地址
+	int64 connected_at = 3;   // 连接时间戳
+}
+
+// PushOnlineUsersRequest 推送在线用户请求
+message PushOnlineUsersRequest {
+	int64 server_id = 1;      // 服务器ID
+	string protocol = 2;      // 协议类型
+	string secret_key = 3;    // 密钥
+	repeated OnlineUser users = 4;  // 在线用户列表
+}
+
+// PushOnlineUsersReply 推送在线用户响应
+message PushOnlineUsersReply {
+	int32 code = 1;           // 状态码
+	string message = 2;       // 消息内容
+}
+
+// ============================================================================
+// QueryServerProtocolConfig - 查询服务器协议配置
+// ============================================================================
+
+// QueryServerProtocolConfigRequest 查询服务器协议配置请求
+message QueryServerProtocolConfigRequest {
+	int64 server_id = 1;      // 服务器ID（路径参数）
+	string secret_key = 2;    // 密钥
+	repeated string protocols = 3;  // 协议列表
+}
+
+// NodeDNS 节点DNS配置
+message NodeDNS {
+	string server = 1;        // DNS服务器
+	string domain = 2;        // 域名
+	int64 port = 3;           // 端口
+}
+
+// NodeOutbound 节点出站配置
+message NodeOutbound {
+	string tag = 1;           // 标签
+	string protocol = 2;      // 协议
+	map<string, string> settings = 3;  // 设置
+}
+
+// Protocol 协议配置
+message Protocol {
+	string type = 1;
+	int32 port = 2;
+	bool enable = 3;
+	string security = 4;
+	string sni = 5;
+	bool allow_insecure = 6;
+	string fingerprint = 7;
+	string reality_server_addr = 8;
+	int32 reality_server_port = 9;
+	string reality_private_key = 10;
+	string reality_public_key = 11;
+	string reality_short_id = 12;
+	string transport = 13;
+	string host = 14;
+	string path = 15;
+	string service_name = 16;
+	string cipher = 17;
+	string server_key = 18;
+	string flow = 19;
+	string hop_ports = 20;
+	int32 hop_interval = 21;
+	string obfs_password = 22;
+	bool disable_sni = 23;
+	bool reduce_rtt = 24;
+	string udp_relay_mode = 25;
+	string congestion_controller = 26;
+	string multiplex = 27;
+	string padding_scheme = 28;
+	int32 up_mbps = 29;
+	int32 down_mbps = 30;
+	string obfs = 31;
+	string obfs_host = 32;
+	string obfs_path = 33;
+	string xhttp_mode = 34;
+	string xhttp_extra = 35;
+	string encryption = 36;
+	string encryption_mode = 37;
+	string encryption_rtt = 38;
+	string encryption_ticket = 39;
+	string encryption_server_padding = 40;
+	string encryption_private_key = 41;
+	string encryption_client_padding = 42;
+	string encryption_password = 43;
+	double ratio = 44;
+	string cert_mode = 45;
+	string cert_dns_provider = 46;
+	string cert_dns_env = 47;
+	string simnet_psk = 48;
+	int32 simnet_key_id = 49;
+	string simnet_ticket_id = 50;
+	string simnet_path = 51;
+	string simnet_carrier = 52;
+	bool simnet_af_enabled = 53;
+	string simnet_af_path_mode = 54;
+	string simnet_af_path_prefix = 55;
+	string simnet_af_path_suffix = 56;
+	string simnet_af_magic_mode = 57;
+	int32 simnet_af_response_jitter_ms = 58;
+	bool simnet_af_handshake_polymorphism = 59;
+	bool simnet_af_settings_jitter = 60;
+	bool simnet_af_fake_header_injection = 61;
+	bool simnet_reverse_enabled = 62;
+	string simnet_reverse_listen_addr = 63;
+	int32 simnet_reverse_listen_port = 64;
+	string simnet_reverse_target_host = 65;
+	int32 simnet_reverse_target_port = 66;
+	bool simnet_fallback_enabled = 67;
+	string simnet_fallback_target_scheme = 68;
+	string simnet_fallback_target_host = 69;
+	int32 simnet_fallback_target_port = 70;
+	string simnet_fallback_host_header = 71;
+	string simnet_fallback_tls_sni = 72;
+
+	// OmniFlow 基础配置
+	string omniflow_carrier = 73;                    // h2 或 h3
+	string omniflow_path = 74;                       // HTTP 路径
+	string omniflow_content_type = 75;               // Content-Type
+	string omniflow_profile_path = 76;               // Profile 文件路径
+	string omniflow_profile_json = 77;               // Profile JSON
+	string omniflow_server_host = 78;                // 服务器主机
+	int32 omniflow_server_port = 79;                 // 服务器端口
+	string omniflow_ca_cert_path = 80;               // CA 证书路径
+	string omniflow_target_meta = 81;                // 加密目标元数据
+	string omniflow_spki_pin = 82;                   // SPKI Pin
+
+	// OmniFlow H3 Fallback
+	bool omniflow_h3_fallback_enabled = 83;
+	string omniflow_h3_fallback_policy = 84;         // always/timeout/never
+	int32 omniflow_h3_fallback_timeout_ms = 85;
+	int32 omniflow_h3_fallback_retry_budget = 86;
+	bool omniflow_h3_fallback_smoke_enabled = 87;
+	int32 omniflow_h3_fallback_smoke_interval_sec = 88;
+	int32 omniflow_h3_fallback_smoke_timeout_ms = 89;
+
+	// OmniFlow 连接管理
+	int32 omniflow_max_age_sec = 90;
+	int32 omniflow_idle_timeout_sec = 91;
+	int32 omniflow_max_connections = 92;
+
+	// OmniFlow 抗指纹
+	bool omniflow_adaptive_tls_enabled = 93;
+	string omniflow_tls_fingerprint = 94;            // chrome/firefox/safari
+	string omniflow_sni_mode = 95;                   // direct/transparent_forward
+	string omniflow_padding_mode = 96;               // random/mtu_align/fixed_overhead
+	bool omniflow_traffic_shaping_enabled = 97;
+
+	bool omniflow_af_enabled = 101;                  // 启用随机 AF path
+	string omniflow_af_path_mode = 102;              // api/random
+	string omniflow_af_path_prefix = 103;            // 随机 path 前缀
+	string omniflow_af_path_suffix = 104;            // 随机 path 后缀
+	int32 omniflow_af_path_rotation_secs = 105;      // path 轮转秒数
+	int32 omniflow_af_path_skew_slots = 106;         // 允许偏移 slot 数
+
+	// OmniFlow 同端口浏览器 Fallback 反向代理
+	bool omniflow_fallback_enabled = 107;
+	string omniflow_fallback_target_scheme = 108;    // https/http
+	string omniflow_fallback_target_host = 109;      // 目标网站 host
+	int32 omniflow_fallback_target_port = 110;       // 目标网站端口
+	string omniflow_fallback_host_header = 111;      // 上游 Host header
+	string omniflow_fallback_tls_sni = 112;          // 上游 TLS SNI
+
+	// OmniFlow 回退 Carrier
+	bool omniflow_fallback_carrier_enabled = 98;
+	bool omniflow_fallback_connect_tunnel = 99;
+	bool omniflow_fallback_wss_enabled = 100;
+}
+
+// QueryServerProtocolConfigReply 查询服务器协议配置响应
+message QueryServerProtocolConfigReply {
+	int32 code = 1;           // 状态码
+	string message = 2;       // 消息内容
+	int64 traffic_report_threshold = 3;  // 流量上报阈值
+	string ip_strategy = 4;   // IP策略
+	repeated NodeDNS dns = 5;  // DNS配置
+	repeated string block = 6;  // 阻止列表
+	repeated NodeOutbound outbound = 7;  // 出站配置
+	repeated Protocol protocols = 8;  // 协议配置
+	int32 total = 9;          // 总数
+}
+
+// ============================================================================
+// SessionCheck / SessionRelease - 设备准入控制
+// ============================================================================
+
+// SessionCheckRequest 会话准入检查请求
+message SessionCheckRequest {
+	int64  server_id     = 1;  // 服务器ID
+	string secret_key    = 2;  // 密钥
+	int64  user_id       = 3;  // 用户ID
+	string client_ip     = 4;  // 客户端IP
+	string protocol      = 5;  // 协议类型
+	string connection_id = 6;  // 连接ID
+}
+
+// SessionCheckResponse 会话准入检查响应
+message SessionCheckResponse {
+	bool   allowed = 1;  // 是否允许
+	int64  current = 2;  // 当前连接数
+	int64  limit   = 3;  // 连接数限制
+	string reason  = 4;  // 拒绝原因
+}
+
+// SessionReleaseRequest 会话释放请求
+message SessionReleaseRequest {
+	int64  server_id     = 1;  // 服务器ID
+	string secret_key    = 2;  // 密钥
+	int64  user_id       = 3;  // 用户ID
+	string client_ip     = 4;  // 客户端IP
+	string connection_id = 5;  // 连接ID
+}
+
+// SessionReleaseResponse 会话释放响应
+message SessionReleaseResponse {
+	bool success = 1;  // 是否成功
+}

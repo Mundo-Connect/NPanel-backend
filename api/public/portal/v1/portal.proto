@@ -1,0 +1,190 @@
+syntax = "proto3";
+
+package api.public.portal.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+option go_package = "github.com/npanel-dev/NPanel-backend/api/public/portal/v1;v1";
+option java_multiple_files = true;
+option java_package = "api.public.portal.v1";
+
+service Portal {
+  rpc GetSubscription(GetSubscriptionRequest) returns (GetSubscriptionReply) {
+    option (google.api.http) = {
+      get: "/v1/public/portal/subscribe"
+    };
+  }
+
+  rpc PrePurchaseOrder(PrePurchaseOrderRequest) returns (PrePurchaseOrderReply) {
+    option (google.api.http) = {
+      post: "/v1/public/portal/pre"
+      body: "*"
+    };
+  }
+
+  rpc Purchase(PurchaseRequest) returns (PurchaseReply) {
+    option (google.api.http) = {
+      post: "/v1/public/portal/purchase"
+      body: "*"
+    };
+  }
+
+  rpc GetAvailablePaymentMethods(google.protobuf.Empty) returns (GetAvailablePaymentMethodsReply) {
+    option (google.api.http) = {
+      get: "/v1/public/portal/payment-method"
+    };
+  }
+
+  rpc PurchaseCheckout(PurchaseCheckoutRequest) returns (PurchaseCheckoutReply) {
+    option (google.api.http) = {
+      post: "/v1/public/portal/order/checkout"
+      body: "*"
+    };
+  }
+
+  rpc QueryPurchaseOrder(QueryPurchaseOrderRequest) returns (QueryPurchaseOrderReply) {
+    option (google.api.http) = {
+      get: "/v1/public/portal/order/status"
+    };
+  }
+}
+
+message GetSubscriptionRequest {
+  optional string language = 1;
+}
+
+message GetSubscriptionReply {
+  repeated SubscribeInfo list = 1;
+}
+
+message SubscribeInfo {
+  int64 id = 1;
+  string name = 2;
+  string language = 3;
+  string description = 4;
+  int64 unit_price = 5;
+  string unit_time = 6;
+  repeated SubscribeDiscount discount = 7;
+  int64 replacement = 8;
+  int32 inventory = 9;
+  int64 traffic = 10;
+  int32 speed_limit = 11;
+  int32 device_limit = 12;
+  int32 quota = 13;
+  repeated int64 nodes = 14;
+  repeated string node_tags = 15;
+  repeated int64 node_group_ids = 16;
+  int64 node_group_id = 17;
+  repeated TrafficLimit traffic_limit = 18;
+  bool show = 19;
+  bool sell = 20;
+  int32 sort = 21;
+  int32 deduction_ratio = 22;
+  bool allow_deduction = 23;
+  int32 reset_cycle = 24;
+  bool renewal_reset = 25;
+  bool show_original_price = 26;
+  int64 created_at = 27;
+  int64 updated_at = 28;
+}
+
+message SubscribeDiscount {
+  int64 quantity = 1;
+  int64 discount = 2;
+}
+
+message TrafficLimit {
+  string stat_type = 1;
+  int64 stat_value = 2;
+  int64 traffic_usage = 3;
+  int32 speed_limit = 4;
+}
+
+message PrePurchaseOrderRequest {
+  int64 payment = 1;
+  int64 subscribe_id = 2;
+  int64 quantity = 3;
+  optional string coupon = 4;
+}
+
+message PrePurchaseOrderReply {
+  int64 price = 1;
+  int64 amount = 2;
+  int64 discount = 3;
+  string coupon = 4;
+  int64 coupon_discount = 5;
+  int64 fee_amount = 6;
+}
+
+message PurchaseRequest {
+  string auth_type = 1;
+  string identifier = 2;
+  string password = 3;
+  int64 payment = 4;
+  int64 subscribe_id = 5;
+  int64 quantity = 6;
+  optional string coupon = 7;
+  optional string invite_code = 8;
+  optional string turnstile_token = 9;
+}
+
+message PurchaseReply {
+  string order_no = 1;
+}
+
+message GetAvailablePaymentMethodsReply {
+  repeated PaymentMethod methods = 1;
+}
+
+message PaymentMethod {
+  int64 id = 1;
+  string name = 2;
+  string platform = 3;
+  string description = 4;
+  string icon = 5;
+  uint32 fee_mode = 6;
+  int64 fee_percent = 7;
+  int64 fee_amount = 8;
+}
+
+message PurchaseCheckoutRequest {
+  string order_no = 1 [json_name = "orderNo"];
+  optional string return_url = 2 [json_name = "returnUrl"];
+}
+
+message PurchaseCheckoutReply {
+  string type = 1;
+  optional string checkout_url = 2;
+  optional StripePayment stripe = 3;
+}
+
+message StripePayment {
+  string publishable_key = 1;
+  string client_secret = 2;
+  string method = 3;
+}
+
+message QueryPurchaseOrderRequest {
+  string auth_type = 1;
+  string identifier = 2;
+  string order_no = 3;
+}
+
+message QueryPurchaseOrderReply {
+  string order_no = 1;
+  SubscribeInfo subscribe = 2;
+  int64 quantity = 3;
+  int64 price = 4;
+  int64 amount = 5;
+  int64 discount = 6;
+  string coupon = 7;
+  int64 coupon_discount = 8;
+  int64 fee_amount = 9;
+  PaymentMethod payment = 10;
+  int32 status = 11;
+  int64 created_at = 12;
+  string token = 13;
+}
+
+

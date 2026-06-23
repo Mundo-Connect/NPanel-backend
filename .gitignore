@@ -17,16 +17,58 @@ coverage.*
 *.coverprofile
 profile.cov
 
+# Build artifacts
+/bin/
+/logs/
+/npanel
+/build/
+/dist/
+/tmp/
+
 # Dependency directories (remove the comment below to include it)
 # vendor/
+node_modules/
 
 # Go workspace file
 go.work
 go.work.sum
 
-# env file
+# Local environment and overrides
 .env
+.env.*
+!.env.example
+.envrc
+docker-compose.override.yml
+compose.override.yml
+compose.override.yaml
+configs/*.local.yaml
+configs/*.secret.yaml
+configs/*.private.yaml
+
+# Runtime data and local persistent config
+/data/
+/mysql/
+/redis/
+/npanel-config/
+
+# Logs and process files
+*.log
+*.pid
+
+# Secrets, certificates, and local databases
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*.db
+*.sqlite
+*.sqlite3
+*.dump
+*.bak
+*.backup
 
 # Editor/IDE
-# .idea/
-# .vscode/
+.DS_Store
+.idea/
+.vscode/

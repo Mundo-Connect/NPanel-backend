@@ -1,0 +1,310 @@
+syntax = "proto3";
+
+package api.public.auth.v1;
+
+option go_package = "github.com/npanel-dev/NPanel-backend/api/public/auth/v1;v1";
+option java_multiple_files = true;
+option java_package = "api.public.auth.v1";
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+service Auth {
+  // CheckUser checks if user email exists
+  rpc CheckUser(CheckUserRequest) returns (CheckUserReply) {
+    option (google.api.http) = {
+      get: "/v1/auth/check"
+    };
+  }
+
+  // CheckUserTelephone checks if user telephone exists
+  rpc CheckUserTelephone(CheckUserTelephoneRequest) returns (CheckUserTelephoneReply) {
+    option (google.api.http) = {
+      get: "/v1/auth/check/telephone"
+    };
+  }
+
+  // UserLogin logs in user with email and password
+  rpc UserLogin(UserLoginRequest) returns (LoginReply) {
+    option (google.api.http) = {
+      post: "/v1/auth/login"
+      body: "*"
+    };
+  }
+
+  // TelephoneLogin logs in user with telephone and password or code
+  rpc TelephoneLogin(TelephoneLoginRequest) returns (LoginReply) {
+    option (google.api.http) = {
+      post: "/v1/auth/login/telephone"
+      body: "*"
+    };
+  }
+
+  // UserRegister registers a new user with email
+  rpc UserRegister(UserRegisterRequest) returns (LoginReply) {
+    option (google.api.http) = {
+      post: "/v1/auth/register"
+      body: "*"
+    };
+  }
+
+  // TelephoneRegister registers a new user with telephone
+  rpc TelephoneRegister(TelephoneRegisterRequest) returns (LoginReply) {
+    option (google.api.http) = {
+      post: "/v1/auth/register/telephone"
+      body: "*"
+    };
+  }
+
+  // ResetPassword resets user password with email
+  rpc ResetPassword(ResetPasswordRequest) returns (LoginReply) {
+    option (google.api.http) = {
+      post: "/v1/auth/reset"
+      body: "*"
+    };
+  }
+
+  // TelephoneResetPassword resets user password with telephone
+  rpc TelephoneResetPassword(TelephoneResetPasswordRequest) returns (LoginReply) {
+    option (google.api.http) = {
+      post: "/v1/auth/reset/telephone"
+      body: "*"
+    };
+  }
+
+  // GenerateCaptcha generates captcha data
+  rpc GenerateCaptcha(google.protobuf.Empty) returns (GenerateCaptchaReply) {
+    option (google.api.http) = {
+      post: "/v1/auth/captcha/generate"
+    };
+  }
+
+  // VerifySliderCaptcha verifies slider captcha
+  rpc VerifySliderCaptcha(VerifySliderCaptchaRequest) returns (VerifySliderCaptchaReply) {
+    option (google.api.http) = {
+      post: "/v1/auth/captcha/slider/verify"
+      body: "*"
+    };
+  }
+
+  // AdminGenerateCaptcha generates admin captcha data
+  rpc AdminGenerateCaptcha(google.protobuf.Empty) returns (GenerateCaptchaReply) {
+    option (google.api.http) = {
+      post: "/v1/auth/admin/captcha/generate"
+    };
+  }
+
+  // AdminVerifySliderCaptcha verifies admin slider captcha
+  rpc AdminVerifySliderCaptcha(VerifySliderCaptchaRequest) returns (VerifySliderCaptchaReply) {
+    option (google.api.http) = {
+      post: "/v1/auth/admin/captcha/slider/verify"
+      body: "*"
+    };
+  }
+
+  // AdminLogin logs in admin with email and password
+  rpc AdminLogin(UserLoginRequest) returns (LoginReply) {
+    option (google.api.http) = {
+      post: "/v1/auth/admin/login"
+      body: "*"
+    };
+  }
+
+  // AdminResetPassword resets admin password with email
+  rpc AdminResetPassword(ResetPasswordRequest) returns (LoginReply) {
+    option (google.api.http) = {
+      post: "/v1/auth/admin/reset"
+      body: "*"
+    };
+  }
+
+  // DeviceLogin logs in user with device identifier
+  rpc DeviceLogin(DeviceLoginRequest) returns (LoginReply) {
+    option (google.api.http) = {
+      post: "/v1/auth/login/device"
+      body: "*"
+    };
+  }
+}
+
+// ============================================================================
+// CheckUser - 检查用户是否存在（邮箱）
+// ============================================================================
+
+// CheckUser request
+message CheckUserRequest {
+  string email = 1;
+}
+
+// CheckUser reply
+message CheckUserReply {
+  bool exist = 1;
+}
+
+// ============================================================================
+// CheckUserTelephone - 检查用户是否存在（手机）
+// ============================================================================
+
+// CheckUserTelephone request
+message CheckUserTelephoneRequest {
+  string telephone = 1;
+  string telephone_area_code = 2;
+}
+
+// CheckUserTelephone reply
+message CheckUserTelephoneReply {
+  bool exist = 1;
+}
+
+// ============================================================================
+// UserLogin - 用户登录（邮箱）
+// ============================================================================
+
+// UserLogin request
+message UserLoginRequest {
+  string email = 1;
+  string password = 2;
+  string cf_token = 3; // Cloudflare turnstile token (optional)
+  string ip = 4;        // X-Original-Forwarded-For header
+  string user_agent = 5; // User-Agent header
+  string identifier = 6;  // Device identifier
+  string login_type = 7;  // Login-Type header fallback
+  string captcha_id = 8;  // Reserved for local captcha compatibility
+  string captcha_code = 9;
+  string slider_token = 10;
+}
+
+// ============================================================================
+// TelephoneLogin - 用户登录（手机）
+// ============================================================================
+
+// TelephoneLogin request
+message TelephoneLoginRequest {
+  string telephone = 1;
+  string telephone_area_code = 2;
+  string password = 3;           // Either password or telephone_code is required
+  string telephone_code = 4;     // Either password or telephone_code is required
+  string cf_token = 5;           // Cloudflare turnstile token (optional)
+  string ip = 6;                 // X-Original-Forwarded-For header
+  string user_agent = 7;         // User-Agent header
+  string identifier = 8;         // Device identifier
+  string login_type = 9;         // Login-Type header fallback
+  string captcha_id = 10;        // Reserved for local captcha compatibility
+  string captcha_code = 11;
+  string slider_token = 12;
+}
+
+// ============================================================================
+// UserRegister - 用户注册（邮箱）
+// ============================================================================
+
+// UserRegister request
+message UserRegisterRequest {
+  string email = 1;
+  string password = 2;
+  string invite = 3;    // Invite code (optional)
+  string code = 4;      // Email verification code (optional, required if email verification enabled)
+  string cf_token = 5;  // Cloudflare turnstile token (optional)
+  string ip = 6;        // X-Original-Forwarded-For header
+  string user_agent = 7; // User-Agent header
+  string identifier = 8;  // Device identifier
+  string login_type = 9;  // Login-Type header fallback
+  string captcha_id = 10; // Reserved for local captcha compatibility
+  string captcha_code = 11;
+  string slider_token = 12;
+}
+
+// ============================================================================
+// TelephoneRegister - 用户注册（手机）
+// ============================================================================
+
+// TelephoneRegister request
+message TelephoneRegisterRequest {
+  string telephone = 1;
+  string telephone_area_code = 2;
+  string password = 3;
+  string invite = 4;    // Invite code (optional)
+  string code = 5;      // SMS verification code (required)
+  string cf_token = 6;  // Cloudflare turnstile token (optional)
+  string ip = 7;        // X-Original-Forwarded-For header
+  string user_agent = 8; // User-Agent header
+  string identifier = 9;   // Device identifier
+  string login_type = 10;  // Login-Type header fallback
+  string captcha_id = 11;  // Reserved for local captcha compatibility
+  string captcha_code = 12;
+  string slider_token = 13;
+}
+
+// ============================================================================
+// ResetPassword - 重置密码（邮箱）
+// ============================================================================
+
+// ResetPassword request
+message ResetPasswordRequest {
+  string email = 1;
+  string password = 2;
+  string code = 3;      // Email verification code (required)
+  string cf_token = 4;  // Cloudflare turnstile token (optional)
+  string ip = 5;        // X-Original-Forwarded-For header
+  string user_agent = 6; // User-Agent header
+  string identifier = 7;  // Device identifier
+  string login_type = 8;  // Login-Type header fallback
+  string captcha_id = 9;  // Reserved for local captcha compatibility
+  string captcha_code = 10;
+  string slider_token = 11;
+}
+
+// ============================================================================
+// TelephoneResetPassword - 重置密码（手机）
+// ============================================================================
+
+// TelephoneResetPassword request
+message TelephoneResetPasswordRequest {
+  string telephone = 1;
+  string telephone_area_code = 2;
+  string password = 3;
+  string code = 4;      // SMS verification code (required)
+  string cf_token = 5;  // Cloudflare turnstile token (optional)
+  string ip = 6;        // X-Original-Forwarded-For header
+  string user_agent = 7; // User-Agent header
+  string identifier = 8;  // Device identifier
+  string login_type = 9;  // Login-Type header fallback
+  string captcha_id = 10; // Reserved for local captcha compatibility
+  string captcha_code = 11;
+  string slider_token = 12;
+}
+
+// ============================================================================
+// 通用响应格式
+// ============================================================================
+
+// LoginReply 登录响应
+message LoginReply {
+  string token = 1;
+}
+
+message GenerateCaptchaReply {
+  string type = 1;
+  string id = 2;
+  string image = 3;
+  string block_image = 4;
+}
+
+message VerifySliderCaptchaRequest {
+  string id = 1;
+  int32 x = 2;
+  int32 y = 3;
+  string trail = 4;
+}
+
+message VerifySliderCaptchaReply {
+  string token = 1;
+}
+
+message DeviceLoginRequest {
+  string identifier = 1;
+  string ip = 2;
+  string user_agent = 3;
+  string cf_token = 4;
+  string short_code = 5;
+}

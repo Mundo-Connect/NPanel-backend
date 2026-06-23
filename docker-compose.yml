@@ -1,0 +1,55 @@
+services:
+  mysql:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: npanel_root_password
+      MYSQL_DATABASE: npanel
+      MYSQL_USER: npanel
+      MYSQL_PASSWORD: npanel_password
+      TZ: UTC
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - npanel_mysql:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-unpanel", "-pnpanel_password"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    volumes:
+      - npanel_redis:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+
+  npanel:
+    build:
+      context: .
+      args:
+        VERSION: ${NPANEL_VERSION:-v1.0.7}
+    image: npanel:latest
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "${NPANEL_HTTP_PORT:-8081}:8081"
+      - "${NPANEL_GRPC_PORT:-9012}:9012"
+    volumes:
+      - ./configs/config.docker.yaml:/data/conf/config.yaml:ro
+      - npanel_logs:/app/logs
+
+volumes:
+  npanel_mysql:
+  npanel_redis:
+  npanel_logs:

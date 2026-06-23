@@ -1,0 +1,102 @@
+syntax = "proto3";
+
+package api.admin.user.v1;
+
+option go_package = "github.com/npanel-dev/NPanel-backend/api/admin/user/v1;v1";
+
+import "google/api/annotations.proto";
+
+// UserDeviceService 用户设备管理服务
+service UserDeviceService {
+  // UpdateUserDevice 更新用户设备
+  rpc UpdateUserDevice(UpdateUserDeviceRequest) returns (UpdateUserDeviceReply) {
+    option (google.api.http) = {
+      put: "/v1/admin/user/device"
+      body: "*"
+    };
+  }
+
+  // DeleteUserDevice 删除用户设备
+  rpc DeleteUserDevice(DeleteUserDeviceRequest) returns (DeleteUserDeviceReply) {
+    option (google.api.http) = {
+      delete: "/v1/admin/user/device"
+    };
+  }
+
+  // KickOfflineByUserDevice 踢下线用户设备
+  rpc KickOfflineByUserDevice(KickOfflineByUserDeviceRequest) returns (KickOfflineByUserDeviceReply) {
+    option (google.api.http) = {
+      put: "/v1/admin/user/device/kick_offline"
+      body: "*"
+    };
+  }
+}
+
+// ===== UpdateUserDevice =====
+
+message UpdateUserDeviceRequest {
+  int64 id = 1;           // 设备ID
+  string ip = 2;
+  string identifier = 3; // 设备标识符
+  string user_agent = 4;
+  bool online = 5;       // 是否在线
+  bool enabled = 6;      // 是否启用
+  int64 created_at = 7;  // Unix timestamp in seconds
+  int64 updated_at = 8;  // Unix timestamp in seconds
+}
+
+message UpdateUserDeviceData {
+  bool success = 1;
+}
+
+message UpdateUserDeviceReply {
+  int32 code = 1;
+  string message = 2;
+  UpdateUserDeviceData data = 3;
+}
+
+// ===== DeleteUserDevice =====
+
+message DeleteUserDeviceRequest {
+  int64 id = 1;   // 设备ID
+}
+
+message DeleteUserDeviceData {
+  bool success = 1;
+}
+
+message DeleteUserDeviceReply {
+  int32 code = 1;
+  string message = 2;
+  DeleteUserDeviceData data = 3;
+}
+
+// ===== KickOfflineByUserDevice =====
+
+message KickOfflineByUserDeviceRequest {
+  int64 id = 1;   // 设备ID
+}
+
+message KickOfflineByUserDeviceData {
+  bool success = 1;
+}
+
+message KickOfflineByUserDeviceReply {
+  int32 code = 1;
+  string message = 2;
+  KickOfflineByUserDeviceData data = 3;
+}
+
+// ===== Common Messages =====
+
+// UserDevice 用户设备
+message UserDevice {
+  int64 id = 1;
+  string ip = 2;
+  string identifier = 3; // 设备标识符
+  string user_agent = 4;
+  bool online = 5;       // 是否在线
+  bool enabled = 6;      // 是否启用
+  int64 created_at = 7;  // Unix timestamp in seconds
+  int64 updated_at = 8;  // Unix timestamp in seconds
+}

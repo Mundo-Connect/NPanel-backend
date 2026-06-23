@@ -1,0 +1,123 @@
+server:
+  http:
+    addr: 0.0.0.0:8081
+    timeout: 55s
+  grpc:
+    addr: 0.0.0.0:9012
+    timeout: 55s
+  auth:
+    enable_jwt: true
+    jwt_secret: "your-secret-key-change-in-production"
+    no_auth_paths:
+      - "/api.public.auth.v1."
+      - "/api.public.common.v1."
+      - "/api/public/auth/"
+      - "/api/public/common/"
+      - "/api.server."
+  cors:
+    enable: true
+    allowed_origins:
+      - "*"
+    allowed_methods:
+      - "GET"
+      - "POST"
+      - "PUT"
+      - "DELETE"
+      - "OPTIONS"
+    allowed_headers:
+      - "*"
+    exposed_headers:
+      - "Content-Length"
+      - "Authorization"
+    allow_credentials: true
+    max_age: 86400
+
+log:
+  level: info
+  # 输出格式配置：
+  # - json: 结构化 JSON，适合采集到 Loki / ELK / Datadog 等日志系统
+  # - console: 人类可读文本
+  # - text / plain / pretty: console 的别名，效果等同于 console
+  format: json
+  # 是否关闭标准输出；false=同时输出到控制台，true=仅写文件
+  disable_console: false
+  # 日志输出路径：
+  # - 写目录，如 logs，会输出到 logs/npanel.debug.log / info / warn / error
+  # - 写文件，如 logs/npanel.log，会直接拆分成 logs/npanel.debug.log / info / warn / error
+  path: logs
+  # 单个日志文件最大体积（MB），超过后轮转
+  max_size_mb: 100
+  # 最多保留多少个历史日志文件
+  max_backups: 30
+  # 历史日志最多保留多少天
+  max_age_days: 7
+  # 是否压缩历史日志文件为 .gz
+  compress: true
+
+data:
+  database:
+    driver: mysql
+    source: np_demo:mnaRFTSWn675jk3Y@tcp(118.193.38.119:3306)/np_demo?parseTime=True&loc=Local
+  redis:
+    addr: 127.0.0.1:6379
+    password: 
+    read_timeout: 0.2s
+    write_timeout: 0.2s
+    db: 0
+    pool_size: 10
+    min_idle_conns: 5
+
+app:
+  site:
+    host: "localhost:8088"
+    site_name: "NPanel"
+    site_desc: "Professional Panel Management System"
+    site_logo: "/assets/logo.png"
+    keywords: "panel,management,npanel"
+    custom_html: ""
+    custom_data: ""
+
+  verify:
+    turnstile_site_key: ""
+    enable_login_verify: false
+    enable_register_verify: false
+    enable_reset_password_verify: false
+
+  mobile:
+    enable: false
+    enable_whitelist: false
+    whitelist: []
+
+  email:
+    enable: false
+    enable_verify: false
+    enable_domain_suffix: false
+    domain_suffix_list: ""
+
+  register:
+    stop_register: false
+    enable_ip_register_limit: false
+    ip_register_limit: 5
+    ip_register_limit_duration: 3600
+    enable_trial: false
+    trial_subscribe: 7
+    trial_time_unit: "day"
+    trial_time: 7
+
+  invite:
+    forced_invite: false
+    referral_percentage: 10
+    only_first_purchase: true
+
+  subscribe:
+    single_model: false
+    subscribe_path: "/subscribe"
+    subscribe_domain: ""
+    pan_domain: false
+    user_agent_limit: false
+    user_agent_list: ""
+
+  admin:
+    email: "next@npanel.dev"
+    password: "123456"
+    algo: "default"

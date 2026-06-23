@@ -1,0 +1,141 @@
+syntax = "proto3";
+
+package api.public.subscribe.v1;
+
+option go_package = "github.com/npanel-dev/NPanel-backend/api/public/subscribe/v1;v1";
+
+import "google/api/annotations.proto";
+
+service PublicSubscribe {
+  rpc QuerySubscribeList(QuerySubscribeListRequest) returns (QuerySubscribeListReply) {
+    option (google.api.http) = {
+      get: "/v1/public/subscribe/list"
+    };
+  }
+
+  rpc QueryUserSubscribeNodeList(QueryUserSubscribeNodeListRequest) returns (QueryUserSubscribeNodeListReply) {
+    option (google.api.http) = {
+      get: "/v1/public/subscribe/node/list"
+    };
+  }
+}
+
+message QuerySubscribeListRequest {
+  string language = 1;
+}
+
+message QuerySubscribeListReply {
+  repeated Subscribe list = 1;
+  int32 total = 2;
+}
+
+message Subscribe {
+  int64 id = 1;
+  string name = 2;
+  string language = 3;
+  string description = 4;
+  int64 unit_price = 5;
+  string unit_time = 6;
+  repeated SubscribeDiscount discount = 7;
+  int64 replacement = 8;
+  int32 inventory = 9;
+  int64 traffic = 10;
+  int32 speed_limit = 11;
+  int32 device_limit = 12;
+  int32 quota = 13;
+  repeated int64 nodes = 14;
+  repeated string node_tags = 15;
+  repeated int64 node_group_ids = 16;
+  int64 node_group_id = 17;
+  repeated TrafficLimit traffic_limit = 18;
+  bool show = 19;
+  bool sell = 20;
+  int32 sort = 21;
+  int32 deduction_ratio = 22;
+  bool allow_deduction = 23;
+  int32 reset_cycle = 24;
+  bool renewal_reset = 25;
+  bool show_original_price = 26;
+  int64 created_at = 27;
+  int64 updated_at = 28;
+}
+
+message SubscribeDiscount {
+  int64 quantity = 1;
+  double discount = 2;
+}
+
+message TrafficLimit {
+  string stat_type = 1;
+  int64 stat_value = 2;
+  int64 traffic_usage = 3;
+  int32 speed_limit = 4;
+}
+
+message QueryUserSubscribeNodeListRequest {}
+
+message QueryUserSubscribeNodeListReply {
+  repeated UserSubscribeInfo list = 1;
+}
+
+message UserSubscribeInfo {
+  int64 id = 1;
+  int64 user_id = 2;
+  int64 order_id = 3;
+  int64 subscribe_id = 4;
+  int64 start_time = 5;
+  int64 expire_time = 6;
+  int64 finished_at = 7;
+  int64 reset_time = 8;
+  int64 traffic = 9;
+  int64 download = 10;
+  int64 upload = 11;
+  string token = 12;
+  uint32 status = 13;
+  int64 created_at = 14;
+  int64 updated_at = 15;
+  bool is_try_out = 16;
+  repeated UserSubscribeNodeInfo nodes = 17;
+}
+
+message UserSubscribeNodeInfo {
+  int64 id = 1;
+  string name = 2;
+  string uuid = 3;
+  string protocol = 4;
+  string protocols = 5;
+  uint32 port = 6;
+  string address = 7;
+  repeated string tags = 8;
+  string country = 9;
+  string city = 10;
+  string longitude = 11;
+  string latitude = 12;
+  string latitude_center = 13;
+  string longitude_center = 14;
+  int64 created_at = 15;
+  string sni = 16;
+
+  // OmniFlow 基础配置
+  string omniflow_carrier = 73;
+  string omniflow_path = 74;
+  string omniflow_content_type = 75;
+  string omniflow_profile_json = 77;
+  string omniflow_ca_cert_path = 80;
+  string omniflow_target_meta = 81;
+  string omniflow_spki_pin = 82;
+
+  // OmniFlow 抗指纹
+  bool omniflow_adaptive_tls_enabled = 93;
+  string omniflow_tls_fingerprint = 94;
+  string omniflow_sni_mode = 95;
+  string omniflow_padding_mode = 96;
+
+  // OmniFlow 随机 AF path
+  bool omniflow_af_enabled = 101;
+  string omniflow_af_path_mode = 102;
+  string omniflow_af_path_prefix = 103;
+  string omniflow_af_path_suffix = 104;
+  int32 omniflow_af_path_rotation_secs = 105;
+  int32 omniflow_af_path_skew_slots = 106;
+}

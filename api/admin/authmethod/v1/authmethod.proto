@@ -1,0 +1,137 @@
+syntax = "proto3";
+
+package api.admin.authmethod.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/struct.proto";
+import "google/protobuf/wrappers.proto";
+import "validate/validate.proto";
+
+option go_package = "github.com/npanel-dev/NPanel-backend/api/admin/authmethod/v1;v1";
+
+// 认证方法服务
+service AuthMethodService {
+  // 获取认证方法配置
+  rpc GetAuthMethodConfig(GetAuthMethodConfigRequest) returns (AuthMethodConfigReply) {
+    option (google.api.http) = {
+      get: "/v1/admin/auth-method/config"
+    };
+  }
+
+  // 更新认证方法配置
+  rpc UpdateAuthMethodConfig(UpdateAuthMethodConfigRequest) returns (AuthMethodConfigReply) {
+    option (google.api.http) = {
+      put: "/v1/admin/auth-method/config"
+      body: "*"
+    };
+  }
+
+  // 获取邮件支持平台列表
+  rpc GetEmailPlatform(GetEmailPlatformRequest) returns (PlatformListReply) {
+    option (google.api.http) = {
+      get: "/v1/admin/auth-method/email_platform"
+    };
+  }
+
+  // 获取短信支持平台列表
+  rpc GetSmsPlatform(GetSmsPlatformRequest) returns (PlatformListReply) {
+    option (google.api.http) = {
+      get: "/v1/admin/auth-method/sms_platform"
+    };
+  }
+
+  // 获取认证方法列表
+  rpc GetAuthMethodList(GetAuthMethodListRequest) returns (AuthMethodListReply) {
+    option (google.api.http) = {
+      get: "/v1/admin/auth-method/list"
+    };
+  }
+
+  // 测试邮件发送
+  rpc TestEmailSend(TestEmailSendRequest) returns (ActionReply) {
+    option (google.api.http) = {
+      post: "/v1/admin/auth-method/test_email_send"
+      body: "*"
+    };
+  }
+
+  // 测试短信发送
+  rpc TestSmsSend(TestSmsSendRequest) returns (ActionReply) {
+    option (google.api.http) = {
+      post: "/v1/admin/auth-method/test_sms_send"
+      body: "*"
+    };
+  }
+}
+
+message Platform {
+  string platform = 1;
+  string platform_url = 2;
+  map<string, string> platform_field_description = 3;
+}
+
+message AuthMethodConfig {
+  int64 id = 1;
+  string method = 2;
+  google.protobuf.Struct config = 3;
+  bool enabled = 4;
+}
+
+message GetAuthMethodConfigRequest {
+  string method = 1 [(validate.rules).string.min_len = 1];
+}
+
+message UpdateAuthMethodConfigRequest {
+  int64 id = 1;
+  string method = 2 [(validate.rules).string.min_len = 1];
+  google.protobuf.Struct config = 3;
+  google.protobuf.BoolValue enabled = 4;
+}
+
+message GetEmailPlatformRequest {}
+message GetSmsPlatformRequest {}
+message GetAuthMethodListRequest {}
+
+message TestEmailSendRequest {
+  string email = 1 [(validate.rules).string.email = true];
+}
+
+message TestSmsSendRequest {
+  string area_code = 1 [(validate.rules).string.min_len = 1];
+  string telephone = 2 [(validate.rules).string.min_len = 1];
+}
+
+message AuthMethodConfigData {
+  AuthMethodConfig config = 1;
+}
+
+message AuthMethodConfigReply {
+  int32 code = 1;
+  string message = 2;
+  AuthMethodConfigData data = 3;
+}
+
+message PlatformListData {
+  repeated Platform list = 1;
+}
+
+message PlatformListReply {
+  int32 code = 1;
+  string msg = 2;
+  PlatformListData data = 3;
+}
+
+message AuthMethodListData {
+  repeated AuthMethodConfig list = 1;
+}
+
+message AuthMethodListReply {
+  int32 code = 1;
+  string message = 2;
+  AuthMethodListData data = 3;
+}
+
+message ActionReply {
+  int32 code = 1;
+  string msg = 2;
+}

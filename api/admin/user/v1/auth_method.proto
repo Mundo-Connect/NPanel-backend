@@ -1,0 +1,118 @@
+syntax = "proto3";
+
+package api.admin.user.v1;
+
+option go_package = "github.com/npanel-dev/NPanel-backend/api/admin/user/v1;v1";
+
+import "google/api/annotations.proto";
+
+// UserAuthMethodService 用户认证方法管理服务
+service UserAuthMethodService {
+  // CreateUserAuthMethod 创建用户认证方法
+  rpc CreateUserAuthMethod(CreateUserAuthMethodRequest) returns (CreateUserAuthMethodReply) {
+    option (google.api.http) = {
+      post: "/v1/admin/user/auth_method"
+      body: "*"
+    };
+  }
+
+  // UpdateUserAuthMethod 更新用户认证方法
+  rpc UpdateUserAuthMethod(UpdateUserAuthMethodRequest) returns (UpdateUserAuthMethodReply) {
+    option (google.api.http) = {
+      put: "/v1/admin/user/auth_method"
+      body: "*"
+    };
+  }
+
+  // DeleteUserAuthMethod 删除用户认证方法
+  rpc DeleteUserAuthMethod(DeleteUserAuthMethodRequest) returns (DeleteUserAuthMethodReply) {
+    option (google.api.http) = {
+      delete: "/v1/admin/user/auth_method"
+    };
+  }
+
+  // GetUserAuthMethod 获取用户认证方法
+  rpc GetUserAuthMethod(GetUserAuthMethodRequest) returns (GetUserAuthMethodReply) {
+    option (google.api.http) = {
+      get: "/v1/admin/user/auth_method"
+    };
+  }
+}
+
+// ===== CreateUserAuthMethod =====
+
+message CreateUserAuthMethodRequest {
+  int64 user_id = 1;
+  string auth_type = 2;        // apple, google, github, facebook, telegram, email, mobile
+  string auth_identifier = 3;  // 认证标识（邮箱、手机号、OpenID等）
+}
+
+message CreateUserAuthMethodData {
+  bool success = 1;
+}
+
+message CreateUserAuthMethodReply {
+  int32 code = 1;
+  string message = 2;
+  CreateUserAuthMethodData data = 3;
+}
+
+// ===== UpdateUserAuthMethod =====
+
+message UpdateUserAuthMethodRequest {
+  int64 user_id = 1;           // 用户ID
+  string auth_type = 2;        // 认证类型
+  string auth_identifier = 3;  // 认证标识
+}
+
+message UpdateUserAuthMethodData {
+  bool success = 1;
+}
+
+message UpdateUserAuthMethodReply {
+  int32 code = 1;
+  string message = 2;
+  UpdateUserAuthMethodData data = 3;
+}
+
+// ===== DeleteUserAuthMethod =====
+
+message DeleteUserAuthMethodRequest {
+  int64 user_id = 1;   // 用户ID
+  string auth_type = 2; // 认证类型
+}
+
+message DeleteUserAuthMethodData {
+  bool success = 1;
+}
+
+message DeleteUserAuthMethodReply {
+  int32 code = 1;
+  string message = 2;
+  DeleteUserAuthMethodData data = 3;
+}
+
+// ===== GetUserAuthMethod =====
+
+message GetUserAuthMethodRequest {
+  int64 user_id = 1;  // 用户ID
+}
+
+message GetUserAuthMethodData {
+  repeated UserAuthMethod auth_methods = 1;
+}
+
+message GetUserAuthMethodReply {
+  int32 code = 1;
+  string message = 2;
+  GetUserAuthMethodData data = 3;
+}
+
+// ===== Common Messages =====
+
+// UserAuthMethod 用户认证方法
+message UserAuthMethod {
+  string auth_type = 1;        // apple, google, github, facebook, telegram, email, mobile
+  string auth_identifier = 2;  // 认证标识
+  bool verified = 3;           // 是否已验证
+}

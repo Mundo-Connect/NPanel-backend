@@ -1,0 +1,200 @@
+syntax = "proto3";
+
+package api.admin.redemption.v1;
+
+import "google/api/annotations.proto";
+import "validate/validate.proto";
+
+option go_package = "github.com/npanel-dev/NPanel-backend/api/admin/redemption/v1;v1";
+option java_multiple_files = true;
+option java_package = "api.admin.redemption.v1";
+
+service Redemption {
+  rpc CreateRedemptionCode(CreateRedemptionCodeRequest) returns (CreateRedemptionCodeReply) {
+    option (google.api.http) = {
+      post: "/v1/admin/redemption/code"
+      body: "*"
+    };
+  }
+
+  rpc UpdateRedemptionCode(UpdateRedemptionCodeRequest) returns (UpdateRedemptionCodeReply) {
+    option (google.api.http) = {
+      put: "/v1/admin/redemption/code"
+      body: "*"
+    };
+  }
+
+  rpc ToggleRedemptionCodeStatus(ToggleRedemptionCodeStatusRequest) returns (ToggleRedemptionCodeStatusReply) {
+    option (google.api.http) = {
+      put: "/v1/admin/redemption/code/status"
+      body: "*"
+    };
+  }
+
+  rpc DeleteRedemptionCode(DeleteRedemptionCodeRequest) returns (DeleteRedemptionCodeReply) {
+    option (google.api.http) = {
+      delete: "/v1/admin/redemption/code"
+      body: "*"
+    };
+  }
+
+  rpc BatchDeleteRedemptionCode(BatchDeleteRedemptionCodeRequest) returns (BatchDeleteRedemptionCodeReply) {
+    option (google.api.http) = {
+      delete: "/v1/admin/redemption/code/batch"
+      body: "*"
+    };
+  }
+
+  rpc GetRedemptionCodeList(GetRedemptionCodeListRequest) returns (GetRedemptionCodeListReply) {
+    option (google.api.http) = {
+      get: "/v1/admin/redemption/code/list"
+    };
+  }
+
+  rpc GetRedemptionRecordList(GetRedemptionRecordListRequest) returns (GetRedemptionRecordListReply) {
+    option (google.api.http) = {
+      get: "/v1/admin/redemption/record/list"
+    };
+  }
+}
+
+message RedemptionCode {
+  int64 id = 1;
+  string code = 2;
+  int32 total_count = 3;
+  int32 used_count = 4;
+  int64 subscribe_plan = 5;
+  string unit_time = 6;
+  int32 quantity = 7;
+  int32 status = 8;
+  int64 created_at = 9;
+  int64 updated_at = 10;
+}
+
+message RedemptionRecord {
+  int64 id = 1;
+  int64 redemption_code_id = 2;
+  int64 user_id = 3;
+  int64 subscribe_id = 4;
+  string unit_time = 5;
+  int32 quantity = 6;
+  int64 redeemed_at = 7;
+  int64 created_at = 8;
+}
+
+message CreateRedemptionCodeRequest {
+  int64 total_count = 1 [(validate.rules).int64.gt = 0];
+  int64 subscribe_plan = 2 [(validate.rules).int64.gt = 0];
+  string unit_time = 3 [(validate.rules).string = {min_len: 1, in: ["day", "month", "quarter", "half_year", "year"]}];
+  int32 quantity = 4 [(validate.rules).int32.gt = 0];
+  int64 batch_count = 5 [(validate.rules).int64.gt = 0];
+}
+
+message CreateRedemptionCodeData {
+  int64 created_count = 1;
+}
+
+message CreateRedemptionCodeReply {
+  int32 code = 1;
+  string message = 2;
+  CreateRedemptionCodeData data = 3;
+}
+
+message UpdateRedemptionCodeRequest {
+  int64 id = 1 [(validate.rules).int64.gt = 0];
+  int64 total_count = 2;
+  int64 subscribe_plan = 3;
+  string unit_time = 4 [(validate.rules).string = {ignore_empty: true, in: ["day", "month", "quarter", "half_year", "year"]}];
+  int32 quantity = 5;
+  optional int32 status = 6;
+}
+
+message UpdateRedemptionCodeData {
+  bool success = 1;
+}
+
+message UpdateRedemptionCodeReply {
+  int32 code = 1;
+  string message = 2;
+  UpdateRedemptionCodeData data = 3;
+}
+
+message ToggleRedemptionCodeStatusRequest {
+  int64 id = 1 [(validate.rules).int64.gt = 0];
+  int32 status = 2 [(validate.rules).int32 = {in: [0, 1]}];
+}
+
+message ToggleRedemptionCodeStatusData {
+  bool success = 1;
+}
+
+message ToggleRedemptionCodeStatusReply {
+  int32 code = 1;
+  string message = 2;
+  ToggleRedemptionCodeStatusData data = 3;
+}
+
+message DeleteRedemptionCodeRequest {
+  int64 id = 1 [(validate.rules).int64.gt = 0];
+}
+
+message DeleteRedemptionCodeData {
+  bool success = 1;
+}
+
+message DeleteRedemptionCodeReply {
+  int32 code = 1;
+  string message = 2;
+  DeleteRedemptionCodeData data = 3;
+}
+
+message BatchDeleteRedemptionCodeRequest {
+  repeated int64 ids = 1;
+}
+
+message BatchDeleteRedemptionCodeData {
+  bool success = 1;
+}
+
+message BatchDeleteRedemptionCodeReply {
+  int32 code = 1;
+  string message = 2;
+  BatchDeleteRedemptionCodeData data = 3;
+}
+
+message GetRedemptionCodeListRequest {
+  int64 page = 1 [(validate.rules).int64.gt = 0];
+  int64 size = 2 [(validate.rules).int64.gt = 0];
+  int64 subscribe_plan = 3;
+  string unit_time = 4;
+  string code = 5;
+}
+
+message GetRedemptionCodeListData {
+  int32 total = 1;
+  repeated RedemptionCode list = 2;
+}
+
+message GetRedemptionCodeListReply {
+  int32 code = 1;
+  string message = 2;
+  GetRedemptionCodeListData data = 3;
+}
+
+message GetRedemptionRecordListRequest {
+  int64 page = 1 [(validate.rules).int64.gt = 0];
+  int64 size = 2 [(validate.rules).int64.gt = 0];
+  int64 user_id = 3;
+  int64 code_id = 4;
+}
+
+message GetRedemptionRecordListData {
+  int32 total = 1;
+  repeated RedemptionRecord list = 2;
+}
+
+message GetRedemptionRecordListReply {
+  int32 code = 1;
+  string message = 2;
+  GetRedemptionRecordListData data = 3;
+}

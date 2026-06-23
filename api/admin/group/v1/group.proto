@@ -1,0 +1,519 @@
+syntax = "proto3";
+
+package api.admin.group.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/wrappers.proto";
+
+option go_package = "github.com/npanel-dev/NPanel-backend/api/admin/group/v1;v1";
+option java_multiple_files = true;
+option java_package = "api.admin.group.v1";
+
+service Group {
+  // ===== 节点组管理 =====
+  // GetNodeGroupList 获取节点组列表
+  rpc GetNodeGroupList (GetNodeGroupListRequest) returns (GetNodeGroupListReply) {
+    option (google.api.http) = {
+      get: "/v1/admin/group/node/list"
+    };
+  }
+
+  // CreateNodeGroup 创建节点组
+  rpc CreateNodeGroup (CreateNodeGroupRequest) returns (CreateNodeGroupReply) {
+    option (google.api.http) = {
+      post: "/v1/admin/group/node"
+      body: "*"
+    };
+  }
+
+  // UpdateNodeGroup 更新节点组
+  rpc UpdateNodeGroup (UpdateNodeGroupRequest) returns (UpdateNodeGroupReply) {
+    option (google.api.http) = {
+      put: "/v1/admin/group/node"
+      body: "*"
+    };
+  }
+
+  // DeleteNodeGroup 删除节点组
+  rpc DeleteNodeGroup (DeleteNodeGroupRequest) returns (DeleteNodeGroupReply) {
+    option (google.api.http) = {
+      delete: "/v1/admin/group/node"
+      body: "*"
+    };
+  }
+
+  // ===== 分组配置管理 =====
+  // GetGroupConfig 获取分组配置
+  rpc GetGroupConfig (GetGroupConfigRequest) returns (GetGroupConfigReply) {
+    option (google.api.http) = {
+      get: "/v1/admin/group/config"
+    };
+  }
+
+  // UpdateGroupConfig 更新分组配置
+  rpc UpdateGroupConfig (UpdateGroupConfigRequest) returns (UpdateGroupConfigReply) {
+    option (google.api.http) = {
+      put: "/v1/admin/group/config"
+      body: "*"
+    };
+  }
+
+  // ===== 分组操作 =====
+  // RecalculateGroup 重新计算分组
+  rpc RecalculateGroup (RecalculateGroupRequest) returns (RecalculateGroupReply) {
+    option (google.api.http) = {
+      post: "/v1/admin/group/recalculate"
+      body: "*"
+    };
+  }
+
+  // GetRecalculationStatus 获取重新计算状态
+  rpc GetRecalculationStatus (GetRecalculationStatusRequest) returns (GetRecalculationStatusReply) {
+    option (google.api.http) = {
+      get: "/v1/admin/group/recalculation/status"
+    };
+  }
+
+  // GetGroupHistory 获取分组历史
+  rpc GetGroupHistory (GetGroupHistoryRequest) returns (GetGroupHistoryReply) {
+    option (google.api.http) = {
+      get: "/v1/admin/group/history"
+    };
+  }
+
+  // GetGroupHistoryDetail 获取分组历史详情
+  rpc GetGroupHistoryDetail (GetGroupHistoryDetailRequest) returns (GetGroupHistoryDetailReply) {
+    option (google.api.http) = {
+      get: "/v1/admin/group/history/detail"
+    };
+  }
+
+  // ExportGroupResult 导出分组结果
+  rpc ExportGroupResult (ExportGroupResultRequest) returns (ExportGroupResultReply) {
+    option (google.api.http) = {
+      get: "/v1/admin/group/export"
+    };
+  }
+
+  // MigrateUsers 迁移用户到另一个分组
+  rpc MigrateUsers (MigrateUsersRequest) returns (MigrateUsersReply) {
+    option (google.api.http) = {
+      post: "/v1/admin/group/migrate"
+      body: "*"
+    };
+  }
+
+  // PreviewUserNodes 预览用户节点
+  rpc PreviewUserNodes (PreviewUserNodesRequest) returns (PreviewUserNodesReply) {
+    option (google.api.http) = {
+      get: "/v1/admin/group/preview"
+    };
+  }
+
+  // ResetGroups 重置所有分组
+  rpc ResetGroups (ResetGroupsRequest) returns (ResetGroupsReply) {
+    option (google.api.http) = {
+      post: "/v1/admin/group/reset"
+      body: "*"
+    };
+  }
+
+  // GetSubscribeGroupMapping 获取订阅组映射
+  rpc GetSubscribeGroupMapping (GetSubscribeGroupMappingRequest) returns (GetSubscribeGroupMappingReply) {
+    option (google.api.http) = {
+      get: "/v1/admin/group/subscribe/mapping"
+    };
+  }
+}
+
+// ==================== Messages ====================
+
+// ===== 节点组 =====
+
+// NodeGroup 节点组信息
+message NodeGroup {
+  int64 id = 1;                     // 节点组ID
+  string name = 2;                  // 节点组名称
+  string type = 3;                  // 节点组类型
+  string description = 4;           // 节点组描述
+  int32 sort = 5;                   // 排序
+  bool for_calculation = 6;         // 是否参与分组计算
+  bool is_expired_group = 7;        // 是否为过期组
+  int32 expired_days_limit = 8;     // 过期天数限制
+  int64 max_traffic_gb_expired = 9; // 过期后最大流量（GB）
+  int32 speed_limit = 10;           // 速度限制
+  int64 min_traffic_gb = 11;        // 最小流量（GB）
+  int64 max_traffic_gb = 12;        // 最大流量（GB）
+  int64 node_count = 13;            // 节点数量
+  int64 created_at = 14;            // 创建时间
+  int64 updated_at = 15;            // 更新时间
+}
+
+// ===== 节点组管理请求和响应 =====
+
+// GetNodeGroupListRequest 获取节点组列表请求
+message GetNodeGroupListRequest {
+  int64 page = 1;     // 页码
+  int64 size = 2;     // 每页数量
+  int64 group_id = 3; // 分组ID过滤（可选）
+}
+
+// GetNodeGroupListData 获取节点组列表数据
+message GetNodeGroupListData {
+  int32 total = 1;              // 总数
+  repeated NodeGroup list = 2;  // 节点组列表
+}
+
+// GetNodeGroupListReply 获取节点组列表响应
+message GetNodeGroupListReply {
+  int32 code = 1;                      // 状态码
+  string message = 2;                  // 消息内容
+  GetNodeGroupListData data = 3;       // 响应数据
+}
+
+// CreateNodeGroupRequest 创建节点组请求
+message CreateNodeGroupRequest {
+  string name = 1;                   // 节点组名称
+  string type = 2;                   // 节点组类型
+  string description = 3;            // 节点组描述
+  int32 sort = 4;                    // 排序
+  google.protobuf.BoolValue for_calculation = 5;          // 是否参与分组计算
+  google.protobuf.BoolValue is_expired_group = 6;         // 是否为过期组
+  google.protobuf.Int32Value expired_days_limit = 7;      // 过期天数限制
+  google.protobuf.Int64Value max_traffic_gb_expired = 8;  // 过期后最大流量（GB）
+  google.protobuf.Int32Value speed_limit = 9;             // 速度限制
+  google.protobuf.Int64Value min_traffic_gb = 10;         // 最小流量（GB）
+  google.protobuf.Int64Value max_traffic_gb = 11;         // 最大流量（GB）
+}
+
+// CreateNodeGroupData 创建节点组数据
+message CreateNodeGroupData {
+  int64 id = 1; // 创建的节点组ID
+}
+
+// CreateNodeGroupReply 创建节点组响应
+message CreateNodeGroupReply {
+  int32 code = 1;                      // 状态码
+  string message = 2;                  // 消息内容
+  CreateNodeGroupData data = 3;         // 响应数据
+}
+
+// UpdateNodeGroupRequest 更新节点组请求
+message UpdateNodeGroupRequest {
+  int64 id = 1;                       // 节点组ID
+  string name = 2;                    // 节点组名称
+  string type = 3;                    // 节点组类型
+  string description = 4;             // 节点组描述
+  int32 sort = 5;                     // 排序
+  google.protobuf.BoolValue for_calculation = 6;          // 是否参与分组计算
+  google.protobuf.BoolValue is_expired_group = 7;         // 是否为过期组
+  google.protobuf.Int32Value expired_days_limit = 8;      // 过期天数限制
+  google.protobuf.Int64Value max_traffic_gb_expired = 9;  // 过期后最大流量（GB）
+  google.protobuf.Int32Value speed_limit = 10;            // 速度限制
+  google.protobuf.Int64Value min_traffic_gb = 11;         // 最小流量（GB）
+  google.protobuf.Int64Value max_traffic_gb = 12;         // 最大流量（GB）
+}
+
+// UpdateNodeGroupData 更新节点组数据
+message UpdateNodeGroupData {
+  bool success = 1; // 是否成功
+}
+
+// UpdateNodeGroupReply 更新节点组响应
+message UpdateNodeGroupReply {
+  int32 code = 1;                      // 状态码
+  string message = 2;                  // 消息内容
+  UpdateNodeGroupData data = 3;         // 响应数据
+}
+
+// DeleteNodeGroupRequest 删除节点组请求
+message DeleteNodeGroupRequest {
+  int64 id = 1; // 节点组ID
+}
+
+// DeleteNodeGroupData 删除节点组数据
+message DeleteNodeGroupData {
+  bool success = 1; // 是否成功
+}
+
+// DeleteNodeGroupReply 删除节点组响应
+message DeleteNodeGroupReply {
+  int32 code = 1;                      // 状态码
+  string message = 2;                  // 消息内容
+  DeleteNodeGroupData data = 3;        // 响应数据
+}
+
+// ===== 分组配置 =====
+
+// RecalculationState 重算状态
+message RecalculationState {
+  string state = 1;     // 状态：pending/running/completed/failed
+  int64 progress = 2;   // 进度
+  int32 total = 3;      // 总数
+}
+
+// GroupConfig 分组配置
+message GroupConfig {
+  bool enabled = 1;   // 是否启用分组
+  string mode = 2;    // 分组模式
+  string config = 3;  // 其他配置（JSON字符串）
+}
+
+// GetGroupConfigRequest 获取分组配置请求
+message GetGroupConfigRequest {
+  repeated string keys = 1; // 配置键列表（可选）
+}
+
+// GetGroupConfigData 获取分组配置数据
+message GetGroupConfigData {
+  bool enabled = 1;             // 是否启用分组
+  string mode = 2;              // 分组模式
+  string config = 3;            // 其他配置（JSON字符串）
+  RecalculationState state = 4; // 重算状态
+}
+
+// GetGroupConfigReply 获取分组配置响应
+message GetGroupConfigReply {
+  int32 code = 1;                      // 状态码
+  string message = 2;                  // 消息内容
+  GetGroupConfigData data = 3;          // 响应数据
+}
+
+// UpdateGroupConfigRequest 更新分组配置请求
+message UpdateGroupConfigRequest {
+  bool enabled = 1;         // 是否启用分组
+  string mode = 2;          // 分组模式
+  string config = 3;        // 其他配置（JSON字符串）
+}
+
+// UpdateGroupConfigData 更新分组配置数据
+message UpdateGroupConfigData {
+  bool success = 1; // 是否成功
+}
+
+// UpdateGroupConfigReply 更新分组配置响应
+message UpdateGroupConfigReply {
+  int32 code = 1;                          // 状态码
+  string message = 2;                      // 消息内容
+  UpdateGroupConfigData data = 3;          // 响应数据
+}
+
+// ===== 分组操作 =====
+
+// RecalculateGroupRequest 重新计算分组请求
+message RecalculateGroupRequest {
+  string mode = 1;         // 分组模式
+  string trigger_type = 2; // 触发类型: manual/scheduled
+}
+
+// RecalculateGroupData 重新计算分组数据
+message RecalculateGroupData {
+  int64 history_id = 1; // 历史记录ID
+}
+
+// RecalculateGroupReply 重新计算分组响应
+message RecalculateGroupReply {
+  int32 code = 1;                        // 状态码
+  string message = 2;                    // 消息内容
+  RecalculateGroupData data = 3;         // 响应数据
+}
+
+// GetRecalculationStatusRequest 获取重新计算状态请求
+message GetRecalculationStatusRequest {}
+
+// GetRecalculationStatusReply 获取重新计算状态响应
+message GetRecalculationStatusReply {
+  int32 code = 1;                            // 状态码
+  string message = 2;                        // 消息内容
+  RecalculationState data = 3;               // 响应数据
+}
+
+// GroupHistory 分组历史
+message GroupHistory {
+  int64 id = 1;                // 历史记录ID
+  string group_mode = 2;      // 分组模式
+  string trigger_type = 3;    // 触发类型
+  int32 total_users = 4;      // 用户总数
+  int32 success_count = 5;    // 成功数量
+  int32 failed_count = 6;     // 失败数量
+  optional int64 start_time = 7;  // 开始时间（可选）
+  optional int64 end_time = 8;    // 结束时间（可选）
+  string operator = 9;        // 操作人
+  string error_log = 10;      // 错误日志
+  int64 created_at = 11;      // 创建时间
+}
+
+// GetGroupHistoryRequest 获取分组历史请求
+message GetGroupHistoryRequest {
+  int64 page = 1;                  // 页码
+  int64 size = 2;                  // 每页数量
+  string group_mode = 3;           // 分组模式过滤（可选）
+  string trigger_type = 4;         // 触发类型过滤（可选）
+}
+
+// GetGroupHistoryData 获取分组历史数据
+message GetGroupHistoryData {
+  int32 total = 1;                     // 总数
+  repeated GroupHistory list = 2;       // 分组历史列表
+}
+
+// GetGroupHistoryReply 获取分组历史响应
+message GetGroupHistoryReply {
+  int32 code = 1;                       // 状态码
+  string message = 2;                   // 消息内容
+  GetGroupHistoryData data = 3;          // 响应数据
+}
+
+// GetGroupHistoryDetailRequest 获取分组历史详情请求
+message GetGroupHistoryDetailRequest {
+  int64 id = 1; // 历史记录ID
+}
+
+// GroupHistoryDetailItem 分组历史详情条目
+message GroupHistoryDetailItem {
+  int64 id = 1;              // 条目ID
+  int64 history_id = 2;      // 历史记录ID
+  int64 user_group_id = 3;   // 用户组ID
+  int64 node_group_id = 4;   // 节点组ID
+  int32 user_count = 5;     // 用户数量
+  int32 node_count = 6;     // 节点数量
+  string user_data = 7;     // 用户数据（JSON，可选）
+  int64 created_at = 8;     // 创建时间
+}
+
+// GroupHistoryDetail 分组历史详情
+message GroupHistoryDetail {
+  int64 id = 1;                               // 历史记录ID
+  string group_mode = 2;                    // 分组模式
+  string trigger_type = 3;                  // 触发类型
+  int32 total_users = 4;                    // 用户总数
+  int32 success_count = 5;                  // 成功数量
+  int32 failed_count = 6;                   // 失败数量
+  optional int64 start_time = 7;            // 开始时间（可选）
+  optional int64 end_time = 8;              // 结束时间（可选）
+  string operator = 9;                      // 操作人
+  string error_log = 10;                    // 错误日志
+  int64 created_at = 11;                    // 创建时间
+  string config_snapshot = 12;              // 配置快照（JSON字符串，可选）
+  repeated GroupHistoryDetailItem group_details = 13; // 分组详情列表（可选）
+}
+
+// GetGroupHistoryDetailReply 获取分组历史详情响应
+message GetGroupHistoryDetailReply {
+  int32 code = 1;                            // 状态码
+  string message = 2;                        // 消息内容
+  GroupHistoryDetail data = 3;               // 响应数据
+}
+
+// ExportGroupResultRequest 导出分组结果请求
+message ExportGroupResultRequest {
+  int64 history_id = 1; // 历史记录ID（可选）
+}
+
+// ExportGroupResultData 导出分组结果数据
+message ExportGroupResultData {
+  string file_url = 1; // 导出文件URL
+}
+
+// ExportGroupResultReply 导出分组结果响应
+message ExportGroupResultReply {
+  int32 code = 1;                         // 状态码
+  string message = 2;                     // 消息内容
+  ExportGroupResultData data = 3;         // 响应数据
+}
+
+// MigrateUsersRequest 迁移用户请求（已废弃 - UserGroup已移除）
+// 此API暂时保留但返回错误，提示使用分组重算功能
+message MigrateUsersRequest {
+  int64 from_user_group_id = 1; // 源用户组ID（已废弃）
+  int64 to_user_group_id = 2;   // 目标用户组ID（已废弃）
+  bool include_locked = 3;       // 是否包含锁定用户
+}
+
+// MigrateUsersData 迁移用户数据
+message MigrateUsersData {
+  int32 success_count = 1; // 成功数量
+  int32 failed_count = 2;  // 失败数量
+}
+
+// MigrateUsersReply 迁移用户响应
+message MigrateUsersReply {
+  int32 code = 1;                  // 状态码
+  string message = 2;              // 消息内容
+  MigrateUsersData data = 3;       // 响应数据
+}
+
+// PreviewUserNodesRequest 预览用户节点请求
+message PreviewUserNodesRequest {
+  int64 user_id = 1; // 用户ID
+}
+
+// Node 节点信息
+message Node {
+  int64 id = 1;        // 节点ID
+  string name = 2;    // 节点名称
+  string address = 3; // 节点地址
+  int32 port = 4;     // 节点端口
+  string tags = 5;    // 节点标签
+  int32 sort = 6;     // 排序
+}
+
+// NodeGroupItem 节点组条目（含节点列表）
+message NodeGroupItem {
+  int64 id = 1;               // 节点组ID
+  string name = 2;           // 节点组名称
+  repeated Node nodes = 3;   // 节点列表
+}
+
+// PreviewUserNodesData 预览用户节点数据
+message PreviewUserNodesData {
+  int64 user_id = 1;                        // 用户ID
+  repeated NodeGroupItem node_groups = 2;  // 节点组列表
+}
+
+// PreviewUserNodesReply 预览用户节点响应
+message PreviewUserNodesReply {
+  int32 code = 1;                      // 状态码
+  string message = 2;                  // 消息内容
+  PreviewUserNodesData data = 3;       // 响应数据
+}
+
+// ResetGroupsRequest 重置所有分组请求
+message ResetGroupsRequest {
+  bool confirm = 1; // 确认重置
+}
+
+// ResetGroupsData 重置所有分组数据
+message ResetGroupsData {
+  bool success = 1; // 是否成功
+}
+
+// ResetGroupsReply 重置所有分组响应
+message ResetGroupsReply {
+  int32 code = 1;                   // 状态码
+  string message = 2;               // 消息内容
+  ResetGroupsData data = 3;         // 响应数据
+}
+
+// ===== 订阅组映射 =====
+
+// SubscribeGroupMappingItem 订阅组映射项
+message SubscribeGroupMappingItem {
+  string subscribe_name = 1;  // 订阅名称
+  string node_group_name = 2; // 节点组名称
+}
+
+// GetSubscribeGroupMappingRequest 获取订阅组映射请求
+message GetSubscribeGroupMappingRequest {}
+
+// GetSubscribeGroupMappingData 获取订阅组映射数据
+message GetSubscribeGroupMappingData {
+  repeated SubscribeGroupMappingItem list = 1; // 映射列表
+}
+
+// GetSubscribeGroupMappingReply 获取订阅组映射响应
+message GetSubscribeGroupMappingReply {
+  int32 code = 1;                              // 状态码
+  string message = 2;                          // 消息内容
+  GetSubscribeGroupMappingData data = 3;        // 响应数据
+}

@@ -1,0 +1,167 @@
+syntax = "proto3";
+
+package api.admin.ads.v1;
+
+import "google/api/annotations.proto";
+import "validate/validate.proto";
+
+option go_package = "github.com/npanel-dev/NPanel-backend/api/admin/ads/v1;v1";
+
+// 广告服务
+service AdsService {
+  // 获取广告列表
+  rpc GetAdsList(GetAdsListRequest) returns (GetAdsListReply) {
+    option (google.api.http) = {
+      get: "/v1/admin/ads/list"
+    };
+  }
+
+  // 获取广告详情
+  rpc GetAds(GetAdsRequest) returns (GetAdsReply) {
+    option (google.api.http) = {
+      get: "/v1/admin/ads/detail"
+    };
+  }
+
+  // 创建广告
+  rpc CreateAds(CreateAdsRequest) returns (CreateAdsReply) {
+    option (google.api.http) = {
+      post: "/v1/admin/ads"
+      body: "*"
+    };
+  }
+
+  // 更新广告
+  rpc UpdateAds(UpdateAdsRequest) returns (UpdateAdsReply) {
+    option (google.api.http) = {
+      put: "/v1/admin/ads"
+      body: "*"
+    };
+  }
+
+  // 删除广告
+  rpc DeleteAds(DeleteAdsRequest) returns (DeleteAdsReply) {
+    option (google.api.http) = {
+      delete: "/v1/admin/ads"
+    };
+  }
+}
+
+// 广告信息
+message Ads {
+  int64 id = 1;
+  string title = 2;
+  string type = 3;
+  string content = 4;
+  string description = 5;
+  string target_url = 6;
+  int64 start_time = 7;    // Unix timestamp in seconds
+  int64 end_time = 8;      // Unix timestamp in seconds
+  int32 status = 9;        // 状态：0=禁用 1=启用
+  int64 created_at = 10;   // Unix timestamp in seconds
+  int64 updated_at = 11;   // Unix timestamp in seconds
+}
+
+// 获取广告列表请求
+message GetAdsListRequest {
+  int32 page = 1;
+  int32 size = 2;
+  string search = 3;
+  optional int32 status = 4;
+}
+
+// 获取广告列表数据
+message GetAdsListData {
+  int32 total = 1;
+  repeated Ads list = 2;
+}
+
+// 获取广告列表响应
+message GetAdsListReply {
+  int32 code = 1;              // 状态码
+  string message = 2;          // 消息内容
+  GetAdsListData data = 3;     // 响应数据
+}
+
+// 获取广告详情请求
+message GetAdsRequest {
+  int64 id = 1;
+}
+
+// 获取广告详情数据
+message GetAdsData {
+  Ads ads = 1;
+}
+
+// 获取广告详情响应
+message GetAdsReply {
+  int32 code = 1;           // 状态码
+  string message = 2;       // 消息内容
+  GetAdsData data = 3;      // 响应数据
+}
+
+// 创建广告请求
+message CreateAdsRequest {
+  string title = 1 [(validate.rules).string = {min_len: 1, max_len: 255}];
+  string type = 2 [(validate.rules).string = {min_len: 1, max_len: 255}];
+  string content = 3;
+  string description = 4;
+  string target_url = 5;
+  int64 start_time = 6;    // Unix timestamp in seconds
+  int64 end_time = 7;      // Unix timestamp in seconds
+  int32 status = 8;        // 状态：0=禁用 1=启用
+}
+
+// 创建广告数据
+message CreateAdsData {
+  Ads ads = 1;
+}
+
+// 创建广告响应
+message CreateAdsReply {
+  int32 code = 1;           // 状态码
+  string message = 2;       // 消息内容
+  CreateAdsData data = 3;   // 响应数据
+}
+
+// 更新广告请求
+message UpdateAdsRequest {
+  int64 id = 1;
+  string title = 2 [(validate.rules).string = {min_len: 1, max_len: 255}];
+  string type = 3 [(validate.rules).string = {min_len: 1, max_len: 255}];
+  string content = 4;
+  string description = 5;
+  string target_url = 6;
+  int64 start_time = 7;    // Unix timestamp in seconds
+  int64 end_time = 8;      // Unix timestamp in seconds
+  int32 status = 9;        // 状态：0=禁用 1=启用
+}
+
+// 更新广告数据
+message UpdateAdsData {
+  Ads ads = 1;
+}
+
+// 更新广告响应
+message UpdateAdsReply {
+  int32 code = 1;           // 状态码
+  string message = 2;       // 消息内容
+  UpdateAdsData data = 3;   // 响应数据
+}
+
+// 删除广告请求
+message DeleteAdsRequest {
+  int64 id = 1;
+}
+
+// 删除广告数据
+message DeleteAdsData {
+  bool success = 1;
+}
+
+// 删除广告响应
+message DeleteAdsReply {
+  int32 code = 1;           // 状态码
+  string message = 2;       // 消息内容
+  DeleteAdsData data = 3;   // 响应数据
+}

@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package api.public.subscription.v1;
+
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+
+option go_package = "github.com/npanel-dev/NPanel-backend/api/public/subscription/v1;v1";
+option java_multiple_files = true;
+option java_package = "api.public.subscription.v1";
+
+// Subscription service for generating client configurations
+// 订阅配置服务 - 生成客户端配置
+service Subscription {
+  // GetSubscribeConfig 获取订阅配置
+  // 根据老项目请求参数生成订阅配置
+  rpc GetSubscribeConfig(GetSubscribeConfigRequest) returns (GetSubscribeConfigReply) {
+    option (google.api.http) = {
+      get: "/v1/subscribe/config"
+      additional_bindings {
+        get: "/v1/subscribe/{token}"
+      }
+    };
+  }
+}
+
+// GetSubscribeConfigRequest 获取订阅配置请求
+message GetSubscribeConfigRequest {
+  string flag = 1;
+  string token = 2 [(google.api.field_behavior) = REQUIRED];
+  string type = 3;
+  string ua = 4;
+  map<string, string> params = 5;
+}
+
+// GetSubscribeConfigReply 获取订阅配置响应
+message GetSubscribeConfigReply {
+  bytes config = 1;
+  string header = 2;
+}

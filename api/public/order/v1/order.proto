@@ -1,0 +1,221 @@
+syntax = "proto3";
+
+package api.public.order.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+option go_package = "github.com/npanel-dev/NPanel-backend/api/public/order/v1;v1";
+option java_multiple_files = true;
+option java_package = "api.public.order.v1";
+
+service PublicOrder {
+  rpc CloseOrder(CloseOrderRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/v1/public/order/close"
+      body: "*"
+    };
+  }
+
+  rpc QueryOrderDetail(QueryOrderDetailRequest) returns (OrderDetail) {
+    option (google.api.http) = {
+      get: "/v1/public/order/detail"
+    };
+  }
+
+  rpc QueryOrderList(QueryOrderListRequest) returns (QueryOrderListReply) {
+    option (google.api.http) = {
+      get: "/v1/public/order/list"
+    };
+  }
+
+  rpc PreCreateOrder(PreCreateOrderRequest) returns (PreCreateOrderReply) {
+    option (google.api.http) = {
+      post: "/v1/public/order/pre"
+      body: "*"
+    };
+  }
+
+  rpc Purchase(PurchaseRequest) returns (PurchaseReply) {
+    option (google.api.http) = {
+      post: "/v1/public/order/purchase"
+      body: "*"
+    };
+  }
+
+  rpc Recharge(RechargeRequest) returns (RechargeReply) {
+    option (google.api.http) = {
+      post: "/v1/public/order/recharge"
+      body: "*"
+    };
+  }
+
+  rpc Renewal(RenewalRequest) returns (RenewalReply) {
+    option (google.api.http) = {
+      post: "/v1/public/order/renewal"
+      body: "*"
+    };
+  }
+
+  rpc ResetTraffic(ResetTrafficRequest) returns (ResetTrafficReply) {
+    option (google.api.http) = {
+      post: "/v1/public/order/reset"
+      body: "*"
+    };
+  }
+}
+
+message CloseOrderRequest {
+  string order_no = 1 [json_name = "orderNo"];
+}
+
+message QueryOrderDetailRequest {
+  string order_no = 1;
+}
+
+message QueryOrderListRequest {
+  int64 page = 1;
+  int64 size = 2;
+}
+
+message PreCreateOrderRequest {
+  int64 subscribe_id = 1;
+  int64 quantity = 2;
+  int64 payment = 3;
+  string coupon = 4;
+}
+
+message PreCreateOrderReply {
+  int64 price = 1;
+  int64 amount = 2;
+  int64 discount = 3;
+  int64 gift_amount = 4;
+  string coupon = 5;
+  int64 coupon_discount = 6;
+  int64 fee_amount = 7;
+}
+
+message PurchaseRequest {
+  int64 subscribe_id = 1;
+  int64 quantity = 2;
+  int64 payment = 3;
+  string coupon = 4;
+}
+
+message PurchaseReply {
+  string order_no = 1;
+}
+
+message RechargeRequest {
+  int64 amount = 1;
+  int64 payment = 2;
+}
+
+message RechargeReply {
+  string order_no = 1;
+}
+
+message RenewalRequest {
+  int64 user_subscribe_id = 1;
+  int64 quantity = 2;
+  int64 payment = 3;
+  string coupon = 4;
+}
+
+message RenewalReply {
+  string order_no = 1;
+}
+
+message ResetTrafficRequest {
+  int64 user_subscribe_id = 1;
+  int64 payment = 2;
+}
+
+message ResetTrafficReply {
+  string order_no = 1;
+}
+
+message QueryOrderListReply {
+  int32 total = 1;
+  repeated OrderDetail list = 2;
+}
+
+message PaymentMethod {
+  int64 id = 1;
+  string name = 2;
+  string platform = 3;
+  string description = 4;
+  string icon = 5;
+  uint32 fee_mode = 6;
+  int64 fee_percent = 7;
+  int64 fee_amount = 8;
+}
+
+message SubscribeDiscount {
+  int64 quantity = 1;
+  int64 discount = 2;
+}
+
+message TrafficLimit {
+  string stat_type = 1;
+  int64 stat_value = 2;
+  int64 traffic_usage = 3;
+  int32 speed_limit = 4;
+}
+
+message Subscribe {
+  int64 id = 1;
+  string name = 2;
+  string language = 3;
+  string description = 4;
+  int64 unit_price = 5;
+  string unit_time = 6;
+  repeated SubscribeDiscount discount = 7;
+  int64 replacement = 8;
+  int32 inventory = 9;
+  int64 traffic = 10;
+  int32 speed_limit = 11;
+  int32 device_limit = 12;
+  int32 quota = 13;
+  repeated int64 nodes = 14;
+  repeated string node_tags = 15;
+  repeated int64 node_group_ids = 16;
+  int64 node_group_id = 17;
+  repeated TrafficLimit traffic_limit = 18;
+  bool show = 19;
+  bool sell = 20;
+  int32 sort = 21;
+  int32 deduction_ratio = 22;
+  bool allow_deduction = 23;
+  int32 reset_cycle = 24;
+  bool renewal_reset = 25;
+  bool show_original_price = 26;
+  int64 created_at = 27;
+  int64 updated_at = 28;
+}
+
+message OrderDetail {
+  int64 id = 1;
+  int64 user_id = 2;
+  string order_no = 3;
+  int32 type = 4;
+  int64 quantity = 5;
+  int64 price = 6;
+  int64 amount = 7;
+  int64 gift_amount = 8;
+  int64 discount = 9;
+  string coupon = 10;
+  int64 coupon_discount = 11;
+  int64 commission = 12;
+  PaymentMethod payment = 13;
+  string method = 14;
+  int64 fee_amount = 15;
+  string trade_no = 16;
+  int32 status = 17;
+  int64 subscribe_id = 18;
+  Subscribe subscribe = 19;
+  int64 created_at = 20;
+  int64 updated_at = 21;
+}
+
+

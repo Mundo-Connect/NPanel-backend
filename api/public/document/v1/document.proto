@@ -1,0 +1,59 @@
+syntax = "proto3";
+
+package api.public.document.v1;
+
+option go_package = "github.com/npanel-dev/NPanel-backend/api/public/document/v1;v1";
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+// Public Document service
+// 公共文档服务（需要认证）
+service PublicDocument {
+  // QueryDocumentList 查询文档列表
+  rpc QueryDocumentList (google.protobuf.Empty) returns (DocumentListReply) {
+    option (google.api.http) = {
+      get: "/v1/public/document/list"
+    };
+  }
+
+  // QueryDocumentDetail 查询文档详情
+  rpc QueryDocumentDetail (QueryDocumentDetailRequest) returns (DocumentDetailReply) {
+    option (google.api.http) = {
+      get: "/v1/public/document/detail"
+    };
+  }
+}
+
+// QueryDocumentDetailRequest 查询文档详情请求
+message QueryDocumentDetailRequest {
+  int64 id = 1;
+}
+
+// DocumentListReply 查询文档列表响应
+message DocumentListReply {
+  int32 total = 1;
+  repeated Document list = 2;
+}
+
+// Document 文档
+message Document {
+  int64 id = 1;
+  string title = 2;
+  string content = 3;
+  repeated string tags = 4;
+  bool show = 5;
+  int64 created_at = 6;
+  int64 updated_at = 7;
+}
+
+// DocumentDetailReply 查询文档详情响应
+message DocumentDetailReply {
+  int64 id = 1;
+  string title = 2;
+  string content = 3;
+  repeated string tags = 4;
+  bool show = 5;
+  int64 created_at = 6;
+  int64 updated_at = 7;
+}
