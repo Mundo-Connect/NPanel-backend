@@ -1,5 +1,7 @@
 # NPanel Backend
 
+[English](README.md) | [简体中文](README.zh-CN.md)
+
 NPanel Backend is the Go service core of the NPanel ecosystem. It provides the management, public, authentication, payment, subscription, node, and server APIs used by NPanel deployments.
 
 NPanel is built by the [npanel-dev](https://github.com/npanel-dev) organization. The project goal is to provide high-performance distributed connectivity infrastructure with a clear operations experience, strong backend foundations, and an ecosystem that can grow across panel, frontend, node, SDK, client, and subscription-template projects.

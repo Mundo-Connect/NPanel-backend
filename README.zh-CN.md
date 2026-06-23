@@ -1,5 +1,7 @@
 # NPanel Backend
 
+[English](README.md) | [简体中文](README.zh-CN.md)
+
 NPanel Backend 是 NPanel 生态的 Go 服务核心，提供管理端、用户端、认证、支付、订阅、节点与服务端上报等 API 能力。
 
 NPanel 由 [npanel-dev](https://github.com/npanel-dev) 组织维护。项目目标是构建高性能的分布式连接基础设施，在保证后端架构清晰、运维体验简单的同时，逐步形成面板、前端、节点、SDK、客户端与订阅模板等完整生态。
