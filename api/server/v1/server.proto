@@ -350,6 +350,9 @@ message Protocol {
 	bool omniflow_fallback_carrier_enabled = 98;
 	bool omniflow_fallback_connect_tunnel = 99;
 	bool omniflow_fallback_wss_enabled = 100;
+
+	string mc1_mode = 113;
+	repeated string mc1_cidr_segments = 114;
 }
 
 // QueryServerProtocolConfigReply 查询服务器协议配置响应

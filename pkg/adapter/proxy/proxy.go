@@ -1,6 +1,10 @@
 package proxy
 
-import "embed"
+import (
+	"embed"
+	"encoding/json"
+	"strings"
+)
 
 // Adapter represents a proxy adapter
 type Adapter struct {
@@ -106,15 +110,82 @@ type AnyTLS struct {
 	SecurityConfig SecurityConfig `json:"security_config"`
 }
 
+// Mx represents a Mundo X proxy configuration.
+type Mx struct {
+	Port            int             `json:"port"`
+	Transport       string          `json:"transport"`
+	TransportConfig TransportConfig `json:"transport_config"`
+	Security        string          `json:"security"`
+	SecurityConfig  SecurityConfig  `json:"security_config"`
+}
+
 // TransportConfig represents the transport configuration for a proxy
 type TransportConfig struct {
-	Path                 string `json:"path,omitempty"` // ws/httpupgrade
-	Host                 string `json:"host,omitempty"`
-	ServiceName          string `json:"service_name"`          // grpc
-	DisableSNI           bool   `json:"disable_sni"`           // Disable SNI for the transport(tuic)
-	ReduceRtt            bool   `json:"reduce_rtt"`            // Reduce RTT for the transport(tuic)
-	UDPRelayMode         string `json:"udp_relay_mode"`        // UDP relay mode for the transport(tuic)
-	CongestionController string `json:"congestion_controller"` // Congestion controller for the transport(tuic)
+	Path                 string   `json:"path,omitempty"` // ws/httpupgrade
+	Host                 string   `json:"host,omitempty"`
+	ServiceName          string   `json:"service_name"`          // grpc
+	DisableSNI           bool     `json:"disable_sni"`           // Disable SNI for the transport(tuic)
+	ReduceRtt            bool     `json:"reduce_rtt"`            // Reduce RTT for the transport(tuic)
+	UDPRelayMode         string   `json:"udp_relay_mode"`        // UDP relay mode for the transport(tuic)
+	CongestionController string   `json:"congestion_controller"` // Congestion controller for the transport(tuic)
+	Mc1Mode              string   `json:"mc1_mode,omitempty"`
+	Mc1CidrSegments      []string `json:"mc1_cidr_segments,omitempty"`
+	Mode                 string   `json:"mode,omitempty"`
+	CidrSegments         []string `json:"cidrSegments,omitempty"`
+	Split                string   `json:"split,omitempty"`
+}
+
+func (c *TransportConfig) UnmarshalJSON(data []byte) error {
+	type transportConfigAlias TransportConfig
+	aux := struct {
+		*transportConfigAlias
+		Mc1CidrSegments mc1CIDRSegments `json:"mc1_cidr_segments,omitempty"`
+		CidrSegments    mc1CIDRSegments `json:"cidrSegments,omitempty"`
+	}{
+		transportConfigAlias: (*transportConfigAlias)(c),
+	}
+	if err := json.Unmarshal(data, &aux); err != nil {
+		return err
+	}
+	if len(aux.Mc1CidrSegments) > 0 {
+		c.Mc1CidrSegments = []string(aux.Mc1CidrSegments)
+	}
+	if len(aux.CidrSegments) > 0 {
+		c.CidrSegments = []string(aux.CidrSegments)
+	}
+	return nil
+}
+
+type mc1CIDRSegments []string
+
+func (s *mc1CIDRSegments) UnmarshalJSON(data []byte) error {
+	if len(data) == 0 || string(data) == "null" {
+		return nil
+	}
+	var single string
+	if err := json.Unmarshal(data, &single); err == nil {
+		*s = sanitizeCIDRSegments(strings.Split(single, ","))
+		return nil
+	}
+	var values []string
+	if err := json.Unmarshal(data, &values); err != nil {
+		return err
+	}
+	*s = sanitizeCIDRSegments(values)
+	return nil
+}
+
+func sanitizeCIDRSegments(values []string) []string {
+	if len(values) == 0 {
+		return nil
+	}
+	result := make([]string, 0, len(values))
+	for _, value := range values {
+		if value = strings.TrimSpace(value); value != "" {
+			result = append(result, value)
+		}
+	}
+	return result
 }
 
 // SecurityConfig represents the security configuration for a proxy

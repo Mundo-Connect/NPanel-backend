@@ -5,9 +5,9 @@ import (
 	"encoding/json"
 	"strings"
 
+	"github.com/go-kratos/kratos/v2/log"
 	v1 "github.com/npanel-dev/NPanel-backend/api/server/v1"
 	serverBiz "github.com/npanel-dev/NPanel-backend/internal/biz/server"
-	"github.com/go-kratos/kratos/v2/log"
 )
 
 func normalizeSimnetProtocolForResponse(protocol *serverBiz.Protocol) *serverBiz.Protocol {
@@ -288,6 +288,8 @@ func (s *ServerService) QueryServerProtocolConfig(ctx context.Context, req *v1.Q
 			Host:                          protocol.Host,
 			Path:                          protocol.Path,
 			ServiceName:                   protocol.ServiceName,
+			Mc1Mode:                       protocol.Mc1Mode,
+			Mc1CidrSegments:               protocol.Mc1CidrSegments,
 			Cipher:                        protocol.Cipher,
 			ServerKey:                     protocol.ServerKey,
 			Flow:                          protocol.Flow,

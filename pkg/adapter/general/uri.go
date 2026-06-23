@@ -31,6 +31,8 @@ type v2rayShareLink struct {
 	PublicKey     string `json:"pbk,omitempty"`
 	ShortId       string `json:"sid,omitempty"`
 	SpiderX       string `json:"spx,omitempty"`
+	Mode          string `json:"mode,omitempty"`
+	Cidr          string `json:"cidr,omitempty"`
 	V             string `json:"v"`
 }
 
@@ -63,6 +65,8 @@ func buildProxy(data proxy.Proxy, uuid string) string {
 		return Hysteria2Uri(data, uuid)
 	case "tuic":
 		return TuicUri(data, uuid)
+	case "mx":
+		return MxUri(data, uuid)
 	default:
 		return ""
 	}
@@ -115,6 +119,12 @@ func VmessUri(data proxy.Proxy, uuid string) string {
 	case "grpc":
 		s.Net = "grpc"
 		s.Path = transport.ServiceName
+	case "mc1":
+		s.Net = "mc1"
+		s.Path = defaultString(transport.Path, "/")
+		s.Host = defaultString(transport.Host, data.Server)
+		s.Mode = defaultString(mc1Mode(transport), "auto")
+		s.Cidr = strings.Join(mc1CidrSegments(transport), ",")
 	case "httpupgrade":
 		s.Net = "http"
 		s.Path = transport.Path
@@ -154,6 +164,14 @@ func VlessUri(data proxy.Proxy, uuid string) string {
 	case "grpc":
 		setQuery(&query, "type", "grpc")
 		setQuery(&query, "serviceName", transportConfig.ServiceName)
+	case "mc1":
+		setQuery(&query, "type", "mc1")
+		setQuery(&query, "path", defaultString(transportConfig.Path, "/"))
+		setQuery(&query, "host", defaultString(transportConfig.Host, data.Server))
+		setQuery(&query, "mode", defaultString(mc1Mode(transportConfig), "auto"))
+		if cidrSegments := mc1CidrSegments(transportConfig); len(cidrSegments) > 0 {
+			setQuery(&query, "cidr", strings.Join(cidrSegments, ","))
+		}
 	}
 
 	if vless.Security == "tls" {
@@ -195,6 +213,14 @@ func TrojanUri(data proxy.Proxy, uuid string) string {
 	case "grpc":
 		setQuery(&query, "type", "grpc")
 		setQuery(&query, "serviceName", transportConfig.ServiceName)
+	case "mc1":
+		setQuery(&query, "type", "mc1")
+		setQuery(&query, "path", defaultString(transportConfig.Path, "/"))
+		setQuery(&query, "host", defaultString(transportConfig.Host, data.Server))
+		setQuery(&query, "mode", defaultString(mc1Mode(transportConfig), "auto"))
+		if cidrSegments := mc1CidrSegments(transportConfig); len(cidrSegments) > 0 {
+			setQuery(&query, "cidr", strings.Join(cidrSegments, ","))
+		}
 	default:
 		setQuery(&query, "type", "tcp")
 		setQuery(&query, "path", transportConfig.Path)
@@ -271,8 +297,98 @@ func TuicUri(data proxy.Proxy, uuid string) string {
 	return u.String()
 }
 
+func MxUri(data proxy.Proxy, uuid string) string {
+	mx, ok := data.Option.(proxy.Mx)
+	if !ok {
+		return ""
+	}
+	transportConfig := mx.TransportConfig
+	securityConfig := mx.SecurityConfig
+
+	transport := strings.ToLower(strings.TrimSpace(mx.Transport))
+	if transport == "" {
+		transport = "tcp"
+	}
+	security := strings.ToLower(strings.TrimSpace(mx.Security))
+
+	var query = make(url.Values)
+	setQuery(&query, "mode", "multi")
+	setQuery(&query, "security", security)
+
+	switch transport {
+	case "websocket", "ws":
+		setQuery(&query, "type", "ws")
+		setQuery(&query, "path", transportConfig.Path)
+		setQuery(&query, "host", transportConfig.Host)
+	case "grpc":
+		setQuery(&query, "type", "grpc")
+		setQuery(&query, "serviceName", transportConfig.ServiceName)
+	case "mc1":
+		setQuery(&query, "type", "mc1")
+		setQuery(&query, "path", defaultString(transportConfig.Path, "/"))
+		setQuery(&query, "host", defaultString(transportConfig.Host, data.Server))
+		setQuery(&query, "mode", defaultString(mc1Mode(transportConfig), "auto"))
+		if cidrSegments := mc1CidrSegments(transportConfig); len(cidrSegments) > 0 {
+			setQuery(&query, "cidr", strings.Join(cidrSegments, ","))
+		}
+	case "xhttp":
+		setQuery(&query, "type", "jatp")
+		setQuery(&query, "endpoint_path", transportConfig.Path)
+		setQuery(&query, "endpoint", defaultString(transportConfig.Host, data.Server))
+		setQuery(&query, "split", transportConfig.Split)
+	default:
+		setQuery(&query, "type", transport)
+	}
+
+	switch security {
+	case "tls":
+		setQuery(&query, "fp", defaultString(securityConfig.Fingerprint, "chrome"))
+		setQuery(&query, "sni", securityConfig.SNI)
+		if securityConfig.AllowInsecure {
+			setQuery(&query, "allowInsecure", "1")
+		}
+	case "reality":
+		setQuery(&query, "fp", defaultString(securityConfig.Fingerprint, "chrome"))
+		setQuery(&query, "sni", securityConfig.SNI)
+		setQuery(&query, "servername", securityConfig.SNI)
+		setQuery(&query, "pbk", securityConfig.RealityPublicKey)
+		setQuery(&query, "sid", securityConfig.RealityShortId)
+		setQuery(&query, "spx", "/")
+	}
+
+	u := &url.URL{
+		Scheme:   "mx",
+		User:     url.User(uuid),
+		Host:     net.JoinHostPort(data.Server, strconv.Itoa(data.Port)),
+		RawQuery: query.Encode(),
+		Fragment: data.Name,
+	}
+	return u.String()
+}
+
 func setQuery(q *url.Values, k, v string) {
 	if v != "" {
 		q.Set(k, v)
 	}
+}
+
+func defaultString(value, fallback string) string {
+	if strings.TrimSpace(value) == "" {
+		return fallback
+	}
+	return value
+}
+
+func mc1Mode(config proxy.TransportConfig) string {
+	if strings.TrimSpace(config.Mc1Mode) != "" {
+		return config.Mc1Mode
+	}
+	return config.Mode
+}
+
+func mc1CidrSegments(config proxy.TransportConfig) []string {
+	if len(config.Mc1CidrSegments) > 0 {
+		return config.Mc1CidrSegments
+	}
+	return config.CidrSegments
 }

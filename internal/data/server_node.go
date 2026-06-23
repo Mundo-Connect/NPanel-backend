@@ -8,6 +8,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/go-kratos/kratos/v2/log"
+	"github.com/hibiken/asynq"
 	"github.com/npanel-dev/NPanel-backend/ent"
 	"github.com/npanel-dev/NPanel-backend/ent/proxynode"
 	"github.com/npanel-dev/NPanel-backend/ent/proxyservergroup"
@@ -19,8 +21,6 @@ import (
 	"github.com/npanel-dev/NPanel-backend/internal/queue/types"
 	"github.com/npanel-dev/NPanel-backend/pkg/tool"
 	"github.com/npanel-dev/NPanel-backend/pkg/uuidx"
-	"github.com/go-kratos/kratos/v2/log"
-	"github.com/hibiken/asynq"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -539,6 +539,8 @@ func (r *serverNodeRepo) QueryServerProtocolConfig(ctx context.Context, serverID
 			Host:                          serverNodeMapString(p["host"]),
 			Path:                          serverNodeMapString(p["path"]),
 			ServiceName:                   serverNodeMapString(p["service_name"]),
+			Mc1Mode:                       serverNodeFirstString(p, "mc1_mode", "mc1Mode", "mode"),
+			Mc1CidrSegments:               serverNodeFirstStringSlice(p, "mc1_cidr_segments", "mc1CidrSegments", "cidrSegments"),
 			Cipher:                        serverNodeMapString(p["cipher"]),
 			ServerKey:                     serverNodeMapString(p["server_key"]),
 			Flow:                          serverNodeMapString(p["flow"]),
@@ -655,6 +657,43 @@ func serverNodeMapString(value interface{}) string {
 		return strings.TrimSpace(s)
 	}
 	return ""
+}
+
+func serverNodeMapStringSlice(value interface{}) []string {
+	switch v := value.(type) {
+	case []string:
+		return serverNodeSanitizeStringList(v)
+	case string:
+		return serverNodeSanitizeStringList(strings.Split(v, ","))
+	case []interface{}:
+		values := make([]string, 0, len(v))
+		for _, item := range v {
+			if s, ok := item.(string); ok {
+				values = append(values, s)
+			}
+		}
+		return serverNodeSanitizeStringList(values)
+	default:
+		return nil
+	}
+}
+
+func serverNodeFirstString(values map[string]interface{}, keys ...string) string {
+	for _, key := range keys {
+		if value := strings.TrimSpace(serverNodeMapString(values[key])); value != "" {
+			return value
+		}
+	}
+	return ""
+}
+
+func serverNodeFirstStringSlice(values map[string]interface{}, keys ...string) []string {
+	for _, key := range keys {
+		if value := serverNodeMapStringSlice(values[key]); len(value) > 0 {
+			return value
+		}
+	}
+	return nil
 }
 
 func serverNodeMapBool(value interface{}) bool {

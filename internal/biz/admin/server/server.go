@@ -5,10 +5,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/go-kratos/kratos/v2/log"
 	"github.com/npanel-dev/NPanel-backend/internal/model/server"
 	"github.com/npanel-dev/NPanel-backend/pkg/ip"
 	"github.com/npanel-dev/NPanel-backend/pkg/tool"
-	"github.com/go-kratos/kratos/v2/log"
 )
 
 // Server represents a proxy server
@@ -153,6 +153,34 @@ func normalizeSimnetProtocol(protocol *server.Protocol, address string) {
 	protocol.NormalizeOmniflow()
 }
 
+func normalizeMxProtocol(protocol *server.Protocol, address string) {
+	if protocol == nil || protocol.Type != "mx" {
+		return
+	}
+	protocol.Transport = strings.ToLower(strings.TrimSpace(protocol.Transport))
+	if protocol.Transport == "" {
+		protocol.Transport = "tcp"
+	}
+	protocol.Security = strings.ToLower(strings.TrimSpace(protocol.Security))
+	if protocol.Security == "" {
+		protocol.Security = "none"
+	}
+	if (protocol.Security == "tls" || protocol.Security == "reality") && strings.TrimSpace(protocol.Fingerprint) == "" {
+		protocol.Fingerprint = "chrome"
+	}
+	if protocol.Transport == "mc1" {
+		if strings.TrimSpace(protocol.Path) == "" {
+			protocol.Path = "/"
+		}
+		if strings.TrimSpace(protocol.Host) == "" {
+			protocol.Host = address
+		}
+		if strings.TrimSpace(protocol.Mc1Mode) == "" {
+			protocol.Mc1Mode = "auto"
+		}
+	}
+}
+
 func isLikelyDomainAddress(address string) bool {
 	address = strings.TrimSpace(address)
 	if address == "" || strings.Contains(address, ":") {
@@ -179,7 +207,7 @@ func (uc *ServerUsecase) CreateServer(ctx context.Context, name, country, city, 
 		processedProtocols[i] = copied
 	}
 	for _, protocol := range processedProtocols {
-		if protocol.Type == "vless" && protocol.Security == "reality" {
+		if (protocol.Type == "vless" || protocol.Type == "mx") && protocol.Security == "reality" {
 			if protocol.RealityPublicKey == "" {
 				public, private, err := tool.Curve25519Genkey(false, "")
 				if err != nil {
@@ -207,6 +235,7 @@ func (uc *ServerUsecase) CreateServer(ctx context.Context, name, country, city, 
 			}
 		}
 		normalizeSimnetProtocol(protocol, address)
+		normalizeMxProtocol(protocol, address)
 	}
 	if country == "" && city == "" && address != "" {
 		location, err := ip.GetRegionByIp(address)
@@ -233,7 +262,7 @@ func (uc *ServerUsecase) UpdateServer(ctx context.Context, id int, name, country
 		processedProtocols[i] = copied
 	}
 	for _, protocol := range processedProtocols {
-		if protocol.Type == "vless" && protocol.Security == "reality" {
+		if (protocol.Type == "vless" || protocol.Type == "mx") && protocol.Security == "reality" {
 			if protocol.RealityPublicKey == "" {
 				public, private, err := tool.Curve25519Genkey(false, "")
 				if err != nil {
@@ -261,6 +290,7 @@ func (uc *ServerUsecase) UpdateServer(ctx context.Context, id int, name, country
 			}
 		}
 		normalizeSimnetProtocol(protocol, address)
+		normalizeMxProtocol(protocol, address)
 	}
 	if address != existingServer.Address || existingServer.Country == "" || country == "" {
 		location, err := ip.GetRegionByIp(address)

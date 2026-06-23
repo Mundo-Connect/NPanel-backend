@@ -2,6 +2,42 @@ package server
 
 import "testing"
 
+func TestUnmarshalProtocolsMxMc1Aliases(t *testing.T) {
+	for _, tc := range []struct {
+		name string
+		json string
+	}{
+		{
+			name: "array alias",
+			json: `[{"type":"mx","port":443,"enable":true,"transport":"mc1","mode":"auto","cidrSegments":["127.0.0.0/24","10.0.0.0/8"]}]`,
+		},
+		{
+			name: "comma string alias",
+			json: `[{"type":"mx","port":443,"enable":true,"transport":"mc1","mode":"auto","cidrSegments":"127.0.0.0/24, 10.0.0.0/8"}]`,
+		},
+		{
+			name: "snake string",
+			json: `[{"type":"mx","port":443,"enable":true,"transport":"mc1","mc1_mode":"auto","mc1_cidr_segments":"127.0.0.0/24, 10.0.0.0/8"}]`,
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			protocols, err := UnmarshalProtocols(tc.json)
+			if err != nil {
+				t.Fatalf("UnmarshalProtocols returned error: %v", err)
+			}
+			if len(protocols) != 1 {
+				t.Fatalf("protocol count = %d, want 1", len(protocols))
+			}
+			if got := protocols[0].Mc1Mode; got != "auto" {
+				t.Fatalf("Mc1Mode = %q, want auto", got)
+			}
+			if got := protocols[0].Mc1CidrSegments; len(got) != 2 || got[0] != "127.0.0.0/24" || got[1] != "10.0.0.0/8" {
+				t.Fatalf("Mc1CidrSegments = %#v, want aliases preserved", got)
+			}
+		})
+	}
+}
+
 func TestProtocolNormalizeSimnetClearsDisabledFallback(t *testing.T) {
 	protocol := &Protocol{
 		Type:                          "simnet",

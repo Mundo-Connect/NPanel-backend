@@ -11,7 +11,8 @@ func TestFilterExperimentalNodesForClient(t *testing.T) {
 					{ID: 1, Protocol: "trojan"},
 					{ID: 2, Protocol: "simnet"},
 					{ID: 3, Protocol: "omniflow"},
-					{ID: 4, Protocol: "vmess"},
+					{ID: 4, Protocol: "mx"},
+					{ID: 5, Protocol: "vmess"},
 				},
 			},
 		}
@@ -20,24 +21,24 @@ func TestFilterExperimentalNodesForClient(t *testing.T) {
 	t.Run("official client omnxt keeps all nodes", func(t *testing.T) {
 		list := mkList()
 		FilterExperimentalNodesForClient(list, "omnxt/1.0")
-		if len(list[0].Nodes) != 4 {
-			t.Fatalf("expected 4 nodes for official client, got %d", len(list[0].Nodes))
+		if len(list[0].Nodes) != 5 {
+			t.Fatalf("expected 5 nodes for official client, got %d", len(list[0].Nodes))
 		}
 	})
 
 	t.Run("official client slaglab keeps all nodes", func(t *testing.T) {
 		list := mkList()
 		FilterExperimentalNodesForClient(list, "SlaGLab/0.4")
-		if len(list[0].Nodes) != 4 {
-			t.Fatalf("expected 4 nodes for official client, got %d", len(list[0].Nodes))
+		if len(list[0].Nodes) != 5 {
+			t.Fatalf("expected 5 nodes for official client, got %d", len(list[0].Nodes))
 		}
 	})
 
 	t.Run("official android slag keeps all nodes", func(t *testing.T) {
 		list := mkList()
 		FilterExperimentalNodesForClient(list, "Slag/1.0.0 (Android; Android W528JS release-keys; arm64) AnyiNet/2.0")
-		if len(list[0].Nodes) != 4 {
-			t.Fatalf("expected 4 nodes for official client, got %d", len(list[0].Nodes))
+		if len(list[0].Nodes) != 5 {
+			t.Fatalf("expected 5 nodes for official client, got %d", len(list[0].Nodes))
 		}
 	})
 
@@ -64,8 +65,8 @@ func TestFilterExperimentalNodesForClient(t *testing.T) {
 	t.Run("third-party client hides experimental nodes", func(t *testing.T) {
 		list := mkList()
 		FilterExperimentalNodesForClient(list, "clash-verge/1.0")
-		if len(list[0].Nodes) != 2 {
-			t.Fatalf("expected 2 nodes after filtering, got %d", len(list[0].Nodes))
+		if len(list[0].Nodes) != 3 {
+			t.Fatalf("expected 3 nodes after filtering, got %d", len(list[0].Nodes))
 		}
 		for _, n := range list[0].Nodes {
 			if isExperimentalProtocol(n.Protocol) {
@@ -77,8 +78,8 @@ func TestFilterExperimentalNodesForClient(t *testing.T) {
 	t.Run("empty user agent hides experimental nodes", func(t *testing.T) {
 		list := mkList()
 		FilterExperimentalNodesForClient(list, "")
-		if len(list[0].Nodes) != 2 {
-			t.Fatalf("expected 2 nodes after filtering, got %d", len(list[0].Nodes))
+		if len(list[0].Nodes) != 3 {
+			t.Fatalf("expected 3 nodes after filtering, got %d", len(list[0].Nodes))
 		}
 	})
 }
@@ -92,6 +93,7 @@ func TestIsExperimentalProtocol(t *testing.T) {
 		{"Simnet", true},
 		{"omniflow", true},
 		{"OmniFlow", true},
+		{"mx", false},
 		{"trojan", false},
 		{"vmess", false},
 		{"", false},

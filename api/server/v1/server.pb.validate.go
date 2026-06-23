@@ -2236,6 +2236,8 @@ func (m *Protocol) validate(all bool) error {
 
 	// no validation rules for OmniflowFallbackWssEnabled
 
+	// no validation rules for Mc1Mode
+
 	if len(errors) > 0 {
 		return ProtocolMultiError(errors)
 	}

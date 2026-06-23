@@ -132,6 +132,8 @@ func (r *publicSubscriptionRepo) createExpiredNodesFromDB(ctx context.Context, u
 			Host:                       matched.Host,
 			Path:                       matched.Path,
 			ServiceName:                matched.ServiceName,
+			Mc1Mode:                    matched.Mc1Mode,
+			Mc1CidrSegments:            matched.Mc1CidrSegments,
 			RealityServerAddr:          matched.RealityServerAddr,
 			RealityServerPort:          int(matched.RealityServerPort),
 			RealityPrivateKey:          matched.RealityPrivateKey,

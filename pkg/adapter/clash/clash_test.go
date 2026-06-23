@@ -1,14 +1,19 @@
 package clash
 
 import (
+	"embed"
 	"testing"
 
 	"github.com/npanel-dev/NPanel-backend/pkg/adapter/proxy"
 	"github.com/stretchr/testify/assert"
 )
 
+//go:embed template/clash.tpl
+var testTemplateFS embed.FS
+
 func TestClash_Build(t *testing.T) {
 	adapter := proxy.Adapter{
+		TemplateFS: &testTemplateFS,
 		Proxies: []proxy.Proxy{
 			{
 				Name:     "test-proxy",

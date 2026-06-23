@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/hibiken/asynq"
 	"github.com/npanel-dev/NPanel-backend/ent"
 	"github.com/npanel-dev/NPanel-backend/ent/proxynode"
 	"github.com/npanel-dev/NPanel-backend/ent/proxyservergroup"
@@ -20,7 +21,6 @@ import (
 	queueTypes "github.com/npanel-dev/NPanel-backend/internal/queue/types"
 	"github.com/npanel-dev/NPanel-backend/pkg/tool"
 	"github.com/npanel-dev/NPanel-backend/pkg/uuidx"
-	"github.com/hibiken/asynq"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -155,30 +155,42 @@ type compatLegacySecurityConfig struct {
 }
 
 type compatLegacyTransportConfig struct {
-	Path                 string `json:"path"`
-	Host                 string `json:"host"`
-	ServiceName          string `json:"service_name"`
-	DisableSNI           bool   `json:"disable_sni"`
-	ReduceRtt            bool   `json:"reduce_rtt"`
-	UDPRelayMode         string `json:"udp_relay_mode"`
-	CongestionController string `json:"congestion_controller"`
+	Path                 string   `json:"path"`
+	Host                 string   `json:"host"`
+	ServiceName          string   `json:"service_name"`
+	DisableSNI           bool     `json:"disable_sni"`
+	ReduceRtt            bool     `json:"reduce_rtt"`
+	UDPRelayMode         string   `json:"udp_relay_mode"`
+	CongestionController string   `json:"congestion_controller"`
+	Mc1Mode              string   `json:"mc1_mode,omitempty"`
+	Mc1CidrSegments      []string `json:"mc1_cidr_segments,omitempty"`
+	Mode                 string   `json:"mode,omitempty"`
+	CidrSegments         []string `json:"cidrSegments,omitempty"`
 }
 
 type compatLegacyVlessNode struct {
-	Port            uint16                       `json:"port"`
-	Flow            string                       `json:"flow"`
-	Network         string                       `json:"transport"`
-	TransportConfig *compatLegacyTransportConfig `json:"transport_config"`
-	Security        string                       `json:"security"`
-	SecurityConfig  *compatLegacySecurityConfig  `json:"security_config"`
+	Port                 uint16                       `json:"port"`
+	Flow                 string                       `json:"flow"`
+	Network              string                       `json:"transport"`
+	TransportConfig      *compatLegacyTransportConfig `json:"transport_config"`
+	NetworkSettings      *compatLegacyTransportConfig `json:"network_settings,omitempty"`
+	NetworkSettingsCamel *compatLegacyTransportConfig `json:"networkSettings,omitempty"`
+	Security             string                       `json:"security"`
+	SecurityConfig       *compatLegacySecurityConfig  `json:"security_config"`
+	TLSSettings          *compatLegacySecurityConfig  `json:"tls_settings,omitempty"`
+	TLSSettingsCamel     *compatLegacySecurityConfig  `json:"tlsSettings,omitempty"`
 }
 
 type compatLegacyVmessNode struct {
-	Port            uint16                       `json:"port"`
-	Network         string                       `json:"transport"`
-	TransportConfig *compatLegacyTransportConfig `json:"transport_config"`
-	Security        string                       `json:"security"`
-	SecurityConfig  *compatLegacySecurityConfig  `json:"security_config"`
+	Port                 uint16                       `json:"port"`
+	Network              string                       `json:"transport"`
+	TransportConfig      *compatLegacyTransportConfig `json:"transport_config"`
+	NetworkSettings      *compatLegacyTransportConfig `json:"network_settings,omitempty"`
+	NetworkSettingsCamel *compatLegacyTransportConfig `json:"networkSettings,omitempty"`
+	Security             string                       `json:"security"`
+	SecurityConfig       *compatLegacySecurityConfig  `json:"security_config"`
+	TLSSettings          *compatLegacySecurityConfig  `json:"tls_settings,omitempty"`
+	TLSSettingsCamel     *compatLegacySecurityConfig  `json:"tlsSettings,omitempty"`
 }
 
 type compatLegacyShadowsocksNode struct {
@@ -188,11 +200,27 @@ type compatLegacyShadowsocksNode struct {
 }
 
 type compatLegacyTrojanNode struct {
-	Port            uint16                       `json:"port"`
-	Network         string                       `json:"transport"`
-	TransportConfig *compatLegacyTransportConfig `json:"transport_config"`
-	Security        string                       `json:"security"`
-	SecurityConfig  *compatLegacySecurityConfig  `json:"security_config"`
+	Port                 uint16                       `json:"port"`
+	Network              string                       `json:"transport"`
+	TransportConfig      *compatLegacyTransportConfig `json:"transport_config"`
+	NetworkSettings      *compatLegacyTransportConfig `json:"network_settings,omitempty"`
+	NetworkSettingsCamel *compatLegacyTransportConfig `json:"networkSettings,omitempty"`
+	Security             string                       `json:"security"`
+	SecurityConfig       *compatLegacySecurityConfig  `json:"security_config"`
+	TLSSettings          *compatLegacySecurityConfig  `json:"tls_settings,omitempty"`
+	TLSSettingsCamel     *compatLegacySecurityConfig  `json:"tlsSettings,omitempty"`
+}
+
+type compatLegacyMxNode struct {
+	Port                 uint16                       `json:"port"`
+	Network              string                       `json:"transport"`
+	TransportConfig      *compatLegacyTransportConfig `json:"transport_config"`
+	NetworkSettings      *compatLegacyTransportConfig `json:"network_settings,omitempty"`
+	NetworkSettingsCamel *compatLegacyTransportConfig `json:"networkSettings,omitempty"`
+	Security             string                       `json:"security"`
+	SecurityConfig       *compatLegacySecurityConfig  `json:"security_config"`
+	TLSSettings          *compatLegacySecurityConfig  `json:"tls_settings,omitempty"`
+	TLSSettingsCamel     *compatLegacySecurityConfig  `json:"tlsSettings,omitempty"`
 }
 
 type compatLegacyAnyTLSNode struct {
@@ -920,6 +948,10 @@ func compatLegacyProtocolConfigMap(config *servermodel.Protocol) map[string]inte
 		ReduceRtt:            config.ReduceRtt,
 		UDPRelayMode:         config.UDPRelayMode,
 		CongestionController: config.CongestionController,
+		Mc1Mode:              config.Mc1Mode,
+		Mc1CidrSegments:      config.Mc1CidrSegments,
+		Mode:                 config.Mc1Mode,
+		CidrSegments:         config.Mc1CidrSegments,
 	}
 
 	var result interface{}
@@ -927,11 +959,13 @@ func compatLegacyProtocolConfigMap(config *servermodel.Protocol) map[string]inte
 	case "shadowsocks":
 		result = compatLegacyShadowsocksNode{Port: uint16(config.Port), Cipher: config.Cipher, ServerKey: base64.StdEncoding.EncodeToString([]byte(config.ServerKey))}
 	case "vless":
-		result = compatLegacyVlessNode{Port: uint16(config.Port), Flow: config.Flow, Network: config.Transport, TransportConfig: transportConfig, Security: config.Security, SecurityConfig: securityConfig}
+		result = compatLegacyVlessNode{Port: uint16(config.Port), Flow: config.Flow, Network: config.Transport, TransportConfig: transportConfig, NetworkSettings: transportConfig, NetworkSettingsCamel: transportConfig, Security: config.Security, SecurityConfig: securityConfig, TLSSettings: securityConfig, TLSSettingsCamel: securityConfig}
 	case "vmess":
-		result = compatLegacyVmessNode{Port: uint16(config.Port), Network: config.Transport, TransportConfig: transportConfig, Security: config.Security, SecurityConfig: securityConfig}
+		result = compatLegacyVmessNode{Port: uint16(config.Port), Network: config.Transport, TransportConfig: transportConfig, NetworkSettings: transportConfig, NetworkSettingsCamel: transportConfig, Security: config.Security, SecurityConfig: securityConfig, TLSSettings: securityConfig, TLSSettingsCamel: securityConfig}
 	case "trojan":
-		result = compatLegacyTrojanNode{Port: uint16(config.Port), Network: config.Transport, TransportConfig: transportConfig, Security: config.Security, SecurityConfig: securityConfig}
+		result = compatLegacyTrojanNode{Port: uint16(config.Port), Network: config.Transport, TransportConfig: transportConfig, NetworkSettings: transportConfig, NetworkSettingsCamel: transportConfig, Security: config.Security, SecurityConfig: securityConfig, TLSSettings: securityConfig, TLSSettingsCamel: securityConfig}
+	case "mx":
+		result = compatLegacyMxNode{Port: uint16(config.Port), Network: config.Transport, TransportConfig: transportConfig, NetworkSettings: transportConfig, NetworkSettingsCamel: transportConfig, Security: config.Security, SecurityConfig: securityConfig, TLSSettings: securityConfig, TLSSettingsCamel: securityConfig}
 	case "anytls":
 		anyTLSSecurityConfig := *securityConfig
 		anyTLSSecurityConfig.PaddingScheme = config.PaddingScheme

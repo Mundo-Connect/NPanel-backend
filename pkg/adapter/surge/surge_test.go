@@ -47,21 +47,6 @@ func TestSurgeBuild(t *testing.T) {
 				},
 			},
 		},
-		Group: []proxy.Group{
-			{
-				Name:    "test-group",
-				Type:    proxy.GroupTypeSelect,
-				Proxies: []string{"test-shadowsocks", "test-trojan", "test-hysteria"},
-			},
-			{
-				Name:    "手动选择",
-				Type:    proxy.GroupTypeSelect,
-				Proxies: []string{"test-shadowsocks", "test-trojan", "test-hysteria"},
-			},
-		},
-		Rules: []string{
-			"DOMAIN-SUFFIX,example.com,DIRECT",
-		},
 	}
 
 	user := UserInfo{
@@ -74,7 +59,7 @@ func TestSurgeBuild(t *testing.T) {
 	}
 
 	surge := NewSurge(adapter)
-	config := surge.Build("test-uuid", "TestSite", user)
+	config := surge.Build("TestSite", user)
 
 	if config == nil {
 		t.Fatal("Expected non-nil config")
@@ -88,10 +73,10 @@ func TestSurgeBuild(t *testing.T) {
 	if !strings.Contains(configStr, "test-trojan=trojan") {
 		t.Errorf("Expected config to contain test-trojan proxy")
 	}
-	if !strings.Contains(configStr, "test-group = select") {
-		t.Errorf("Expected config to contain test-group proxy group")
+	if !strings.Contains(configStr, "🇺🇳 Nodes = select, test-shadowsocks,test-trojan,test-hysteria") {
+		t.Errorf("Expected config to contain generated node proxy group")
 	}
-	if !strings.Contains(configStr, "DOMAIN-SUFFIX,example.com,DIRECT") {
-		t.Errorf("Expected config to contain rule for example.com")
+	if !strings.Contains(configStr, "FINAL, 🐠 Final, dns-failed") {
+		t.Errorf("Expected config to contain default final rule")
 	}
 }

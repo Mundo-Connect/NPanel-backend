@@ -10,6 +10,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+const (
+	TeamID       = "test-team-id"
+	ClientID     = "test-client-id"
+	KeyID        = "test-key-id"
+	ClientSecret = "test-client-secret"
+)
+
 func TestAppleLogin(t *testing.T) {
 	t.Skipf("Skip TestAppleLogin test")
 	router := gin.Default()

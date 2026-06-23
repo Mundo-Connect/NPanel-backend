@@ -4,10 +4,11 @@ import (
 	"context"
 	"testing"
 
+	"github.com/hibiken/asynq"
 	"github.com/npanel-dev/NPanel-backend/ent"
 	"github.com/npanel-dev/NPanel-backend/ent/enttest"
 	"github.com/npanel-dev/NPanel-backend/internal/conf"
-	"github.com/hibiken/asynq"
+	servermodel "github.com/npanel-dev/NPanel-backend/internal/model/server"
 	"github.com/redis/go-redis/v9"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -77,5 +78,37 @@ func TestCompatQueryServerProtocolConfigFiltersEnabledProtocols(t *testing.T) {
 	}
 	if resp.IPStrategy != "prefer_ipv4" {
 		t.Fatalf("IPStrategy = %q, want prefer_ipv4", resp.IPStrategy)
+	}
+}
+
+func TestCompatLegacyProtocolConfigMapIncludesMxMc1TransportConfig(t *testing.T) {
+	protocols, err := servermodel.UnmarshalProtocols(`[{"type":"mx","port":443,"enable":true,"security":"reality","sni":"sni.example.com","fingerprint":"chrome","reality_public_key":"public-key","reality_short_id":"short-id","transport":"mc1","path":"/mc1","host":"front.example.com","mode":"auto","cidrSegments":["127.0.0.0/24"]}]`)
+	if err != nil {
+		t.Fatalf("UnmarshalProtocols returned error: %v", err)
+	}
+	config := compatLegacyProtocolConfigMap(protocols[0])
+	if got, _ := config["transport"].(string); got != "mc1" {
+		t.Fatalf("transport = %q, want mc1; config=%v", got, config)
+	}
+	transportConfig, ok := config["transport_config"].(map[string]interface{})
+	if !ok {
+		t.Fatalf("transport_config type = %T, want map[string]interface{}", config["transport_config"])
+	}
+	networkSettings, ok := config["networkSettings"].(map[string]interface{})
+	if !ok {
+		t.Fatalf("networkSettings type = %T, want map[string]interface{}", config["networkSettings"])
+	}
+	if got, _ := transportConfig["mode"].(string); got != "auto" {
+		t.Fatalf("transport_config.mode = %q, want auto; config=%v", got, transportConfig)
+	}
+	if got, _ := networkSettings["mode"].(string); got != "auto" {
+		t.Fatalf("networkSettings.mode = %q, want auto; config=%v", got, networkSettings)
+	}
+	cidrSegments, ok := transportConfig["cidrSegments"].([]interface{})
+	if !ok || len(cidrSegments) != 1 || cidrSegments[0] != "127.0.0.0/24" {
+		t.Fatalf("transport_config.cidrSegments = %#v, want [127.0.0.0/24]", transportConfig["cidrSegments"])
+	}
+	if _, ok := config["tlsSettings"].(map[string]interface{}); !ok {
+		t.Fatalf("tlsSettings type = %T, want map[string]interface{}", config["tlsSettings"])
 	}
 }

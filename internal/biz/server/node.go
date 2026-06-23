@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/go-kratos/kratos/v2/log"
 	v1 "github.com/npanel-dev/NPanel-backend/api/server/v1"
 	"github.com/npanel-dev/NPanel-backend/internal/responsecode"
-	"github.com/go-kratos/kratos/v2/log"
 )
 
 // ServerNodeRepo 节点服务器仓储接口
@@ -100,6 +100,8 @@ type Protocol struct {
 	Host                          string
 	Path                          string
 	ServiceName                   string
+	Mc1Mode                       string
+	Mc1CidrSegments               []string
 	Cipher                        string
 	ServerKey                     string
 	Flow                          string

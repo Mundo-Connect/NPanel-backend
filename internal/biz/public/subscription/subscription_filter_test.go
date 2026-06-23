@@ -40,21 +40,22 @@ func TestFilterSubscriptionNodesByUserAgent(t *testing.T) {
 			{ID: 1, Type: "trojan"},
 			{ID: 2, Type: "simnet"},
 			{ID: 3, Type: "omniflow"},
-			{ID: 4, Type: "vmess"},
+			{ID: 4, Type: "mx"},
+			{ID: 5, Type: "vmess"},
 		}
 	}
 
 	t.Run("official client omnxt keeps all nodes", func(t *testing.T) {
 		got := filterSubscriptionNodesByUserAgent(mkNodes(), "omnxt/1.0")
-		if len(got) != 4 {
-			t.Fatalf("expected 4 nodes for official client, got %d", len(got))
+		if len(got) != 5 {
+			t.Fatalf("expected 5 nodes for official client, got %d", len(got))
 		}
 	})
 
 	t.Run("official client slaglab keeps all nodes", func(t *testing.T) {
 		got := filterSubscriptionNodesByUserAgent(mkNodes(), "slaglab/0.4")
-		if len(got) != 4 {
-			t.Fatalf("expected 4 nodes for official client, got %d", len(got))
+		if len(got) != 5 {
+			t.Fatalf("expected 5 nodes for official client, got %d", len(got))
 		}
 	})
 

@@ -191,6 +191,8 @@ func (r *subscribeApplicationRepo) GetPreviewNodes(ctx context.Context) ([]*publ
 			Host:                          matched.Host,
 			Path:                          matched.Path,
 			ServiceName:                   matched.ServiceName,
+			Mc1Mode:                       matched.Mc1Mode,
+			Mc1CidrSegments:               matched.Mc1CidrSegments,
 			Method:                        matched.Cipher,
 			ServerKey:                     matched.ServerKey,
 			Flow:                          matched.Flow,

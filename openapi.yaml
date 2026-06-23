@@ -8884,6 +8884,12 @@ components:
                     type: boolean
                 omniflowFallbackWssEnabled:
                     type: boolean
+                mc1Mode:
+                    type: string
+                mc1CidrSegments:
+                    type: array
+                    items:
+                        type: string
             description: Protocol represents a server protocol configuration with all fields
         api.admin.server.v1.QueryNodeTagData:
             type: object
@@ -14265,6 +14271,12 @@ components:
                     type: boolean
                 omniflowFallbackWssEnabled:
                     type: boolean
+                mc1Mode:
+                    type: string
+                mc1CidrSegments:
+                    type: array
+                    items:
+                        type: string
             description: Protocol 协议配置
         api.server.v1.PushOnlineUsersReply:
             type: object

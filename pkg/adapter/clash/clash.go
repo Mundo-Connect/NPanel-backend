@@ -43,6 +43,9 @@ func (c *Clash) Build(uuid string) ([]byte, error) {
 	}
 	var rules = append(c.Rules, fmt.Sprintf("MATCH,%s", c.Default))
 
+	if c.TemplateFS == nil {
+		return nil, fmt.Errorf("clash template fs is nil")
+	}
 	tmplBytes, err := c.TemplateFS.ReadFile("template/clash.tpl")
 	if err != nil {
 		logger.Errorw("Failed to read template file", logger.Field("error", err))

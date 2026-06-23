@@ -82,6 +82,15 @@ func addNode(data *Server, host string, port int) *proxy.Proxy {
 			node.Port = tuic.Port
 		}
 		option = tuic
+	case "mx":
+		var mx proxy.Mx
+		if err := json.Unmarshal([]byte(data.Config), &mx); err != nil {
+			return nil
+		}
+		if port == 0 {
+			node.Port = mx.Port
+		}
+		option = mx
 	default:
 		return nil
 	}
