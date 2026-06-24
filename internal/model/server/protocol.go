@@ -420,16 +420,30 @@ func UnmarshalProtocols(protocolsJSON string) ([]*Protocol, error) {
 
 // ValidateProtocols validates protocol list
 func ValidateProtocols(protocols []*Protocol) error {
-	// 验证protocol类型唯一性
+	// 验证protocol类型唯一性；Mundo X 使用同一个 type=mx 承载不同传输层，
+	// 因此 mx 需要按 type+transport 去重，避免 mc1/mundordp/mundosql 互相挡住。
 	seen := make(map[string]bool)
 	for _, p := range protocols {
-		if p.Type == "" {
+		if p == nil || strings.TrimSpace(p.Type) == "" {
 			return ErrProtocolTypeRequired
 		}
-		if seen[p.Type] {
+		key := protocolUniqueKey(p)
+		if seen[key] {
 			return ErrDuplicateProtocolType
 		}
-		seen[p.Type] = true
+		seen[key] = true
 	}
 	return nil
+}
+
+func protocolUniqueKey(p *Protocol) string {
+	protocolType := strings.ToLower(strings.TrimSpace(p.Type))
+	if protocolType != "mx" {
+		return protocolType
+	}
+	transport := strings.ToLower(strings.TrimSpace(p.Transport))
+	if transport == "" {
+		transport = "tcp"
+	}
+	return protocolType + ":" + transport
 }

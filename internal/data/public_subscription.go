@@ -172,24 +172,7 @@ func (r *publicSubscriptionRepo) GetAvailableNodes(ctx context.Context, userSubs
 			continue
 		}
 
-		var matched *servermodel.Protocol
-		var firstEnabled *servermodel.Protocol
-		var firstAvailable *servermodel.Protocol
-		for _, protocol := range protocols {
-			if protocol == nil {
-				continue
-			}
-			if firstAvailable == nil {
-				firstAvailable = protocol
-			}
-			if protocol.Enable && firstEnabled == nil {
-				firstEnabled = protocol
-			}
-			if strings.EqualFold(strings.TrimSpace(protocol.Type), strings.TrimSpace(node.Protocol)) {
-				matched = protocol
-				break
-			}
-		}
+		matched, firstEnabled, firstAvailable := matchNodeProtocolConfig(protocols, node.Protocol, node.Port)
 		if matched == nil {
 			matched = firstEnabled
 		}
