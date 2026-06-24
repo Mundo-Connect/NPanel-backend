@@ -2156,6 +2156,42 @@ func (m *Protocol) validate(all bool) error {
 
 	// no validation rules for SimnetFallbackTlsSni
 
+	// no validation rules for SimnetInboundMaxStreamsPerSession
+
+	// no validation rules for SimnetInboundMaxHandlerTasksPerSession
+
+	// no validation rules for SimnetStreamEventChannelCapacity
+
+	// no validation rules for SimnetStreamDataChannelCapacity
+
+	// no validation rules for SimnetTargetDialTimeoutMs
+
+	// no validation rules for SimnetTargetMaxConcurrentDials
+
+	// no validation rules for SimnetEgressBlockLoopback
+
+	// no validation rules for SimnetEgressBlockPrivate
+
+	// no validation rules for SimnetEgressBlockLinkLocal
+
+	// no validation rules for SimnetEgressBlockMetadata
+
+	// no validation rules for SimnetSendWindow
+
+	// no validation rules for SimnetRecvWindow
+
+	// no validation rules for SimnetMaxConcurrentStreams
+
+	// no validation rules for SimnetInitialWindowSize
+
+	// no validation rules for SimnetMaxFrameSize
+
+	// no validation rules for SimnetClientMaxConcurrentStreams
+
+	// no validation rules for SimnetClientMaxStreamsPerSession
+
+	// no validation rules for SimnetClientSessionIdleTimeoutSecs
+
 	// no validation rules for OmniflowCarrier
 
 	// no validation rules for OmniflowPath

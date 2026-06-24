@@ -18,6 +18,7 @@ func normalizeSimnetProtocolForResponse(protocol *serverBiz.Protocol) *serverBiz
 	if strings.TrimSpace(normalized.SimnetPath) == "" {
 		normalized.SimnetPath = "/simnet/session"
 	}
+	applySimnetResourceDefaultsForResponse(&normalized)
 	if !normalized.SimnetFallbackEnabled || strings.TrimSpace(normalized.SimnetFallbackTargetHost) == "" {
 		normalized.SimnetFallbackEnabled = false
 		normalized.SimnetFallbackTargetScheme = ""
@@ -66,6 +67,51 @@ func normalizeSimnetProtocolForResponse(protocol *serverBiz.Protocol) *serverBiz
 		normalized.SimnetAfFakeHeaderInjection = true
 	}
 	return &normalized
+}
+
+func applySimnetResourceDefaultsForResponse(protocol *serverBiz.Protocol) {
+	if protocol.SimnetInboundMaxStreamsPerSession <= 0 {
+		protocol.SimnetInboundMaxStreamsPerSession = 128
+	}
+	if protocol.SimnetInboundMaxHandlerTasksPerSession <= 0 {
+		protocol.SimnetInboundMaxHandlerTasksPerSession = 128
+	}
+	if protocol.SimnetStreamEventChannelCapacity <= 0 {
+		protocol.SimnetStreamEventChannelCapacity = 256
+	}
+	if protocol.SimnetStreamDataChannelCapacity <= 0 {
+		protocol.SimnetStreamDataChannelCapacity = 128
+	}
+	if protocol.SimnetTargetDialTimeoutMs <= 0 {
+		protocol.SimnetTargetDialTimeoutMs = 12_000
+	}
+	if protocol.SimnetTargetMaxConcurrentDials <= 0 {
+		protocol.SimnetTargetMaxConcurrentDials = 256
+	}
+	if protocol.SimnetSendWindow <= 0 {
+		protocol.SimnetSendWindow = 4 * 1024 * 1024
+	}
+	if protocol.SimnetRecvWindow <= 0 {
+		protocol.SimnetRecvWindow = 4 * 1024 * 1024
+	}
+	if protocol.SimnetMaxConcurrentStreams <= 0 {
+		protocol.SimnetMaxConcurrentStreams = 100
+	}
+	if protocol.SimnetInitialWindowSize <= 0 {
+		protocol.SimnetInitialWindowSize = 65_535
+	}
+	if protocol.SimnetMaxFrameSize <= 0 {
+		protocol.SimnetMaxFrameSize = 16_384
+	}
+	if protocol.SimnetClientMaxConcurrentStreams <= 0 {
+		protocol.SimnetClientMaxConcurrentStreams = 32
+	}
+	if protocol.SimnetClientMaxStreamsPerSession <= 0 {
+		protocol.SimnetClientMaxStreamsPerSession = 512
+	}
+	if protocol.SimnetClientSessionIdleTimeoutSecs <= 0 {
+		protocol.SimnetClientSessionIdleTimeoutSecs = 90
+	}
 }
 
 func normalizeMundoProtocolForResponse(protocol *serverBiz.Protocol) *serverBiz.Protocol {
@@ -312,86 +358,104 @@ func (s *ServerService) QueryServerProtocolConfig(ctx context.Context, req *v1.Q
 		protocol = normalizeSimnetProtocolForResponse(protocol)
 		protocol = normalizeMundoProtocolForResponse(protocol)
 		protocolConfigs = append(protocolConfigs, &v1.Protocol{
-			Type:                          protocol.Type,
-			Port:                          protocol.Port,
-			Enable:                        protocol.Enable,
-			Security:                      protocol.Security,
-			Sni:                           protocol.SNI,
-			AllowInsecure:                 protocol.AllowInsecure,
-			Fingerprint:                   protocol.Fingerprint,
-			RealityServerAddr:             protocol.RealityServerAddr,
-			RealityServerPort:             protocol.RealityServerPort,
-			RealityPrivateKey:             protocol.RealityPrivateKey,
-			RealityPublicKey:              protocol.RealityPublicKey,
-			RealityShortId:                protocol.RealityShortId,
-			Transport:                     protocol.Transport,
-			Host:                          protocol.Host,
-			Path:                          protocol.Path,
-			ServiceName:                   protocol.ServiceName,
-			Mc1Mode:                       protocol.Mc1Mode,
-			Mc1CidrSegments:               protocol.Mc1CidrSegments,
-			MundoUsername:                 protocol.MundoUsername,
-			MundoCertificateFingerprint:   protocol.MundoCertificateFingerprint,
-			MundoFakeTitle:                protocol.MundoFakeTitle,
-			MundoFakeMessage:              protocol.MundoFakeMessage,
-			MundoAcceptProxyProtocol:      protocol.MundoAcceptProxyProtocol,
-			MundoUseTlsCertificate:        protocol.MundoUseTLSCertificate,
-			Cipher:                        protocol.Cipher,
-			ServerKey:                     protocol.ServerKey,
-			Flow:                          protocol.Flow,
-			HopPorts:                      protocol.HopPorts,
-			HopInterval:                   protocol.HopInterval,
-			ObfsPassword:                  protocol.ObfsPassword,
-			DisableSni:                    protocol.DisableSNI,
-			ReduceRtt:                     protocol.ReduceRtt,
-			UdpRelayMode:                  protocol.UDPRelayMode,
-			CongestionController:          protocol.CongestionController,
-			Multiplex:                     protocol.Multiplex,
-			PaddingScheme:                 protocol.PaddingScheme,
-			UpMbps:                        protocol.UpMbps,
-			DownMbps:                      protocol.DownMbps,
-			Obfs:                          protocol.Obfs,
-			ObfsHost:                      protocol.ObfsHost,
-			ObfsPath:                      protocol.ObfsPath,
-			XhttpMode:                     protocol.XhttpMode,
-			XhttpExtra:                    protocol.XhttpExtra,
-			Encryption:                    protocol.Encryption,
-			EncryptionMode:                protocol.EncryptionMode,
-			EncryptionRtt:                 protocol.EncryptionRtt,
-			EncryptionTicket:              protocol.EncryptionTicket,
-			EncryptionServerPadding:       protocol.EncryptionServerPadding,
-			EncryptionPrivateKey:          protocol.EncryptionPrivateKey,
-			EncryptionClientPadding:       protocol.EncryptionClientPadding,
-			EncryptionPassword:            protocol.EncryptionPassword,
-			Ratio:                         protocol.Ratio,
-			CertMode:                      protocol.CertMode,
-			CertDnsProvider:               protocol.CertDNSProvider,
-			CertDnsEnv:                    protocol.CertDNSEnv,
-			SimnetPsk:                     protocol.SimnetPsk,
-			SimnetKeyId:                   protocol.SimnetKeyID,
-			SimnetTicketId:                protocol.SimnetTicketID,
-			SimnetPath:                    protocol.SimnetPath,
-			SimnetCarrier:                 protocol.SimnetCarrier,
-			SimnetAfEnabled:               protocol.SimnetAfEnabled,
-			SimnetAfPathMode:              protocol.SimnetAfPathMode,
-			SimnetAfPathPrefix:            protocol.SimnetAfPathPrefix,
-			SimnetAfPathSuffix:            protocol.SimnetAfPathSuffix,
-			SimnetAfMagicMode:             protocol.SimnetAfMagicMode,
-			SimnetAfResponseJitterMs:      protocol.SimnetAfResponseJitterMs,
-			SimnetAfHandshakePolymorphism: protocol.SimnetAfHandshakePolymorphism,
-			SimnetAfSettingsJitter:        protocol.SimnetAfSettingsJitter,
-			SimnetAfFakeHeaderInjection:   protocol.SimnetAfFakeHeaderInjection,
-			SimnetReverseEnabled:          protocol.SimnetReverseEnabled,
-			SimnetReverseListenAddr:       protocol.SimnetReverseListenAddr,
-			SimnetReverseListenPort:       protocol.SimnetReverseListenPort,
-			SimnetReverseTargetHost:       protocol.SimnetReverseTargetHost,
-			SimnetReverseTargetPort:       protocol.SimnetReverseTargetPort,
-			SimnetFallbackEnabled:         protocol.SimnetFallbackEnabled,
-			SimnetFallbackTargetScheme:    protocol.SimnetFallbackTargetScheme,
-			SimnetFallbackTargetHost:      protocol.SimnetFallbackTargetHost,
-			SimnetFallbackTargetPort:      protocol.SimnetFallbackTargetPort,
-			SimnetFallbackHostHeader:      protocol.SimnetFallbackHostHeader,
-			SimnetFallbackTlsSni:          protocol.SimnetFallbackTLSSNI,
+			Type:                                   protocol.Type,
+			Port:                                   protocol.Port,
+			Enable:                                 protocol.Enable,
+			Security:                               protocol.Security,
+			Sni:                                    protocol.SNI,
+			AllowInsecure:                          protocol.AllowInsecure,
+			Fingerprint:                            protocol.Fingerprint,
+			RealityServerAddr:                      protocol.RealityServerAddr,
+			RealityServerPort:                      protocol.RealityServerPort,
+			RealityPrivateKey:                      protocol.RealityPrivateKey,
+			RealityPublicKey:                       protocol.RealityPublicKey,
+			RealityShortId:                         protocol.RealityShortId,
+			Transport:                              protocol.Transport,
+			Host:                                   protocol.Host,
+			Path:                                   protocol.Path,
+			ServiceName:                            protocol.ServiceName,
+			Mc1Mode:                                protocol.Mc1Mode,
+			Mc1CidrSegments:                        protocol.Mc1CidrSegments,
+			MundoUsername:                          protocol.MundoUsername,
+			MundoCertificateFingerprint:            protocol.MundoCertificateFingerprint,
+			MundoFakeTitle:                         protocol.MundoFakeTitle,
+			MundoFakeMessage:                       protocol.MundoFakeMessage,
+			MundoAcceptProxyProtocol:               protocol.MundoAcceptProxyProtocol,
+			MundoUseTlsCertificate:                 protocol.MundoUseTLSCertificate,
+			Cipher:                                 protocol.Cipher,
+			ServerKey:                              protocol.ServerKey,
+			Flow:                                   protocol.Flow,
+			HopPorts:                               protocol.HopPorts,
+			HopInterval:                            protocol.HopInterval,
+			ObfsPassword:                           protocol.ObfsPassword,
+			DisableSni:                             protocol.DisableSNI,
+			ReduceRtt:                              protocol.ReduceRtt,
+			UdpRelayMode:                           protocol.UDPRelayMode,
+			CongestionController:                   protocol.CongestionController,
+			Multiplex:                              protocol.Multiplex,
+			PaddingScheme:                          protocol.PaddingScheme,
+			UpMbps:                                 protocol.UpMbps,
+			DownMbps:                               protocol.DownMbps,
+			Obfs:                                   protocol.Obfs,
+			ObfsHost:                               protocol.ObfsHost,
+			ObfsPath:                               protocol.ObfsPath,
+			XhttpMode:                              protocol.XhttpMode,
+			XhttpExtra:                             protocol.XhttpExtra,
+			Encryption:                             protocol.Encryption,
+			EncryptionMode:                         protocol.EncryptionMode,
+			EncryptionRtt:                          protocol.EncryptionRtt,
+			EncryptionTicket:                       protocol.EncryptionTicket,
+			EncryptionServerPadding:                protocol.EncryptionServerPadding,
+			EncryptionPrivateKey:                   protocol.EncryptionPrivateKey,
+			EncryptionClientPadding:                protocol.EncryptionClientPadding,
+			EncryptionPassword:                     protocol.EncryptionPassword,
+			Ratio:                                  protocol.Ratio,
+			CertMode:                               protocol.CertMode,
+			CertDnsProvider:                        protocol.CertDNSProvider,
+			CertDnsEnv:                             protocol.CertDNSEnv,
+			SimnetPsk:                              protocol.SimnetPsk,
+			SimnetKeyId:                            protocol.SimnetKeyID,
+			SimnetTicketId:                         protocol.SimnetTicketID,
+			SimnetPath:                             protocol.SimnetPath,
+			SimnetCarrier:                          protocol.SimnetCarrier,
+			SimnetAfEnabled:                        protocol.SimnetAfEnabled,
+			SimnetAfPathMode:                       protocol.SimnetAfPathMode,
+			SimnetAfPathPrefix:                     protocol.SimnetAfPathPrefix,
+			SimnetAfPathSuffix:                     protocol.SimnetAfPathSuffix,
+			SimnetAfMagicMode:                      protocol.SimnetAfMagicMode,
+			SimnetAfResponseJitterMs:               protocol.SimnetAfResponseJitterMs,
+			SimnetAfHandshakePolymorphism:          protocol.SimnetAfHandshakePolymorphism,
+			SimnetAfSettingsJitter:                 protocol.SimnetAfSettingsJitter,
+			SimnetAfFakeHeaderInjection:            protocol.SimnetAfFakeHeaderInjection,
+			SimnetReverseEnabled:                   protocol.SimnetReverseEnabled,
+			SimnetReverseListenAddr:                protocol.SimnetReverseListenAddr,
+			SimnetReverseListenPort:                protocol.SimnetReverseListenPort,
+			SimnetReverseTargetHost:                protocol.SimnetReverseTargetHost,
+			SimnetReverseTargetPort:                protocol.SimnetReverseTargetPort,
+			SimnetFallbackEnabled:                  protocol.SimnetFallbackEnabled,
+			SimnetFallbackTargetScheme:             protocol.SimnetFallbackTargetScheme,
+			SimnetFallbackTargetHost:               protocol.SimnetFallbackTargetHost,
+			SimnetFallbackTargetPort:               protocol.SimnetFallbackTargetPort,
+			SimnetFallbackHostHeader:               protocol.SimnetFallbackHostHeader,
+			SimnetFallbackTlsSni:                   protocol.SimnetFallbackTLSSNI,
+			SimnetInboundMaxStreamsPerSession:      protocol.SimnetInboundMaxStreamsPerSession,
+			SimnetInboundMaxHandlerTasksPerSession: protocol.SimnetInboundMaxHandlerTasksPerSession,
+			SimnetStreamEventChannelCapacity:       protocol.SimnetStreamEventChannelCapacity,
+			SimnetStreamDataChannelCapacity:        protocol.SimnetStreamDataChannelCapacity,
+			SimnetTargetDialTimeoutMs:              protocol.SimnetTargetDialTimeoutMs,
+			SimnetTargetMaxConcurrentDials:         protocol.SimnetTargetMaxConcurrentDials,
+			SimnetEgressBlockLoopback:              protocol.SimnetEgressBlockLoopback,
+			SimnetEgressBlockPrivate:               protocol.SimnetEgressBlockPrivate,
+			SimnetEgressBlockLinkLocal:             protocol.SimnetEgressBlockLinkLocal,
+			SimnetEgressBlockMetadata:              protocol.SimnetEgressBlockMetadata,
+			SimnetSendWindow:                       protocol.SimnetSendWindow,
+			SimnetRecvWindow:                       protocol.SimnetRecvWindow,
+			SimnetMaxConcurrentStreams:             protocol.SimnetMaxConcurrentStreams,
+			SimnetInitialWindowSize:                protocol.SimnetInitialWindowSize,
+			SimnetMaxFrameSize:                     protocol.SimnetMaxFrameSize,
+			SimnetClientMaxConcurrentStreams:       protocol.SimnetClientMaxConcurrentStreams,
+			SimnetClientMaxStreamsPerSession:       protocol.SimnetClientMaxStreamsPerSession,
+			SimnetClientSessionIdleTimeoutSecs:     protocol.SimnetClientSessionIdleTimeoutSecs,
 			// OmniFlow
 			OmniflowCarrier:                    protocol.OmniflowCarrier,
 			OmniflowPath:                       protocol.OmniflowPath,

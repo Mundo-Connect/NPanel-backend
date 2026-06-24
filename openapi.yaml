@@ -8787,6 +8787,56 @@ components:
                     type: string
                 simnetFallbackTlsSni:
                     type: string
+                simnetInboundMaxStreamsPerSession:
+                    type: integer
+                    format: int32
+                simnetInboundMaxHandlerTasksPerSession:
+                    type: integer
+                    format: int32
+                simnetStreamEventChannelCapacity:
+                    type: integer
+                    format: int32
+                simnetStreamDataChannelCapacity:
+                    type: integer
+                    format: int32
+                simnetTargetDialTimeoutMs:
+                    type: integer
+                    format: int32
+                simnetTargetMaxConcurrentDials:
+                    type: integer
+                    format: int32
+                simnetEgressBlockLoopback:
+                    type: boolean
+                simnetEgressBlockPrivate:
+                    type: boolean
+                simnetEgressBlockLinkLocal:
+                    type: boolean
+                simnetEgressBlockMetadata:
+                    type: boolean
+                simnetSendWindow:
+                    type: integer
+                    format: int32
+                simnetRecvWindow:
+                    type: integer
+                    format: int32
+                simnetMaxConcurrentStreams:
+                    type: integer
+                    format: int32
+                simnetInitialWindowSize:
+                    type: integer
+                    format: int32
+                simnetMaxFrameSize:
+                    type: integer
+                    format: int32
+                simnetClientMaxConcurrentStreams:
+                    type: integer
+                    format: int32
+                simnetClientMaxStreamsPerSession:
+                    type: integer
+                    format: int32
+                simnetClientSessionIdleTimeoutSecs:
+                    type: integer
+                    format: int32
                 omniflowCarrier:
                     type: string
                     description: OmniFlow 基础配置
@@ -14186,6 +14236,56 @@ components:
                     type: string
                 simnetFallbackTlsSni:
                     type: string
+                simnetInboundMaxStreamsPerSession:
+                    type: integer
+                    format: int32
+                simnetInboundMaxHandlerTasksPerSession:
+                    type: integer
+                    format: int32
+                simnetStreamEventChannelCapacity:
+                    type: integer
+                    format: int32
+                simnetStreamDataChannelCapacity:
+                    type: integer
+                    format: int32
+                simnetTargetDialTimeoutMs:
+                    type: integer
+                    format: int32
+                simnetTargetMaxConcurrentDials:
+                    type: integer
+                    format: int32
+                simnetEgressBlockLoopback:
+                    type: boolean
+                simnetEgressBlockPrivate:
+                    type: boolean
+                simnetEgressBlockLinkLocal:
+                    type: boolean
+                simnetEgressBlockMetadata:
+                    type: boolean
+                simnetSendWindow:
+                    type: integer
+                    format: int32
+                simnetRecvWindow:
+                    type: integer
+                    format: int32
+                simnetMaxConcurrentStreams:
+                    type: integer
+                    format: int32
+                simnetInitialWindowSize:
+                    type: integer
+                    format: int32
+                simnetMaxFrameSize:
+                    type: integer
+                    format: int32
+                simnetClientMaxConcurrentStreams:
+                    type: integer
+                    format: int32
+                simnetClientMaxStreamsPerSession:
+                    type: integer
+                    format: int32
+                simnetClientSessionIdleTimeoutSecs:
+                    type: integer
+                    format: int32
                 omniflowCarrier:
                     type: string
                     description: OmniFlow 基础配置

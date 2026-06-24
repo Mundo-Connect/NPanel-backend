@@ -162,14 +162,17 @@ func buildOmnxtSimnetConfigs(proxies []map[string]interface{}, userInfo UserInfo
 			// Server PSK is needed for AF path/magic/content-type derivation.
 			// The Node uses credentials[0] (server PSK, key_id=0) for AF, so
 			// the SDK must also use the same key material for path matching.
-			"simnet_server_psk":    mapStringOrNil(proxy["SimnetPSK"]),
-			"simnet_server_key_id": defaultInt(mapInt(proxy["SimnetKeyID"]), 0),
-			"simnet_ticket_id":     mapStringOrNil(proxy["SimnetTicketID"]),
-			"simnet_path":          defaultString(mapString(proxy["SimnetPath"]), "/simnet/session"),
-			"simnet_carrier":       defaultString(mapString(proxy["SimnetCarrier"]), "h2"),
-			"simnet_af_enabled":    afEnabled,
-			"proxy_mode":           proxyMode,
-			"dns_servers":          dnsServers,
+			"simnet_server_psk":                       mapStringOrNil(proxy["SimnetPSK"]),
+			"simnet_server_key_id":                    defaultInt(mapInt(proxy["SimnetKeyID"]), 0),
+			"simnet_ticket_id":                        mapStringOrNil(proxy["SimnetTicketID"]),
+			"simnet_path":                             defaultString(mapString(proxy["SimnetPath"]), "/simnet/session"),
+			"simnet_carrier":                          defaultString(mapString(proxy["SimnetCarrier"]), "h2"),
+			"simnet_af_enabled":                       afEnabled,
+			"simnet_client_max_concurrent_streams":    defaultInt(mapInt(proxy["SimnetClientMaxConcurrentStreams"]), 32),
+			"simnet_client_max_streams_per_session":   defaultInt(mapInt(proxy["SimnetClientMaxStreamsPerSession"]), 512),
+			"simnet_client_session_idle_timeout_secs": defaultInt(mapInt(proxy["SimnetClientSessionIdleTimeoutSecs"]), 90),
+			"proxy_mode":                              proxyMode,
+			"dns_servers":                             dnsServers,
 		}
 		if afEnabled {
 			item["simnet_af_path_mode"] = defaultString(mapString(proxy["SimnetAfPathMode"]), "api")
@@ -202,18 +205,21 @@ func buildOmnxtProtocolLinks(proxies []map[string]interface{}, userInfo UserInfo
 
 		afEnabled := mapBool(item["simnet_af_enabled"])
 		payload := map[string]interface{}{
-			"protocol":          mapString(item["protocol"]),
-			"server_addr":       serverAddr,
-			"server_port":       serverPort,
-			"sni":               mapString(item["sni"]),
-			"simnet_psk":        mapString(item["simnet_psk"]),
-			"simnet_key_id":     mapInt(item["simnet_key_id"]),
-			"simnet_ticket_id":  item["simnet_ticket_id"],
-			"simnet_path":       item["simnet_path"],
-			"simnet_carrier":    mapString(item["simnet_carrier"]),
-			"simnet_af_enabled": afEnabled,
-			"proxy_mode":        item["proxy_mode"],
-			"dns_servers":       item["dns_servers"],
+			"protocol":                              mapString(item["protocol"]),
+			"server_addr":                           serverAddr,
+			"server_port":                           serverPort,
+			"sni":                                   mapString(item["sni"]),
+			"simnet_psk":                            mapString(item["simnet_psk"]),
+			"simnet_key_id":                         mapInt(item["simnet_key_id"]),
+			"simnet_ticket_id":                      item["simnet_ticket_id"],
+			"simnet_path":                           item["simnet_path"],
+			"simnet_carrier":                        mapString(item["simnet_carrier"]),
+			"simnet_af_enabled":                     afEnabled,
+			"simnet_client_max_concurrent_streams":  mapInt(item["simnet_client_max_concurrent_streams"]),
+			"simnet_client_max_streams_per_session": mapInt(item["simnet_client_max_streams_per_session"]),
+			"simnet_client_session_idle_timeout_secs": mapInt(item["simnet_client_session_idle_timeout_secs"]),
+			"proxy_mode":  item["proxy_mode"],
+			"dns_servers": item["dns_servers"],
 		}
 		if afEnabled {
 			payload["simnet_af_path_mode"] = mapString(item["simnet_af_path_mode"])

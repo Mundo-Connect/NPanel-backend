@@ -119,12 +119,6 @@ func VmessUri(data proxy.Proxy, uuid string) string {
 	case "grpc":
 		s.Net = "grpc"
 		s.Path = transport.ServiceName
-	case "mc1":
-		s.Net = "mc1"
-		s.Path = defaultString(transport.Path, "/")
-		s.Host = defaultString(transport.Host, data.Server)
-		s.Mode = defaultString(mc1Mode(transport), "auto")
-		s.Cidr = strings.Join(mc1CidrSegments(transport), ",")
 	case "httpupgrade":
 		s.Net = "http"
 		s.Path = transport.Path
@@ -164,14 +158,6 @@ func VlessUri(data proxy.Proxy, uuid string) string {
 	case "grpc":
 		setQuery(&query, "type", "grpc")
 		setQuery(&query, "serviceName", transportConfig.ServiceName)
-	case "mc1":
-		setQuery(&query, "type", "mc1")
-		setQuery(&query, "path", defaultString(transportConfig.Path, "/"))
-		setQuery(&query, "host", defaultString(transportConfig.Host, data.Server))
-		setQuery(&query, "mode", defaultString(mc1Mode(transportConfig), "auto"))
-		if cidrSegments := mc1CidrSegments(transportConfig); len(cidrSegments) > 0 {
-			setQuery(&query, "cidr", strings.Join(cidrSegments, ","))
-		}
 	}
 
 	if vless.Security == "tls" {
@@ -213,14 +199,6 @@ func TrojanUri(data proxy.Proxy, uuid string) string {
 	case "grpc":
 		setQuery(&query, "type", "grpc")
 		setQuery(&query, "serviceName", transportConfig.ServiceName)
-	case "mc1":
-		setQuery(&query, "type", "mc1")
-		setQuery(&query, "path", defaultString(transportConfig.Path, "/"))
-		setQuery(&query, "host", defaultString(transportConfig.Host, data.Server))
-		setQuery(&query, "mode", defaultString(mc1Mode(transportConfig), "auto"))
-		if cidrSegments := mc1CidrSegments(transportConfig); len(cidrSegments) > 0 {
-			setQuery(&query, "cidr", strings.Join(cidrSegments, ","))
-		}
 	default:
 		setQuery(&query, "type", "tcp")
 		setQuery(&query, "path", transportConfig.Path)

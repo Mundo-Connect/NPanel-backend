@@ -10,19 +10,28 @@ import (
 func TestCleanLegacyNodeProtocolsKeepsSimnetAfClientFields(t *testing.T) {
 	raw, err := json.Marshal([]*servermodel.Protocol{
 		{
-			Type:                          "simnet",
-			Port:                          443,
-			Enable:                        true,
-			SimnetPsk:                     " server-psk ",
-			SimnetKeyID:                   0,
-			SimnetCarrier:                 "",
-			SimnetAfEnabled:               true,
-			SimnetAfPathMode:              " random ",
-			SimnetAfMagicMode:             " derived ",
-			SimnetAfResponseJitterMs:      0,
-			SimnetAfHandshakePolymorphism: true,
-			SimnetAfSettingsJitter:        true,
-			SimnetAfFakeHeaderInjection:   true,
+			Type:                               "simnet",
+			Port:                               443,
+			Enable:                             true,
+			SimnetPsk:                          " server-psk ",
+			SimnetKeyID:                        0,
+			SimnetCarrier:                      "",
+			SimnetAfEnabled:                    true,
+			SimnetAfPathMode:                   " random ",
+			SimnetAfMagicMode:                  " derived ",
+			SimnetAfResponseJitterMs:           0,
+			SimnetAfHandshakePolymorphism:      true,
+			SimnetAfSettingsJitter:             true,
+			SimnetAfFakeHeaderInjection:        true,
+			SimnetClientMaxConcurrentStreams:   0,
+			SimnetClientMaxStreamsPerSession:   0,
+			SimnetClientSessionIdleTimeoutSecs: 0,
+		},
+		{
+			Type:                             "vless",
+			Port:                             8443,
+			Enable:                           true,
+			SimnetClientMaxConcurrentStreams: 0,
 		},
 	})
 	if err != nil {
@@ -35,8 +44,8 @@ func TestCleanLegacyNodeProtocolsKeepsSimnetAfClientFields(t *testing.T) {
 	if err := json.Unmarshal([]byte(cleaned), &protocols); err != nil {
 		t.Fatalf("cleaned protocols should be valid json: %v\n%s", err, cleaned)
 	}
-	if len(protocols) != 1 {
-		t.Fatalf("expected one protocol, got %d", len(protocols))
+	if len(protocols) != 2 {
+		t.Fatalf("expected two protocols, got %d", len(protocols))
 	}
 	protocol := protocols[0]
 	if !protocol.SimnetAfEnabled {
@@ -68,6 +77,14 @@ func TestCleanLegacyNodeProtocolsKeepsSimnetAfClientFields(t *testing.T) {
 	}
 	if protocol.SimnetPsk != "server-psk" {
 		t.Fatalf("expected trimmed server psk, got %q", protocol.SimnetPsk)
+	}
+	if protocol.SimnetClientMaxConcurrentStreams != 32 ||
+		protocol.SimnetClientMaxStreamsPerSession != 512 ||
+		protocol.SimnetClientSessionIdleTimeoutSecs != 90 {
+		t.Fatalf("expected simnet client defaults, got %d/%d/%d", protocol.SimnetClientMaxConcurrentStreams, protocol.SimnetClientMaxStreamsPerSession, protocol.SimnetClientSessionIdleTimeoutSecs)
+	}
+	if protocols[1].SimnetClientMaxConcurrentStreams != 0 {
+		t.Fatalf("non-simnet protocol should not receive simnet defaults: %+v", protocols[1])
 	}
 }
 

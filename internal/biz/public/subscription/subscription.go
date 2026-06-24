@@ -445,86 +445,89 @@ type NodeInfo struct {
 	Tags        []string
 	NodeGroupID int64
 
-	Security                      string
-	SNI                           string
-	AllowInsecure                 bool
-	Fingerprint                   string
-	RealityServerAddr             string
-	RealityServerPort             int
-	RealityPrivateKey             string
-	RealityPublicKey              string
-	RealityShortId                string
-	Transport                     string
-	Host                          string
-	Path                          string
-	ServiceName                   string
-	Mc1Mode                       string
-	Mc1CidrSegments               []string
-	MundoUsername                 string
-	MundoCertificateFingerprint   string
-	MundoFakeTitle                string
-	MundoFakeMessage              string
-	MundoAcceptProxyProtocol      bool
-	MundoUseTLSCertificate        bool
-	Method                        string
-	ServerKey                     string
-	Flow                          string
-	HopPorts                      string
-	HopInterval                   int
-	ObfsPassword                  string
-	UpMbps                        int
-	DownMbps                      int
-	DisableSNI                    bool
-	ReduceRtt                     bool
-	UDPRelayMode                  string
-	CongestionController          string
-	PaddingScheme                 string
-	Multiplex                     string
-	XhttpMode                     string
-	XhttpExtra                    string
-	Encryption                    string
-	EncryptionMode                string
-	EncryptionRtt                 string
-	EncryptionTicket              string
-	EncryptionServerPadding       string
-	EncryptionPrivateKey          string
-	EncryptionClientPadding       string
-	EncryptionPassword            string
-	Ratio                         float64
-	CertMode                      string
-	CertDNSProvider               string
-	CertDNSEnv                    string
-	SimnetPsk                     string
-	SimnetKeyID                   int
-	SimnetTicketID                string
-	SimnetPath                    string
-	SimnetCarrier                 string
-	SimnetAfEnabled               bool
-	SimnetAfPathMode              string
-	SimnetAfPathPrefix            string
-	SimnetAfPathSuffix            string
-	SimnetAfMagicMode             string
-	SimnetAfResponseJitterMs      int
-	SimnetAfHandshakePolymorphism bool
-	SimnetAfSettingsJitter        bool
-	SimnetAfFakeHeaderInjection   bool
-	OmniflowCarrier               string
-	OmniflowPath                  string
-	OmniflowContentType           string
-	OmniflowProfileJson           string
-	OmniflowCaCertPath            string
-	OmniflowTargetMeta            string
-	OmniflowSpkiPin               string
-	OmniflowAdaptiveTlsEnabled    bool
-	OmniflowTlsFingerprint        string
-	OmniflowSniMode               string
-	OmniflowPaddingMode           string
-	OmniflowAfEnabled             bool
-	OmniflowAfPathMode            string
-	OmniflowAfPathPrefix          string
-	OmniflowAfPathSuffix          string
-	OmniflowAfPathRotationSecs    int
-	OmniflowAfPathSkewSlots       int
+	Security                           string
+	SNI                                string
+	AllowInsecure                      bool
+	Fingerprint                        string
+	RealityServerAddr                  string
+	RealityServerPort                  int
+	RealityPrivateKey                  string
+	RealityPublicKey                   string
+	RealityShortId                     string
+	Transport                          string
+	Host                               string
+	Path                               string
+	ServiceName                        string
+	Mc1Mode                            string
+	Mc1CidrSegments                    []string
+	MundoUsername                      string
+	MundoCertificateFingerprint        string
+	MundoFakeTitle                     string
+	MundoFakeMessage                   string
+	MundoAcceptProxyProtocol           bool
+	MundoUseTLSCertificate             bool
+	Method                             string
+	ServerKey                          string
+	Flow                               string
+	HopPorts                           string
+	HopInterval                        int
+	ObfsPassword                       string
+	UpMbps                             int
+	DownMbps                           int
+	DisableSNI                         bool
+	ReduceRtt                          bool
+	UDPRelayMode                       string
+	CongestionController               string
+	PaddingScheme                      string
+	Multiplex                          string
+	XhttpMode                          string
+	XhttpExtra                         string
+	Encryption                         string
+	EncryptionMode                     string
+	EncryptionRtt                      string
+	EncryptionTicket                   string
+	EncryptionServerPadding            string
+	EncryptionPrivateKey               string
+	EncryptionClientPadding            string
+	EncryptionPassword                 string
+	Ratio                              float64
+	CertMode                           string
+	CertDNSProvider                    string
+	CertDNSEnv                         string
+	SimnetPsk                          string
+	SimnetKeyID                        int
+	SimnetTicketID                     string
+	SimnetPath                         string
+	SimnetCarrier                      string
+	SimnetAfEnabled                    bool
+	SimnetAfPathMode                   string
+	SimnetAfPathPrefix                 string
+	SimnetAfPathSuffix                 string
+	SimnetAfMagicMode                  string
+	SimnetAfResponseJitterMs           int
+	SimnetAfHandshakePolymorphism      bool
+	SimnetAfSettingsJitter             bool
+	SimnetAfFakeHeaderInjection        bool
+	SimnetClientMaxConcurrentStreams   int
+	SimnetClientMaxStreamsPerSession   int
+	SimnetClientSessionIdleTimeoutSecs int
+	OmniflowCarrier                    string
+	OmniflowPath                       string
+	OmniflowContentType                string
+	OmniflowProfileJson                string
+	OmniflowCaCertPath                 string
+	OmniflowTargetMeta                 string
+	OmniflowSpkiPin                    string
+	OmniflowAdaptiveTlsEnabled         bool
+	OmniflowTlsFingerprint             string
+	OmniflowSniMode                    string
+	OmniflowPaddingMode                string
+	OmniflowAfEnabled                  bool
+	OmniflowAfPathMode                 string
+	OmniflowAfPathPrefix               string
+	OmniflowAfPathSuffix               string
+	OmniflowAfPathRotationSecs         int
+	OmniflowAfPathSkewSlots            int
 }
 
 func (n *NodeInfo) NormalizeSimnet() {
@@ -533,6 +536,15 @@ func (n *NodeInfo) NormalizeSimnet() {
 	}
 	if strings.TrimSpace(n.SimnetPath) == "" {
 		n.SimnetPath = "/simnet/session"
+	}
+	if n.SimnetClientMaxConcurrentStreams <= 0 {
+		n.SimnetClientMaxConcurrentStreams = 32
+	}
+	if n.SimnetClientMaxStreamsPerSession <= 0 {
+		n.SimnetClientMaxStreamsPerSession = 512
+	}
+	if n.SimnetClientSessionIdleTimeoutSecs <= 0 {
+		n.SimnetClientSessionIdleTimeoutSecs = 90
 	}
 	if !n.SimnetAfEnabled {
 		n.SimnetAfPathMode = ""

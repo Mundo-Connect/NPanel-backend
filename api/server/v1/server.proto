@@ -297,6 +297,24 @@ message Protocol {
 	int32 simnet_fallback_target_port = 70;
 	string simnet_fallback_host_header = 71;
 	string simnet_fallback_tls_sni = 72;
+	int32 simnet_inbound_max_streams_per_session = 121;
+	int32 simnet_inbound_max_handler_tasks_per_session = 122;
+	int32 simnet_stream_event_channel_capacity = 123;
+	int32 simnet_stream_data_channel_capacity = 124;
+	int32 simnet_target_dial_timeout_ms = 125;
+	int32 simnet_target_max_concurrent_dials = 126;
+	bool simnet_egress_block_loopback = 127;
+	bool simnet_egress_block_private = 128;
+	bool simnet_egress_block_link_local = 129;
+	bool simnet_egress_block_metadata = 130;
+	int32 simnet_send_window = 131;
+	int32 simnet_recv_window = 132;
+	int32 simnet_max_concurrent_streams = 133;
+	int32 simnet_initial_window_size = 134;
+	int32 simnet_max_frame_size = 135;
+	int32 simnet_client_max_concurrent_streams = 136;
+	int32 simnet_client_max_streams_per_session = 137;
+	int32 simnet_client_session_idle_timeout_secs = 138;
 
 	// OmniFlow 基础配置
 	string omniflow_carrier = 73;                    // h2 或 h3

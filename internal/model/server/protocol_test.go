@@ -185,6 +185,60 @@ func TestProtocolNormalizeSimnetDefaultsEnabledAfSubFeatures(t *testing.T) {
 	}
 }
 
+func TestProtocolNormalizeSimnetDefaultsResourceLimits(t *testing.T) {
+	protocol := &Protocol{Type: "simnet"}
+
+	protocol.NormalizeSimnet()
+
+	if protocol.SimnetInboundMaxStreamsPerSession != defaultSimnetInboundMaxStreamsPerSession {
+		t.Fatalf("inbound max streams = %d, want %d", protocol.SimnetInboundMaxStreamsPerSession, defaultSimnetInboundMaxStreamsPerSession)
+	}
+	if protocol.SimnetInboundMaxHandlerTasksPerSession != defaultSimnetInboundMaxHandlerTasksPerSession {
+		t.Fatalf("handler task limit = %d, want %d", protocol.SimnetInboundMaxHandlerTasksPerSession, defaultSimnetInboundMaxHandlerTasksPerSession)
+	}
+	if protocol.SimnetStreamEventChannelCapacity != defaultSimnetStreamEventChannelCapacity {
+		t.Fatalf("event channel capacity = %d, want %d", protocol.SimnetStreamEventChannelCapacity, defaultSimnetStreamEventChannelCapacity)
+	}
+	if protocol.SimnetStreamDataChannelCapacity != defaultSimnetStreamDataChannelCapacity {
+		t.Fatalf("data channel capacity = %d, want %d", protocol.SimnetStreamDataChannelCapacity, defaultSimnetStreamDataChannelCapacity)
+	}
+	if protocol.SimnetTargetDialTimeoutMs != defaultSimnetTargetDialTimeoutMs {
+		t.Fatalf("dial timeout = %d, want %d", protocol.SimnetTargetDialTimeoutMs, defaultSimnetTargetDialTimeoutMs)
+	}
+	if protocol.SimnetTargetMaxConcurrentDials != defaultSimnetTargetMaxConcurrentDials {
+		t.Fatalf("dial limit = %d, want %d", protocol.SimnetTargetMaxConcurrentDials, defaultSimnetTargetMaxConcurrentDials)
+	}
+	if protocol.SimnetSendWindow != defaultSimnetSessionWindow || protocol.SimnetRecvWindow != defaultSimnetSessionWindow {
+		t.Fatalf("windows = %d/%d, want %d", protocol.SimnetSendWindow, protocol.SimnetRecvWindow, defaultSimnetSessionWindow)
+	}
+	if protocol.SimnetMaxConcurrentStreams != defaultSimnetMaxConcurrentStreams ||
+		protocol.SimnetInitialWindowSize != defaultSimnetInitialWindowSize ||
+		protocol.SimnetMaxFrameSize != defaultSimnetMaxFrameSize {
+		t.Fatalf("h2 defaults = %d/%d/%d", protocol.SimnetMaxConcurrentStreams, protocol.SimnetInitialWindowSize, protocol.SimnetMaxFrameSize)
+	}
+	if protocol.SimnetClientMaxConcurrentStreams != defaultSimnetClientMaxConcurrentStreams ||
+		protocol.SimnetClientMaxStreamsPerSession != defaultSimnetClientMaxStreamsPerSession ||
+		protocol.SimnetClientSessionIdleTimeoutSecs != defaultSimnetClientSessionIdleTimeoutSecs {
+		t.Fatalf("client defaults = %d/%d/%d", protocol.SimnetClientMaxConcurrentStreams, protocol.SimnetClientMaxStreamsPerSession, protocol.SimnetClientSessionIdleTimeoutSecs)
+	}
+}
+
+func TestProtocolNormalizeSimnetDoesNotPolluteOtherProtocols(t *testing.T) {
+	protocol := &Protocol{Type: "vless"}
+
+	protocol.NormalizeSimnet()
+
+	if protocol.SimnetPath != "" {
+		t.Fatalf("non-simnet path changed to %q", protocol.SimnetPath)
+	}
+	if protocol.SimnetInboundMaxStreamsPerSession != 0 ||
+		protocol.SimnetTargetDialTimeoutMs != 0 ||
+		protocol.SimnetSendWindow != 0 ||
+		protocol.SimnetClientMaxConcurrentStreams != 0 {
+		t.Fatalf("non-simnet resource fields were populated: %+v", protocol)
+	}
+}
+
 func TestProtocolNormalizeOmniflowClearsDisabledAfPath(t *testing.T) {
 	protocol := &Protocol{
 		Type:                         "omniflow",
