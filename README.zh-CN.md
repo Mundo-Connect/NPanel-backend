@@ -211,7 +211,7 @@ SKIP_GIT_PULL=1 ./scripts/docker-upgrade.sh
 如果要指定本地构建的后端版本：
 
 ```bash
-NPANEL_VERSION=v1.0.7 ./scripts/docker-upgrade.sh
+NPANEL_VERSION=v1.0.8 ./scripts/docker-upgrade.sh
 ```
 
 使用单容器部署时：
@@ -231,14 +231,14 @@ docker run -d --name npanel -p 8081:8081 -p 9012:9012 -v "$(pwd)/npanel-config:/
 
 1. 打开 `Actions` -> `Release`
 2. 点击 `Run workflow`
-3. 输入版本号，例如 `v1.0.7`
+3. 输入版本号，例如 `v1.0.8`
 
 该 workflow 会构建 64 位 Linux、macOS、Windows 版本，并把压缩包和 `SHA256SUMS` 上传到 GitHub Release。
 
 如果需要在本地生成同样的发布包：
 
 ```bash
-./scripts/build-release.sh v1.0.7
+./scripts/build-release.sh v1.0.8
 ```
 
 ## 本地开发

@@ -58,7 +58,7 @@ func main() {
 		Name = "npanel"
 	}
 	if Version == "" {
-		Version = "v1.0.7"
+		Version = "v1.0.8"
 	}
 	buildmeta.SetMainVersion(Version)
 

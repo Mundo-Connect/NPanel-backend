@@ -211,7 +211,7 @@ SKIP_GIT_PULL=1 ./scripts/docker-upgrade.sh
 To upgrade to a specific backend build version while rebuilding locally:
 
 ```bash
-NPANEL_VERSION=v1.0.7 ./scripts/docker-upgrade.sh
+NPANEL_VERSION=v1.0.8 ./scripts/docker-upgrade.sh
 ```
 
 For single-container deployments:
@@ -231,14 +231,14 @@ Maintainers can publish binary release packages from GitHub Actions:
 
 1. Open `Actions` -> `Release`
 2. Click `Run workflow`
-3. Enter a version such as `v1.0.7`
+3. Enter a version such as `v1.0.8`
 
 The workflow builds 64-bit Linux, macOS, and Windows packages and uploads them to the GitHub Release together with `SHA256SUMS`.
 
 To build the same packages locally:
 
 ```bash
-./scripts/build-release.sh v1.0.7
+./scripts/build-release.sh v1.0.8
 ```
 
 ## Local Development
