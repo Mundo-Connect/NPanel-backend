@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/go-kratos/kratos/v2/log"
 	"github.com/npanel-dev/NPanel-backend/ent"
 	"github.com/npanel-dev/NPanel-backend/ent/proxynode"
 	"github.com/npanel-dev/NPanel-backend/ent/proxyserver"
@@ -17,7 +18,6 @@ import (
 	servermodel "github.com/npanel-dev/NPanel-backend/internal/model/server"
 	"github.com/npanel-dev/NPanel-backend/internal/responsecode"
 	"github.com/npanel-dev/NPanel-backend/pkg/tool"
-	"github.com/go-kratos/kratos/v2/log"
 )
 
 type publicSubscribeRepo struct {
@@ -636,6 +636,7 @@ func cleanSimnetProtocolForClient(protocol *servermodel.Protocol) {
 	} else {
 		protocol.SimnetPath = strings.TrimSpace(protocol.SimnetPath)
 	}
+	protocol.NormalizeSimnet()
 	if !protocol.SimnetAfEnabled {
 		protocol.SimnetAfPathMode = ""
 		protocol.SimnetAfMagicMode = ""

@@ -38,6 +38,29 @@ func TestUnmarshalProtocolsMxMc1Aliases(t *testing.T) {
 	}
 }
 
+func TestUnmarshalProtocolsMundoAliases(t *testing.T) {
+	protocols, err := UnmarshalProtocols(`[{"type":"mx","port":443,"enable":true,"transport":"mundordp","username":"alice","certificateFingerprint":"fp","fakeTitle":"Login","fakeMessage":"Denied","acceptProxyProtocol":true,"useTLSCertificate":true}]`)
+	if err != nil {
+		t.Fatalf("UnmarshalProtocols returned error: %v", err)
+	}
+	if len(protocols) != 1 {
+		t.Fatalf("protocol count = %d, want 1", len(protocols))
+	}
+	protocol := protocols[0]
+	if protocol.MundoUsername != "alice" {
+		t.Fatalf("MundoUsername = %q, want alice", protocol.MundoUsername)
+	}
+	if protocol.MundoCertificateFingerprint != "fp" {
+		t.Fatalf("MundoCertificateFingerprint = %q, want fp", protocol.MundoCertificateFingerprint)
+	}
+	if protocol.MundoFakeTitle != "Login" || protocol.MundoFakeMessage != "Denied" {
+		t.Fatalf("mundo fake fields = %q/%q, want Login/Denied", protocol.MundoFakeTitle, protocol.MundoFakeMessage)
+	}
+	if !protocol.MundoAcceptProxyProtocol || !protocol.MundoUseTLSCertificate {
+		t.Fatalf("mundo bool fields were not preserved: %+v", protocol)
+	}
+}
+
 func TestProtocolNormalizeSimnetClearsDisabledFallback(t *testing.T) {
 	protocol := &Protocol{
 		Type:                          "simnet",
@@ -124,6 +147,60 @@ func TestProtocolNormalizeSimnetDefaultsEnabledAfSubFeatures(t *testing.T) {
 	}
 	if !protocol.SimnetAfFakeHeaderInjection {
 		t.Fatal("expected enabled AF to default fake header injection on")
+	}
+}
+
+func TestProtocolNormalizeSimnetDefaultsResourceLimits(t *testing.T) {
+	protocol := &Protocol{Type: "simnet"}
+
+	protocol.NormalizeSimnet()
+
+	if protocol.SimnetInboundMaxStreamsPerSession != defaultSimnetInboundMaxStreamsPerSession {
+		t.Fatalf("inbound max streams = %d, want %d", protocol.SimnetInboundMaxStreamsPerSession, defaultSimnetInboundMaxStreamsPerSession)
+	}
+	if protocol.SimnetInboundMaxHandlerTasksPerSession != defaultSimnetInboundMaxHandlerTasksPerSession {
+		t.Fatalf("handler task limit = %d, want %d", protocol.SimnetInboundMaxHandlerTasksPerSession, defaultSimnetInboundMaxHandlerTasksPerSession)
+	}
+	if protocol.SimnetStreamEventChannelCapacity != defaultSimnetStreamEventChannelCapacity {
+		t.Fatalf("event channel capacity = %d, want %d", protocol.SimnetStreamEventChannelCapacity, defaultSimnetStreamEventChannelCapacity)
+	}
+	if protocol.SimnetStreamDataChannelCapacity != defaultSimnetStreamDataChannelCapacity {
+		t.Fatalf("data channel capacity = %d, want %d", protocol.SimnetStreamDataChannelCapacity, defaultSimnetStreamDataChannelCapacity)
+	}
+	if protocol.SimnetTargetDialTimeoutMs != defaultSimnetTargetDialTimeoutMs {
+		t.Fatalf("dial timeout = %d, want %d", protocol.SimnetTargetDialTimeoutMs, defaultSimnetTargetDialTimeoutMs)
+	}
+	if protocol.SimnetTargetMaxConcurrentDials != defaultSimnetTargetMaxConcurrentDials {
+		t.Fatalf("dial limit = %d, want %d", protocol.SimnetTargetMaxConcurrentDials, defaultSimnetTargetMaxConcurrentDials)
+	}
+	if protocol.SimnetSendWindow != defaultSimnetSessionWindow || protocol.SimnetRecvWindow != defaultSimnetSessionWindow {
+		t.Fatalf("windows = %d/%d, want %d", protocol.SimnetSendWindow, protocol.SimnetRecvWindow, defaultSimnetSessionWindow)
+	}
+	if protocol.SimnetMaxConcurrentStreams != defaultSimnetMaxConcurrentStreams ||
+		protocol.SimnetInitialWindowSize != defaultSimnetInitialWindowSize ||
+		protocol.SimnetMaxFrameSize != defaultSimnetMaxFrameSize {
+		t.Fatalf("h2 defaults = %d/%d/%d", protocol.SimnetMaxConcurrentStreams, protocol.SimnetInitialWindowSize, protocol.SimnetMaxFrameSize)
+	}
+	if protocol.SimnetClientMaxConcurrentStreams != defaultSimnetClientMaxConcurrentStreams ||
+		protocol.SimnetClientMaxStreamsPerSession != defaultSimnetClientMaxStreamsPerSession ||
+		protocol.SimnetClientSessionIdleTimeoutSecs != defaultSimnetClientSessionIdleTimeoutSecs {
+		t.Fatalf("client defaults = %d/%d/%d", protocol.SimnetClientMaxConcurrentStreams, protocol.SimnetClientMaxStreamsPerSession, protocol.SimnetClientSessionIdleTimeoutSecs)
+	}
+}
+
+func TestProtocolNormalizeSimnetDoesNotPolluteOtherProtocols(t *testing.T) {
+	protocol := &Protocol{Type: "vless"}
+
+	protocol.NormalizeSimnet()
+
+	if protocol.SimnetPath != "" {
+		t.Fatalf("non-simnet path changed to %q", protocol.SimnetPath)
+	}
+	if protocol.SimnetInboundMaxStreamsPerSession != 0 ||
+		protocol.SimnetTargetDialTimeoutMs != 0 ||
+		protocol.SimnetSendWindow != 0 ||
+		protocol.SimnetClientMaxConcurrentStreams != 0 {
+		t.Fatalf("non-simnet resource fields were populated: %+v", protocol)
 	}
 }
 

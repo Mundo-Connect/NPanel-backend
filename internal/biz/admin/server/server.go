@@ -181,6 +181,24 @@ func normalizeMxProtocol(protocol *server.Protocol, address string) {
 	}
 }
 
+func normalizeMundoProtocol(protocol *server.Protocol) {
+	if protocol == nil || protocol.Type != "mx" || !isMundoNetwork(protocol.Transport) {
+		return
+	}
+	if strings.TrimSpace(protocol.MundoUsername) == "" {
+		protocol.MundoUsername = "MundoUser"
+	}
+}
+
+func isMundoNetwork(transport string) bool {
+	switch strings.ToLower(strings.TrimSpace(transport)) {
+	case "mundordp", "mundosql":
+		return true
+	default:
+		return false
+	}
+}
+
 func isLikelyDomainAddress(address string) bool {
 	address = strings.TrimSpace(address)
 	if address == "" || strings.Contains(address, ":") {
@@ -236,6 +254,7 @@ func (uc *ServerUsecase) CreateServer(ctx context.Context, name, country, city, 
 		}
 		normalizeSimnetProtocol(protocol, address)
 		normalizeMxProtocol(protocol, address)
+		normalizeMundoProtocol(protocol)
 	}
 	if country == "" && city == "" && address != "" {
 		location, err := ip.GetRegionByIp(address)
@@ -291,6 +310,7 @@ func (uc *ServerUsecase) UpdateServer(ctx context.Context, id int, name, country
 		}
 		normalizeSimnetProtocol(protocol, address)
 		normalizeMxProtocol(protocol, address)
+		normalizeMundoProtocol(protocol)
 	}
 	if address != existingServer.Address || existingServer.Country == "" || country == "" {
 		location, err := ip.GetRegionByIp(address)

@@ -155,17 +155,23 @@ type compatLegacySecurityConfig struct {
 }
 
 type compatLegacyTransportConfig struct {
-	Path                 string   `json:"path"`
-	Host                 string   `json:"host"`
-	ServiceName          string   `json:"service_name"`
-	DisableSNI           bool     `json:"disable_sni"`
-	ReduceRtt            bool     `json:"reduce_rtt"`
-	UDPRelayMode         string   `json:"udp_relay_mode"`
-	CongestionController string   `json:"congestion_controller"`
-	Mc1Mode              string   `json:"mc1_mode,omitempty"`
-	Mc1CidrSegments      []string `json:"mc1_cidr_segments,omitempty"`
-	Mode                 string   `json:"mode,omitempty"`
-	CidrSegments         []string `json:"cidrSegments,omitempty"`
+	Path                   string   `json:"path"`
+	Host                   string   `json:"host"`
+	ServiceName            string   `json:"service_name"`
+	DisableSNI             bool     `json:"disable_sni"`
+	ReduceRtt              bool     `json:"reduce_rtt"`
+	UDPRelayMode           string   `json:"udp_relay_mode"`
+	CongestionController   string   `json:"congestion_controller"`
+	Mc1Mode                string   `json:"mc1_mode,omitempty"`
+	Mc1CidrSegments        []string `json:"mc1_cidr_segments,omitempty"`
+	Mode                   string   `json:"mode,omitempty"`
+	CidrSegments           []string `json:"cidrSegments,omitempty"`
+	Username               string   `json:"username,omitempty"`
+	CertificateFingerprint string   `json:"certificateFingerprint,omitempty"`
+	FakeTitle              string   `json:"fakeTitle,omitempty"`
+	FakeMessage            string   `json:"fakeMessage,omitempty"`
+	AcceptProxyProtocol    bool     `json:"acceptProxyProtocol,omitempty"`
+	UseTLSCertificate      bool     `json:"useTLSCertificate,omitempty"`
 }
 
 type compatLegacyVlessNode struct {
@@ -953,6 +959,14 @@ func compatLegacyProtocolConfigMap(config *servermodel.Protocol) map[string]inte
 		Mode:                 config.Mc1Mode,
 		CidrSegments:         config.Mc1CidrSegments,
 	}
+	if compatLegacyIsMxMundoNetwork(config.Type, config.Transport) {
+		transportConfig.Username = compatLegacyMundoUsername(config.MundoUsername)
+		transportConfig.CertificateFingerprint = config.MundoCertificateFingerprint
+		transportConfig.FakeTitle = config.MundoFakeTitle
+		transportConfig.FakeMessage = config.MundoFakeMessage
+		transportConfig.AcceptProxyProtocol = config.MundoAcceptProxyProtocol
+		transportConfig.UseTLSCertificate = config.MundoUseTLSCertificate
+	}
 
 	var result interface{}
 	switch config.Type {
@@ -983,6 +997,25 @@ func compatLegacyProtocolConfigMap(config *servermodel.Protocol) map[string]inte
 	payload, _ := json.Marshal(result)
 	_ = json.Unmarshal(payload, &resp)
 	return resp
+}
+
+func compatLegacyIsMxMundoNetwork(protocolType, transport string) bool {
+	if strings.TrimSpace(protocolType) != "mx" {
+		return false
+	}
+	switch strings.ToLower(strings.TrimSpace(transport)) {
+	case "mundordp", "mundosql":
+		return true
+	default:
+		return false
+	}
+}
+
+func compatLegacyMundoUsername(username string) string {
+	if strings.TrimSpace(username) != "" {
+		return username
+	}
+	return "MundoUser"
 }
 
 func normalizeCompatLegacyQueryServerConfigResponse(resp *CompatLegacyQueryServerConfigResponse) *CompatLegacyQueryServerConfigResponse {

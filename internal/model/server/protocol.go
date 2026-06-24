@@ -7,80 +7,104 @@ import (
 
 // Protocol represents a server protocol configuration - 完全按照原项目定义
 type Protocol struct {
-	Type                          string   `json:"type"`
-	Port                          int32    `json:"port"`
-	Enable                        bool     `json:"enable"`
-	Security                      string   `json:"security,omitempty"`
-	SNI                           string   `json:"sni,omitempty"`
-	AllowInsecure                 bool     `json:"allow_insecure,omitempty"`
-	Fingerprint                   string   `json:"fingerprint,omitempty"`
-	RealityServerAddr             string   `json:"reality_server_addr,omitempty"`
-	RealityServerPort             int32    `json:"reality_server_port,omitempty"`
-	RealityPrivateKey             string   `json:"reality_private_key,omitempty"`
-	RealityPublicKey              string   `json:"reality_public_key,omitempty"`
-	RealityShortId                string   `json:"reality_short_id,omitempty"`
-	Transport                     string   `json:"transport,omitempty"`
-	Host                          string   `json:"host,omitempty"`
-	Path                          string   `json:"path,omitempty"`
-	ServiceName                   string   `json:"service_name,omitempty"`
-	Mc1Mode                       string   `json:"mc1_mode,omitempty"`
-	Mc1CidrSegments               []string `json:"mc1_cidr_segments,omitempty"`
-	Cipher                        string   `json:"cipher,omitempty"`
-	ServerKey                     string   `json:"server_key,omitempty"`
-	Flow                          string   `json:"flow,omitempty"`
-	HopPorts                      string   `json:"hop_ports,omitempty"`
-	HopInterval                   int32    `json:"hop_interval,omitempty"`
-	ObfsPassword                  string   `json:"obfs_password,omitempty"`
-	DisableSNI                    bool     `json:"disable_sni,omitempty"`
-	ReduceRtt                     bool     `json:"reduce_rtt,omitempty"`
-	UDPRelayMode                  string   `json:"udp_relay_mode,omitempty"`
-	CongestionController          string   `json:"congestion_controller,omitempty"`
-	Multiplex                     string   `json:"multiplex,omitempty"`
-	PaddingScheme                 string   `json:"padding_scheme,omitempty"`
-	UpMbps                        int32    `json:"up_mbps,omitempty"`
-	DownMbps                      int32    `json:"down_mbps,omitempty"`
-	Obfs                          string   `json:"obfs,omitempty"`
-	ObfsHost                      string   `json:"obfs_host,omitempty"`
-	ObfsPath                      string   `json:"obfs_path,omitempty"`
-	XhttpMode                     string   `json:"xhttp_mode,omitempty"`
-	XhttpExtra                    string   `json:"xhttp_extra,omitempty"`
-	Encryption                    string   `json:"encryption,omitempty"`
-	EncryptionMode                string   `json:"encryption_mode,omitempty"`
-	EncryptionRtt                 string   `json:"encryption_rtt,omitempty"`
-	EncryptionTicket              string   `json:"encryption_ticket,omitempty"`
-	EncryptionServerPadding       string   `json:"encryption_server_padding,omitempty"`
-	EncryptionPrivateKey          string   `json:"encryption_private_key,omitempty"`
-	EncryptionClientPadding       string   `json:"encryption_client_padding,omitempty"`
-	EncryptionPassword            string   `json:"encryption_password,omitempty"`
-	Ratio                         float64  `json:"ratio,omitempty"`
-	CertMode                      string   `json:"cert_mode,omitempty"`
-	CertDNSProvider               string   `json:"cert_dns_provider,omitempty"`
-	CertDNSEnv                    string   `json:"cert_dns_env,omitempty"`
-	SimnetPsk                     string   `json:"simnet_psk,omitempty"`
-	SimnetKeyID                   int32    `json:"simnet_key_id,omitempty"`
-	SimnetTicketID                string   `json:"simnet_ticket_id,omitempty"`
-	SimnetPath                    string   `json:"simnet_path,omitempty"`
-	SimnetCarrier                 string   `json:"simnet_carrier,omitempty"`
-	SimnetAfEnabled               bool     `json:"simnet_af_enabled,omitempty"`
-	SimnetAfPathMode              string   `json:"simnet_af_path_mode,omitempty"`
-	SimnetAfPathPrefix            string   `json:"simnet_af_path_prefix,omitempty"`
-	SimnetAfPathSuffix            string   `json:"simnet_af_path_suffix,omitempty"`
-	SimnetAfMagicMode             string   `json:"simnet_af_magic_mode,omitempty"`
-	SimnetAfResponseJitterMs      int32    `json:"simnet_af_response_jitter_ms,omitempty"`
-	SimnetAfHandshakePolymorphism bool     `json:"simnet_af_handshake_polymorphism,omitempty"`
-	SimnetAfSettingsJitter        bool     `json:"simnet_af_settings_jitter,omitempty"`
-	SimnetAfFakeHeaderInjection   bool     `json:"simnet_af_fake_header_injection,omitempty"`
-	SimnetReverseEnabled          bool     `json:"simnet_reverse_enabled,omitempty"`
-	SimnetReverseListenAddr       string   `json:"simnet_reverse_listen_addr,omitempty"`
-	SimnetReverseListenPort       int32    `json:"simnet_reverse_listen_port,omitempty"`
-	SimnetReverseTargetHost       string   `json:"simnet_reverse_target_host,omitempty"`
-	SimnetReverseTargetPort       int32    `json:"simnet_reverse_target_port,omitempty"`
-	SimnetFallbackEnabled         bool     `json:"simnet_fallback_enabled,omitempty"`
-	SimnetFallbackTargetScheme    string   `json:"simnet_fallback_target_scheme,omitempty"`
-	SimnetFallbackTargetHost      string   `json:"simnet_fallback_target_host,omitempty"`
-	SimnetFallbackTargetPort      int32    `json:"simnet_fallback_target_port,omitempty"`
-	SimnetFallbackHostHeader      string   `json:"simnet_fallback_host_header,omitempty"`
-	SimnetFallbackTLSSNI          string   `json:"simnet_fallback_tls_sni,omitempty"`
+	Type                                   string   `json:"type"`
+	Port                                   int32    `json:"port"`
+	Enable                                 bool     `json:"enable"`
+	Security                               string   `json:"security,omitempty"`
+	SNI                                    string   `json:"sni,omitempty"`
+	AllowInsecure                          bool     `json:"allow_insecure,omitempty"`
+	Fingerprint                            string   `json:"fingerprint,omitempty"`
+	RealityServerAddr                      string   `json:"reality_server_addr,omitempty"`
+	RealityServerPort                      int32    `json:"reality_server_port,omitempty"`
+	RealityPrivateKey                      string   `json:"reality_private_key,omitempty"`
+	RealityPublicKey                       string   `json:"reality_public_key,omitempty"`
+	RealityShortId                         string   `json:"reality_short_id,omitempty"`
+	Transport                              string   `json:"transport,omitempty"`
+	Host                                   string   `json:"host,omitempty"`
+	Path                                   string   `json:"path,omitempty"`
+	ServiceName                            string   `json:"service_name,omitempty"`
+	Mc1Mode                                string   `json:"mc1_mode,omitempty"`
+	Mc1CidrSegments                        []string `json:"mc1_cidr_segments,omitempty"`
+	MundoUsername                          string   `json:"mundo_username,omitempty"`
+	MundoCertificateFingerprint            string   `json:"mundo_certificate_fingerprint,omitempty"`
+	MundoFakeTitle                         string   `json:"mundo_fake_title,omitempty"`
+	MundoFakeMessage                       string   `json:"mundo_fake_message,omitempty"`
+	MundoAcceptProxyProtocol               bool     `json:"mundo_accept_proxy_protocol,omitempty"`
+	MundoUseTLSCertificate                 bool     `json:"mundo_use_tls_certificate,omitempty"`
+	Cipher                                 string   `json:"cipher,omitempty"`
+	ServerKey                              string   `json:"server_key,omitempty"`
+	Flow                                   string   `json:"flow,omitempty"`
+	HopPorts                               string   `json:"hop_ports,omitempty"`
+	HopInterval                            int32    `json:"hop_interval,omitempty"`
+	ObfsPassword                           string   `json:"obfs_password,omitempty"`
+	DisableSNI                             bool     `json:"disable_sni,omitempty"`
+	ReduceRtt                              bool     `json:"reduce_rtt,omitempty"`
+	UDPRelayMode                           string   `json:"udp_relay_mode,omitempty"`
+	CongestionController                   string   `json:"congestion_controller,omitempty"`
+	Multiplex                              string   `json:"multiplex,omitempty"`
+	PaddingScheme                          string   `json:"padding_scheme,omitempty"`
+	UpMbps                                 int32    `json:"up_mbps,omitempty"`
+	DownMbps                               int32    `json:"down_mbps,omitempty"`
+	Obfs                                   string   `json:"obfs,omitempty"`
+	ObfsHost                               string   `json:"obfs_host,omitempty"`
+	ObfsPath                               string   `json:"obfs_path,omitempty"`
+	XhttpMode                              string   `json:"xhttp_mode,omitempty"`
+	XhttpExtra                             string   `json:"xhttp_extra,omitempty"`
+	Encryption                             string   `json:"encryption,omitempty"`
+	EncryptionMode                         string   `json:"encryption_mode,omitempty"`
+	EncryptionRtt                          string   `json:"encryption_rtt,omitempty"`
+	EncryptionTicket                       string   `json:"encryption_ticket,omitempty"`
+	EncryptionServerPadding                string   `json:"encryption_server_padding,omitempty"`
+	EncryptionPrivateKey                   string   `json:"encryption_private_key,omitempty"`
+	EncryptionClientPadding                string   `json:"encryption_client_padding,omitempty"`
+	EncryptionPassword                     string   `json:"encryption_password,omitempty"`
+	Ratio                                  float64  `json:"ratio,omitempty"`
+	CertMode                               string   `json:"cert_mode,omitempty"`
+	CertDNSProvider                        string   `json:"cert_dns_provider,omitempty"`
+	CertDNSEnv                             string   `json:"cert_dns_env,omitempty"`
+	SimnetPsk                              string   `json:"simnet_psk,omitempty"`
+	SimnetKeyID                            int32    `json:"simnet_key_id,omitempty"`
+	SimnetTicketID                         string   `json:"simnet_ticket_id,omitempty"`
+	SimnetPath                             string   `json:"simnet_path,omitempty"`
+	SimnetCarrier                          string   `json:"simnet_carrier,omitempty"`
+	SimnetAfEnabled                        bool     `json:"simnet_af_enabled,omitempty"`
+	SimnetAfPathMode                       string   `json:"simnet_af_path_mode,omitempty"`
+	SimnetAfPathPrefix                     string   `json:"simnet_af_path_prefix,omitempty"`
+	SimnetAfPathSuffix                     string   `json:"simnet_af_path_suffix,omitempty"`
+	SimnetAfMagicMode                      string   `json:"simnet_af_magic_mode,omitempty"`
+	SimnetAfResponseJitterMs               int32    `json:"simnet_af_response_jitter_ms,omitempty"`
+	SimnetAfHandshakePolymorphism          bool     `json:"simnet_af_handshake_polymorphism,omitempty"`
+	SimnetAfSettingsJitter                 bool     `json:"simnet_af_settings_jitter,omitempty"`
+	SimnetAfFakeHeaderInjection            bool     `json:"simnet_af_fake_header_injection,omitempty"`
+	SimnetReverseEnabled                   bool     `json:"simnet_reverse_enabled,omitempty"`
+	SimnetReverseListenAddr                string   `json:"simnet_reverse_listen_addr,omitempty"`
+	SimnetReverseListenPort                int32    `json:"simnet_reverse_listen_port,omitempty"`
+	SimnetReverseTargetHost                string   `json:"simnet_reverse_target_host,omitempty"`
+	SimnetReverseTargetPort                int32    `json:"simnet_reverse_target_port,omitempty"`
+	SimnetFallbackEnabled                  bool     `json:"simnet_fallback_enabled,omitempty"`
+	SimnetFallbackTargetScheme             string   `json:"simnet_fallback_target_scheme,omitempty"`
+	SimnetFallbackTargetHost               string   `json:"simnet_fallback_target_host,omitempty"`
+	SimnetFallbackTargetPort               int32    `json:"simnet_fallback_target_port,omitempty"`
+	SimnetFallbackHostHeader               string   `json:"simnet_fallback_host_header,omitempty"`
+	SimnetFallbackTLSSNI                   string   `json:"simnet_fallback_tls_sni,omitempty"`
+	SimnetInboundMaxStreamsPerSession      int32    `json:"simnet_inbound_max_streams_per_session,omitempty"`
+	SimnetInboundMaxHandlerTasksPerSession int32    `json:"simnet_inbound_max_handler_tasks_per_session,omitempty"`
+	SimnetStreamEventChannelCapacity       int32    `json:"simnet_stream_event_channel_capacity,omitempty"`
+	SimnetStreamDataChannelCapacity        int32    `json:"simnet_stream_data_channel_capacity,omitempty"`
+	SimnetTargetDialTimeoutMs              int32    `json:"simnet_target_dial_timeout_ms,omitempty"`
+	SimnetTargetMaxConcurrentDials         int32    `json:"simnet_target_max_concurrent_dials,omitempty"`
+	SimnetEgressBlockLoopback              bool     `json:"simnet_egress_block_loopback,omitempty"`
+	SimnetEgressBlockPrivate               bool     `json:"simnet_egress_block_private,omitempty"`
+	SimnetEgressBlockLinkLocal             bool     `json:"simnet_egress_block_link_local,omitempty"`
+	SimnetEgressBlockMetadata              bool     `json:"simnet_egress_block_metadata,omitempty"`
+	SimnetSendWindow                       int32    `json:"simnet_send_window,omitempty"`
+	SimnetRecvWindow                       int32    `json:"simnet_recv_window,omitempty"`
+	SimnetMaxConcurrentStreams             int32    `json:"simnet_max_concurrent_streams,omitempty"`
+	SimnetInitialWindowSize                int32    `json:"simnet_initial_window_size,omitempty"`
+	SimnetMaxFrameSize                     int32    `json:"simnet_max_frame_size,omitempty"`
+	SimnetClientMaxConcurrentStreams       int32    `json:"simnet_client_max_concurrent_streams,omitempty"`
+	SimnetClientMaxStreamsPerSession       int32    `json:"simnet_client_max_streams_per_session,omitempty"`
+	SimnetClientSessionIdleTimeoutSecs     int32    `json:"simnet_client_session_idle_timeout_secs,omitempty"`
 
 	// OmniFlow 基础配置
 	OmniflowCarrier     string `json:"omniflow_carrier,omitempty"`
@@ -135,6 +159,22 @@ type Protocol struct {
 	OmniflowFallbackWssEnabled     bool `json:"omniflow_fallback_wss_enabled,omitempty"`
 }
 
+const (
+	defaultSimnetInboundMaxStreamsPerSession      int32 = 128
+	defaultSimnetInboundMaxHandlerTasksPerSession int32 = 128
+	defaultSimnetStreamEventChannelCapacity       int32 = 256
+	defaultSimnetStreamDataChannelCapacity        int32 = 128
+	defaultSimnetTargetDialTimeoutMs              int32 = 12_000
+	defaultSimnetTargetMaxConcurrentDials         int32 = 256
+	defaultSimnetSessionWindow                    int32 = 4 * 1024 * 1024
+	defaultSimnetMaxConcurrentStreams             int32 = 100
+	defaultSimnetInitialWindowSize                int32 = 65_535
+	defaultSimnetMaxFrameSize                     int32 = 16_384
+	defaultSimnetClientMaxConcurrentStreams       int32 = 32
+	defaultSimnetClientMaxStreamsPerSession       int32 = 512
+	defaultSimnetClientSessionIdleTimeoutSecs     int32 = 90
+)
+
 func (p *Protocol) UnmarshalJSON(data []byte) error {
 	type protocolAlias Protocol
 	normalized := data
@@ -167,6 +207,18 @@ func (p *Protocol) UnmarshalJSON(data []byte) error {
 		CidrSegments         mc1StringSlice `json:"cidrSegments,omitempty"`
 		Mc1ModeCamel         string         `json:"mc1Mode,omitempty"`
 		Mc1CidrSegmentsCamel mc1StringSlice `json:"mc1CidrSegments,omitempty"`
+		Username             string         `json:"username,omitempty"`
+		MundoUsernameCamel   string         `json:"mundoUsername,omitempty"`
+		CertFingerprint      string         `json:"certificateFingerprint,omitempty"`
+		MundoCertFPCamel     string         `json:"mundoCertificateFingerprint,omitempty"`
+		FakeTitle            string         `json:"fakeTitle,omitempty"`
+		MundoFakeTitleCamel  string         `json:"mundoFakeTitle,omitempty"`
+		FakeMessage          string         `json:"fakeMessage,omitempty"`
+		MundoFakeMsgCamel    string         `json:"mundoFakeMessage,omitempty"`
+		AcceptProxyProtocol  bool           `json:"acceptProxyProtocol,omitempty"`
+		MundoAcceptPPCamel   bool           `json:"mundoAcceptProxyProtocol,omitempty"`
+		UseTLSCertificate    bool           `json:"useTLSCertificate,omitempty"`
+		MundoUseTLSCertCamel bool           `json:"mundoUseTLSCertificate,omitempty"`
 	}{
 		protocolAlias: (*protocolAlias)(p),
 	}
@@ -186,6 +238,40 @@ func (p *Protocol) UnmarshalJSON(data []byte) error {
 		} else {
 			p.Mc1CidrSegments = []string(aux.CidrSegments)
 		}
+	}
+	if strings.TrimSpace(p.MundoUsername) == "" {
+		if strings.TrimSpace(aux.MundoUsernameCamel) != "" {
+			p.MundoUsername = aux.MundoUsernameCamel
+		} else {
+			p.MundoUsername = aux.Username
+		}
+	}
+	if strings.TrimSpace(p.MundoCertificateFingerprint) == "" {
+		if strings.TrimSpace(aux.MundoCertFPCamel) != "" {
+			p.MundoCertificateFingerprint = aux.MundoCertFPCamel
+		} else {
+			p.MundoCertificateFingerprint = aux.CertFingerprint
+		}
+	}
+	if strings.TrimSpace(p.MundoFakeTitle) == "" {
+		if strings.TrimSpace(aux.MundoFakeTitleCamel) != "" {
+			p.MundoFakeTitle = aux.MundoFakeTitleCamel
+		} else {
+			p.MundoFakeTitle = aux.FakeTitle
+		}
+	}
+	if strings.TrimSpace(p.MundoFakeMessage) == "" {
+		if strings.TrimSpace(aux.MundoFakeMsgCamel) != "" {
+			p.MundoFakeMessage = aux.MundoFakeMsgCamel
+		} else {
+			p.MundoFakeMessage = aux.FakeMessage
+		}
+	}
+	if !p.MundoAcceptProxyProtocol {
+		p.MundoAcceptProxyProtocol = aux.MundoAcceptPPCamel || aux.AcceptProxyProtocol
+	}
+	if !p.MundoUseTLSCertificate {
+		p.MundoUseTLSCertificate = aux.MundoUseTLSCertCamel || aux.UseTLSCertificate
 	}
 	return nil
 }
@@ -247,6 +333,7 @@ func (p *Protocol) NormalizeSimnet() {
 	if strings.TrimSpace(p.SimnetPath) == "" {
 		p.SimnetPath = "/simnet/session"
 	}
+	p.applySimnetResourceDefaults()
 	if !p.SimnetFallbackEnabled || strings.TrimSpace(p.SimnetFallbackTargetHost) == "" {
 		p.SimnetFallbackEnabled = false
 		p.SimnetFallbackTargetScheme = ""
@@ -293,6 +380,51 @@ func (p *Protocol) NormalizeSimnet() {
 	}
 	if !p.SimnetAfFakeHeaderInjection {
 		p.SimnetAfFakeHeaderInjection = true
+	}
+}
+
+func (p *Protocol) applySimnetResourceDefaults() {
+	if p.SimnetInboundMaxStreamsPerSession <= 0 {
+		p.SimnetInboundMaxStreamsPerSession = defaultSimnetInboundMaxStreamsPerSession
+	}
+	if p.SimnetInboundMaxHandlerTasksPerSession <= 0 {
+		p.SimnetInboundMaxHandlerTasksPerSession = defaultSimnetInboundMaxHandlerTasksPerSession
+	}
+	if p.SimnetStreamEventChannelCapacity <= 0 {
+		p.SimnetStreamEventChannelCapacity = defaultSimnetStreamEventChannelCapacity
+	}
+	if p.SimnetStreamDataChannelCapacity <= 0 {
+		p.SimnetStreamDataChannelCapacity = defaultSimnetStreamDataChannelCapacity
+	}
+	if p.SimnetTargetDialTimeoutMs <= 0 {
+		p.SimnetTargetDialTimeoutMs = defaultSimnetTargetDialTimeoutMs
+	}
+	if p.SimnetTargetMaxConcurrentDials <= 0 {
+		p.SimnetTargetMaxConcurrentDials = defaultSimnetTargetMaxConcurrentDials
+	}
+	if p.SimnetSendWindow <= 0 {
+		p.SimnetSendWindow = defaultSimnetSessionWindow
+	}
+	if p.SimnetRecvWindow <= 0 {
+		p.SimnetRecvWindow = defaultSimnetSessionWindow
+	}
+	if p.SimnetMaxConcurrentStreams <= 0 {
+		p.SimnetMaxConcurrentStreams = defaultSimnetMaxConcurrentStreams
+	}
+	if p.SimnetInitialWindowSize <= 0 {
+		p.SimnetInitialWindowSize = defaultSimnetInitialWindowSize
+	}
+	if p.SimnetMaxFrameSize <= 0 {
+		p.SimnetMaxFrameSize = defaultSimnetMaxFrameSize
+	}
+	if p.SimnetClientMaxConcurrentStreams <= 0 {
+		p.SimnetClientMaxConcurrentStreams = defaultSimnetClientMaxConcurrentStreams
+	}
+	if p.SimnetClientMaxStreamsPerSession <= 0 {
+		p.SimnetClientMaxStreamsPerSession = defaultSimnetClientMaxStreamsPerSession
+	}
+	if p.SimnetClientSessionIdleTimeoutSecs <= 0 {
+		p.SimnetClientSessionIdleTimeoutSecs = defaultSimnetClientSessionIdleTimeoutSecs
 	}
 }
 
