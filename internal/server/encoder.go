@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/go-kratos/kratos/v2/errors"
 	"google.golang.org/protobuf/encoding/protojson"
@@ -113,7 +114,10 @@ var requiredFields = map[string]bool{
 // CustomResponseEncoder 自定义响应编码器
 // 必需字段总是输出，其他字段为空时移除
 func CustomResponseEncoder(w http.ResponseWriter, r *http.Request, v interface{}) error {
-	marshal, err := protojson.MarshalOptions{UseProtoNames: true}.Marshal(v.(proto.Message))
+	marshal, err := protojson.MarshalOptions{
+		UseProtoNames:   true,
+		EmitUnpopulated: shouldEmitUnpopulatedFields(r),
+	}.Marshal(v.(proto.Message))
 	if err != nil {
 		return err
 	}
@@ -142,4 +146,17 @@ func CustomResponseEncoder(w http.ResponseWriter, r *http.Request, v interface{}
 	w.Header().Set("Content-Type", "application/json")
 	_, err = w.Write(response)
 	return err
+}
+
+func shouldEmitUnpopulatedFields(r *http.Request) bool {
+	if r == nil || r.URL == nil {
+		return false
+	}
+	path := strings.TrimPrefix(r.URL.Path, "/api")
+	switch path {
+	case "/v1/admin/system/subscribe_config", "/v1/common/site/config":
+		return true
+	default:
+		return false
+	}
 }
