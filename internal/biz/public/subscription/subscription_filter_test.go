@@ -42,20 +42,23 @@ func TestFilterSubscriptionNodesByUserAgent(t *testing.T) {
 			{ID: 3, Type: "omniflow"},
 			{ID: 4, Type: "mx"},
 			{ID: 5, Type: "vmess"},
+			{ID: 6, Type: "vless", Transport: "mc1"},
+			{ID: 7, Type: "vless", Transport: "mundordp"},
+			{ID: 8, Type: "trojan", Transport: "mundosql"},
 		}
 	}
 
 	t.Run("official client omnxt keeps all nodes", func(t *testing.T) {
 		got := filterSubscriptionNodesByUserAgent(mkNodes(), "omnxt/1.0")
-		if len(got) != 5 {
-			t.Fatalf("expected 5 nodes for official client, got %d", len(got))
+		if len(got) != 8 {
+			t.Fatalf("expected 8 nodes for official client, got %d", len(got))
 		}
 	})
 
 	t.Run("official client slaglab keeps all nodes", func(t *testing.T) {
 		got := filterSubscriptionNodesByUserAgent(mkNodes(), "slaglab/0.4")
-		if len(got) != 5 {
-			t.Fatalf("expected 5 nodes for official client, got %d", len(got))
+		if len(got) != 8 {
+			t.Fatalf("expected 8 nodes for official client, got %d", len(got))
 		}
 	})
 
@@ -65,8 +68,8 @@ func TestFilterSubscriptionNodesByUserAgent(t *testing.T) {
 			t.Fatalf("expected 2 nodes after filtering, got %d", len(got))
 		}
 		for _, n := range got {
-			if isExperimentalSubscriptionProtocol(n.Type) {
-				t.Fatalf("experimental protocol %q leaked to third-party client", n.Type)
+			if isExperimentalSubscriptionProtocol(n.Type) || isExperimentalSubscriptionTransport(n.Transport) {
+				t.Fatalf("experimental node leaked to third-party client: %+v", n)
 			}
 		}
 	})

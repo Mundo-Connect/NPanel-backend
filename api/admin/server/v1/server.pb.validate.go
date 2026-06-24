@@ -283,6 +283,18 @@ func (m *Protocol) validate(all bool) error {
 
 	// no validation rules for Mc1Mode
 
+	// no validation rules for MundoUsername
+
+	// no validation rules for MundoCertificateFingerprint
+
+	// no validation rules for MundoFakeTitle
+
+	// no validation rules for MundoFakeMessage
+
+	// no validation rules for MundoAcceptProxyProtocol
+
+	// no validation rules for MundoUseTlsCertificate
+
 	if len(errors) > 0 {
 		return ProtocolMultiError(errors)
 	}

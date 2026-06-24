@@ -333,7 +333,7 @@ func (uc *SubscriptionUseCase) GetSubscribeConfig(ctx context.Context, req *v1.G
 }
 
 func filterSubscriptionNodesByUserAgent(nodes []*NodeInfo, userAgent string) []*NodeInfo {
-	// 默认剔除实验性协议（simnet/omniflow/mx）。
+	// 默认剔除实验性协议/网络（simnet/omniflow/mx/mc1/mundordp/mundosql）。
 	// 仅当请求来自自有客户端/SDK（UA 命中 omnxt 或 slaglab）时才放行。
 	// 开源客户端不支持这两个新协议，且必须搭配我方节点列表与 SDK 才能使用。
 	if len(nodes) == 0 || isOfficialClient(userAgent) {
@@ -342,7 +342,7 @@ func filterSubscriptionNodesByUserAgent(nodes []*NodeInfo, userAgent string) []*
 
 	filtered := make([]*NodeInfo, 0, len(nodes))
 	for _, node := range nodes {
-		if node == nil || isExperimentalSubscriptionProtocol(node.Type) {
+		if node == nil || isExperimentalSubscriptionProtocol(node.Type) || isExperimentalSubscriptionTransport(node.Transport) {
 			continue
 		}
 		filtered = append(filtered, node)
@@ -351,7 +351,7 @@ func filterSubscriptionNodesByUserAgent(nodes []*NodeInfo, userAgent string) []*
 }
 
 // isOfficialClient 判断请求是否来自自有客户端/SDK。
-// 只有命中的客户端才允许下发 simnet/omniflow/mx 等实验性协议。
+// 只有命中的客户端才允许下发 simnet/omniflow/mx/mundo 等实验性协议。
 func isOfficialClient(userAgent string) bool {
 	ua := strings.ToLower(strings.TrimSpace(userAgent))
 	if ua == "" {
@@ -375,6 +375,15 @@ func isOfficialClient(userAgent string) bool {
 func isExperimentalSubscriptionProtocol(protocolType string) bool {
 	switch strings.ToLower(strings.TrimSpace(protocolType)) {
 	case "simnet", "omn", "omniflow", "mx":
+		return true
+	default:
+		return false
+	}
+}
+
+func isExperimentalSubscriptionTransport(transport string) bool {
+	switch strings.ToLower(strings.TrimSpace(transport)) {
+	case "mc1", "mundordp", "mundosql":
 		return true
 	default:
 		return false
@@ -450,6 +459,12 @@ type NodeInfo struct {
 	ServiceName                   string
 	Mc1Mode                       string
 	Mc1CidrSegments               []string
+	MundoUsername                 string
+	MundoCertificateFingerprint   string
+	MundoFakeTitle                string
+	MundoFakeMessage              string
+	MundoAcceptProxyProtocol      bool
+	MundoUseTLSCertificate        bool
 	Method                        string
 	ServerKey                     string
 	Flow                          string

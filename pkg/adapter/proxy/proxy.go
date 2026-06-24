@@ -121,18 +121,24 @@ type Mx struct {
 
 // TransportConfig represents the transport configuration for a proxy
 type TransportConfig struct {
-	Path                 string   `json:"path,omitempty"` // ws/httpupgrade
-	Host                 string   `json:"host,omitempty"`
-	ServiceName          string   `json:"service_name"`          // grpc
-	DisableSNI           bool     `json:"disable_sni"`           // Disable SNI for the transport(tuic)
-	ReduceRtt            bool     `json:"reduce_rtt"`            // Reduce RTT for the transport(tuic)
-	UDPRelayMode         string   `json:"udp_relay_mode"`        // UDP relay mode for the transport(tuic)
-	CongestionController string   `json:"congestion_controller"` // Congestion controller for the transport(tuic)
-	Mc1Mode              string   `json:"mc1_mode,omitempty"`
-	Mc1CidrSegments      []string `json:"mc1_cidr_segments,omitempty"`
-	Mode                 string   `json:"mode,omitempty"`
-	CidrSegments         []string `json:"cidrSegments,omitempty"`
-	Split                string   `json:"split,omitempty"`
+	Path                   string   `json:"path,omitempty"` // ws/httpupgrade
+	Host                   string   `json:"host,omitempty"`
+	ServiceName            string   `json:"service_name"`          // grpc
+	DisableSNI             bool     `json:"disable_sni"`           // Disable SNI for the transport(tuic)
+	ReduceRtt              bool     `json:"reduce_rtt"`            // Reduce RTT for the transport(tuic)
+	UDPRelayMode           string   `json:"udp_relay_mode"`        // UDP relay mode for the transport(tuic)
+	CongestionController   string   `json:"congestion_controller"` // Congestion controller for the transport(tuic)
+	Mc1Mode                string   `json:"mc1_mode,omitempty"`
+	Mc1CidrSegments        []string `json:"mc1_cidr_segments,omitempty"`
+	Username               string   `json:"username,omitempty"`
+	CertificateFingerprint string   `json:"certificateFingerprint,omitempty"`
+	FakeTitle              string   `json:"fakeTitle,omitempty"`
+	FakeMessage            string   `json:"fakeMessage,omitempty"`
+	AcceptProxyProtocol    bool     `json:"acceptProxyProtocol,omitempty"`
+	UseTLSCertificate      bool     `json:"useTLSCertificate,omitempty"`
+	Mode                   string   `json:"mode,omitempty"`
+	CidrSegments           []string `json:"cidrSegments,omitempty"`
+	Split                  string   `json:"split,omitempty"`
 }
 
 func (c *TransportConfig) UnmarshalJSON(data []byte) error {
@@ -141,6 +147,12 @@ func (c *TransportConfig) UnmarshalJSON(data []byte) error {
 		*transportConfigAlias
 		Mc1CidrSegments mc1CIDRSegments `json:"mc1_cidr_segments,omitempty"`
 		CidrSegments    mc1CIDRSegments `json:"cidrSegments,omitempty"`
+		MundoUsername   string          `json:"mundo_username,omitempty"`
+		MundoCertFP     string          `json:"mundo_certificate_fingerprint,omitempty"`
+		MundoFakeTitle  string          `json:"mundo_fake_title,omitempty"`
+		MundoFakeMsg    string          `json:"mundo_fake_message,omitempty"`
+		MundoAcceptPP   bool            `json:"mundo_accept_proxy_protocol,omitempty"`
+		MundoUseTLSCert bool            `json:"mundo_use_tls_certificate,omitempty"`
 	}{
 		transportConfigAlias: (*transportConfigAlias)(c),
 	}
@@ -152,6 +164,24 @@ func (c *TransportConfig) UnmarshalJSON(data []byte) error {
 	}
 	if len(aux.CidrSegments) > 0 {
 		c.CidrSegments = []string(aux.CidrSegments)
+	}
+	if strings.TrimSpace(c.Username) == "" {
+		c.Username = aux.MundoUsername
+	}
+	if strings.TrimSpace(c.CertificateFingerprint) == "" {
+		c.CertificateFingerprint = aux.MundoCertFP
+	}
+	if strings.TrimSpace(c.FakeTitle) == "" {
+		c.FakeTitle = aux.MundoFakeTitle
+	}
+	if strings.TrimSpace(c.FakeMessage) == "" {
+		c.FakeMessage = aux.MundoFakeMsg
+	}
+	if !c.AcceptProxyProtocol {
+		c.AcceptProxyProtocol = aux.MundoAcceptPP
+	}
+	if !c.UseTLSCertificate {
+		c.UseTLSCertificate = aux.MundoUseTLSCert
 	}
 	return nil
 }

@@ -68,6 +68,45 @@ func normalizeSimnetProtocolForResponse(protocol *serverBiz.Protocol) *serverBiz
 	return &normalized
 }
 
+func normalizeMundoProtocolForResponse(protocol *serverBiz.Protocol) *serverBiz.Protocol {
+	if protocol == nil {
+		return protocol
+	}
+	if protocol.Type != "mx" || !isMundoTransport(protocol.Transport) {
+		if strings.TrimSpace(protocol.MundoUsername) == "" &&
+			strings.TrimSpace(protocol.MundoCertificateFingerprint) == "" &&
+			strings.TrimSpace(protocol.MundoFakeTitle) == "" &&
+			strings.TrimSpace(protocol.MundoFakeMessage) == "" &&
+			!protocol.MundoAcceptProxyProtocol &&
+			!protocol.MundoUseTLSCertificate {
+			return protocol
+		}
+		normalized := *protocol
+		normalized.MundoUsername = ""
+		normalized.MundoCertificateFingerprint = ""
+		normalized.MundoFakeTitle = ""
+		normalized.MundoFakeMessage = ""
+		normalized.MundoAcceptProxyProtocol = false
+		normalized.MundoUseTLSCertificate = false
+		return &normalized
+	}
+	if strings.TrimSpace(protocol.MundoUsername) != "" {
+		return protocol
+	}
+	normalized := *protocol
+	normalized.MundoUsername = "MundoUser"
+	return &normalized
+}
+
+func isMundoTransport(transport string) bool {
+	switch strings.ToLower(strings.TrimSpace(transport)) {
+	case "mundordp", "mundosql":
+		return true
+	default:
+		return false
+	}
+}
+
 // ServerService 节点服务器服务
 type ServerService struct {
 	v1.UnimplementedServerServer
@@ -271,6 +310,7 @@ func (s *ServerService) QueryServerProtocolConfig(ctx context.Context, req *v1.Q
 			continue
 		}
 		protocol = normalizeSimnetProtocolForResponse(protocol)
+		protocol = normalizeMundoProtocolForResponse(protocol)
 		protocolConfigs = append(protocolConfigs, &v1.Protocol{
 			Type:                          protocol.Type,
 			Port:                          protocol.Port,
@@ -290,6 +330,12 @@ func (s *ServerService) QueryServerProtocolConfig(ctx context.Context, req *v1.Q
 			ServiceName:                   protocol.ServiceName,
 			Mc1Mode:                       protocol.Mc1Mode,
 			Mc1CidrSegments:               protocol.Mc1CidrSegments,
+			MundoUsername:                 protocol.MundoUsername,
+			MundoCertificateFingerprint:   protocol.MundoCertificateFingerprint,
+			MundoFakeTitle:                protocol.MundoFakeTitle,
+			MundoFakeMessage:              protocol.MundoFakeMessage,
+			MundoAcceptProxyProtocol:      protocol.MundoAcceptProxyProtocol,
+			MundoUseTlsCertificate:        protocol.MundoUseTLSCertificate,
 			Cipher:                        protocol.Cipher,
 			ServerKey:                     protocol.ServerKey,
 			Flow:                          protocol.Flow,

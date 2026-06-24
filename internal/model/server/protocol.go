@@ -25,6 +25,12 @@ type Protocol struct {
 	ServiceName                   string   `json:"service_name,omitempty"`
 	Mc1Mode                       string   `json:"mc1_mode,omitempty"`
 	Mc1CidrSegments               []string `json:"mc1_cidr_segments,omitempty"`
+	MundoUsername                 string   `json:"mundo_username,omitempty"`
+	MundoCertificateFingerprint   string   `json:"mundo_certificate_fingerprint,omitempty"`
+	MundoFakeTitle                string   `json:"mundo_fake_title,omitempty"`
+	MundoFakeMessage              string   `json:"mundo_fake_message,omitempty"`
+	MundoAcceptProxyProtocol      bool     `json:"mundo_accept_proxy_protocol,omitempty"`
+	MundoUseTLSCertificate        bool     `json:"mundo_use_tls_certificate,omitempty"`
 	Cipher                        string   `json:"cipher,omitempty"`
 	ServerKey                     string   `json:"server_key,omitempty"`
 	Flow                          string   `json:"flow,omitempty"`
@@ -167,6 +173,18 @@ func (p *Protocol) UnmarshalJSON(data []byte) error {
 		CidrSegments         mc1StringSlice `json:"cidrSegments,omitempty"`
 		Mc1ModeCamel         string         `json:"mc1Mode,omitempty"`
 		Mc1CidrSegmentsCamel mc1StringSlice `json:"mc1CidrSegments,omitempty"`
+		Username             string         `json:"username,omitempty"`
+		MundoUsernameCamel   string         `json:"mundoUsername,omitempty"`
+		CertFingerprint      string         `json:"certificateFingerprint,omitempty"`
+		MundoCertFPCamel     string         `json:"mundoCertificateFingerprint,omitempty"`
+		FakeTitle            string         `json:"fakeTitle,omitempty"`
+		MundoFakeTitleCamel  string         `json:"mundoFakeTitle,omitempty"`
+		FakeMessage          string         `json:"fakeMessage,omitempty"`
+		MundoFakeMsgCamel    string         `json:"mundoFakeMessage,omitempty"`
+		AcceptProxyProtocol  bool           `json:"acceptProxyProtocol,omitempty"`
+		MundoAcceptPPCamel   bool           `json:"mundoAcceptProxyProtocol,omitempty"`
+		UseTLSCertificate    bool           `json:"useTLSCertificate,omitempty"`
+		MundoUseTLSCertCamel bool           `json:"mundoUseTLSCertificate,omitempty"`
 	}{
 		protocolAlias: (*protocolAlias)(p),
 	}
@@ -186,6 +204,40 @@ func (p *Protocol) UnmarshalJSON(data []byte) error {
 		} else {
 			p.Mc1CidrSegments = []string(aux.CidrSegments)
 		}
+	}
+	if strings.TrimSpace(p.MundoUsername) == "" {
+		if strings.TrimSpace(aux.MundoUsernameCamel) != "" {
+			p.MundoUsername = aux.MundoUsernameCamel
+		} else {
+			p.MundoUsername = aux.Username
+		}
+	}
+	if strings.TrimSpace(p.MundoCertificateFingerprint) == "" {
+		if strings.TrimSpace(aux.MundoCertFPCamel) != "" {
+			p.MundoCertificateFingerprint = aux.MundoCertFPCamel
+		} else {
+			p.MundoCertificateFingerprint = aux.CertFingerprint
+		}
+	}
+	if strings.TrimSpace(p.MundoFakeTitle) == "" {
+		if strings.TrimSpace(aux.MundoFakeTitleCamel) != "" {
+			p.MundoFakeTitle = aux.MundoFakeTitleCamel
+		} else {
+			p.MundoFakeTitle = aux.FakeTitle
+		}
+	}
+	if strings.TrimSpace(p.MundoFakeMessage) == "" {
+		if strings.TrimSpace(aux.MundoFakeMsgCamel) != "" {
+			p.MundoFakeMessage = aux.MundoFakeMsgCamel
+		} else {
+			p.MundoFakeMessage = aux.FakeMessage
+		}
+	}
+	if !p.MundoAcceptProxyProtocol {
+		p.MundoAcceptProxyProtocol = aux.MundoAcceptPPCamel || aux.AcceptProxyProtocol
+	}
+	if !p.MundoUseTLSCertificate {
+		p.MundoUseTLSCertificate = aux.MundoUseTLSCertCamel || aux.UseTLSCertificate
 	}
 	return nil
 }

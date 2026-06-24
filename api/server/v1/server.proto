@@ -351,9 +351,15 @@ message Protocol {
 	bool omniflow_fallback_connect_tunnel = 99;
 	bool omniflow_fallback_wss_enabled = 100;
 
-	string mc1_mode = 113;
-	repeated string mc1_cidr_segments = 114;
-}
+		string mc1_mode = 113;
+		repeated string mc1_cidr_segments = 114;
+		string mundo_username = 115;
+		string mundo_certificate_fingerprint = 116;
+		string mundo_fake_title = 117;
+		string mundo_fake_message = 118;
+		bool mundo_accept_proxy_protocol = 119;
+		bool mundo_use_tls_certificate = 120;
+	}
 
 // QueryServerProtocolConfigReply 查询服务器协议配置响应
 message QueryServerProtocolConfigReply {

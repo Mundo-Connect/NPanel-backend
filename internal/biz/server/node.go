@@ -102,6 +102,12 @@ type Protocol struct {
 	ServiceName                   string
 	Mc1Mode                       string
 	Mc1CidrSegments               []string
+	MundoUsername                 string
+	MundoCertificateFingerprint   string
+	MundoFakeTitle                string
+	MundoFakeMessage              string
+	MundoAcceptProxyProtocol      bool
+	MundoUseTLSCertificate        bool
 	Cipher                        string
 	ServerKey                     string
 	Flow                          string

@@ -336,6 +336,9 @@ func MxUri(data proxy.Proxy, uuid string) string {
 		setQuery(&query, "endpoint_path", transportConfig.Path)
 		setQuery(&query, "endpoint", defaultString(transportConfig.Host, data.Server))
 		setQuery(&query, "split", transportConfig.Split)
+	case "mundordp", "mundosql":
+		setQuery(&query, "type", transport)
+		applyMundoQuerySettings(&query, transportConfig)
 	default:
 		setQuery(&query, "type", transport)
 	}
@@ -391,4 +394,17 @@ func mc1CidrSegments(config proxy.TransportConfig) []string {
 		return config.Mc1CidrSegments
 	}
 	return config.CidrSegments
+}
+
+func applyMundoQuerySettings(query *url.Values, config proxy.TransportConfig) {
+	setQuery(query, "username", defaultString(config.Username, "MundoUser"))
+	setQuery(query, "certificateFingerprint", config.CertificateFingerprint)
+	setQuery(query, "fakeTitle", config.FakeTitle)
+	setQuery(query, "fakeMessage", config.FakeMessage)
+	if config.AcceptProxyProtocol {
+		setQuery(query, "acceptProxyProtocol", "true")
+	}
+	if config.UseTLSCertificate {
+		setQuery(query, "useTLSCertificate", "true")
+	}
 }

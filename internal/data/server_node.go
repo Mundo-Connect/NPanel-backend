@@ -541,6 +541,12 @@ func (r *serverNodeRepo) QueryServerProtocolConfig(ctx context.Context, serverID
 			ServiceName:                   serverNodeMapString(p["service_name"]),
 			Mc1Mode:                       serverNodeFirstString(p, "mc1_mode", "mc1Mode", "mode"),
 			Mc1CidrSegments:               serverNodeFirstStringSlice(p, "mc1_cidr_segments", "mc1CidrSegments", "cidrSegments"),
+			MundoUsername:                 serverNodeFirstString(p, "mundo_username", "mundoUsername", "username"),
+			MundoCertificateFingerprint:   serverNodeFirstString(p, "mundo_certificate_fingerprint", "mundoCertificateFingerprint", "certificateFingerprint"),
+			MundoFakeTitle:                serverNodeFirstString(p, "mundo_fake_title", "mundoFakeTitle", "fakeTitle"),
+			MundoFakeMessage:              serverNodeFirstString(p, "mundo_fake_message", "mundoFakeMessage", "fakeMessage"),
+			MundoAcceptProxyProtocol:      serverNodeFirstBool(p, "mundo_accept_proxy_protocol", "mundoAcceptProxyProtocol", "acceptProxyProtocol"),
+			MundoUseTLSCertificate:        serverNodeFirstBool(p, "mundo_use_tls_certificate", "mundoUseTLSCertificate", "useTLSCertificate"),
 			Cipher:                        serverNodeMapString(p["cipher"]),
 			ServerKey:                     serverNodeMapString(p["server_key"]),
 			Flow:                          serverNodeMapString(p["flow"]),
@@ -694,6 +700,15 @@ func serverNodeFirstStringSlice(values map[string]interface{}, keys ...string) [
 		}
 	}
 	return nil
+}
+
+func serverNodeFirstBool(values map[string]interface{}, keys ...string) bool {
+	for _, key := range keys {
+		if serverNodeMapBool(values[key]) {
+			return true
+		}
+	}
+	return false
 }
 
 func serverNodeMapBool(value interface{}) bool {

@@ -7,6 +7,7 @@ import (
 	"github.com/hibiken/asynq"
 	"github.com/npanel-dev/NPanel-backend/ent"
 	"github.com/npanel-dev/NPanel-backend/ent/enttest"
+	serverbiz "github.com/npanel-dev/NPanel-backend/internal/biz/server"
 	"github.com/npanel-dev/NPanel-backend/internal/conf"
 	servermodel "github.com/npanel-dev/NPanel-backend/internal/model/server"
 	"github.com/redis/go-redis/v9"
@@ -110,5 +111,72 @@ func TestCompatLegacyProtocolConfigMapIncludesMxMc1TransportConfig(t *testing.T)
 	}
 	if _, ok := config["tlsSettings"].(map[string]interface{}); !ok {
 		t.Fatalf("tlsSettings type = %T, want map[string]interface{}", config["tlsSettings"])
+	}
+}
+
+func TestCompatLegacyProtocolConfigMapIncludesMundoTransportConfig(t *testing.T) {
+	protocols, err := servermodel.UnmarshalProtocols(`[{"type":"mx","port":443,"enable":true,"security":"tls","transport":"mundordp","username":"admin","certificateFingerprint":"sha256:abc","fakeTitle":"Remote Desktop","fakeMessage":"Access denied","acceptProxyProtocol":true,"useTLSCertificate":true}]`)
+	if err != nil {
+		t.Fatalf("UnmarshalProtocols returned error: %v", err)
+	}
+	config := compatLegacyProtocolConfigMap(protocols[0])
+	if got, _ := config["transport"].(string); got != "mundordp" {
+		t.Fatalf("transport = %q, want mundordp; config=%v", got, config)
+	}
+	transportConfig, ok := config["transport_config"].(map[string]interface{})
+	if !ok {
+		t.Fatalf("transport_config type = %T, want map[string]interface{}", config["transport_config"])
+	}
+	networkSettings, ok := config["networkSettings"].(map[string]interface{})
+	if !ok {
+		t.Fatalf("networkSettings type = %T, want map[string]interface{}", config["networkSettings"])
+	}
+	for key, want := range map[string]string{
+		"username":               "admin",
+		"certificateFingerprint": "sha256:abc",
+		"fakeTitle":              "Remote Desktop",
+		"fakeMessage":            "Access denied",
+	} {
+		if got, _ := transportConfig[key].(string); got != want {
+			t.Fatalf("transport_config.%s = %q, want %q; config=%v", key, got, want, transportConfig)
+		}
+		if got, _ := networkSettings[key].(string); got != want {
+			t.Fatalf("networkSettings.%s = %q, want %q; config=%v", key, got, want, networkSettings)
+		}
+	}
+	if got, _ := transportConfig["acceptProxyProtocol"].(bool); !got {
+		t.Fatalf("transport_config.acceptProxyProtocol = %v, want true; config=%v", got, transportConfig)
+	}
+	if got, _ := transportConfig["useTLSCertificate"].(bool); !got {
+		t.Fatalf("transport_config.useTLSCertificate = %v, want true; config=%v", got, transportConfig)
+	}
+}
+
+func TestNormalizeMundoProtocolForResponseOnlyKeepsMxMundo(t *testing.T) {
+	vless := normalizeMundoProtocolForResponse(&serverbiz.Protocol{
+		Type:                        "vless",
+		Transport:                   "mundordp",
+		MundoUsername:               "admin",
+		MundoCertificateFingerprint: "sha256:abc",
+		MundoFakeTitle:              "Remote Desktop",
+		MundoFakeMessage:            "Denied",
+		MundoAcceptProxyProtocol:    true,
+		MundoUseTLSCertificate:      true,
+	})
+	if vless.MundoUsername != "" ||
+		vless.MundoCertificateFingerprint != "" ||
+		vless.MundoFakeTitle != "" ||
+		vless.MundoFakeMessage != "" ||
+		vless.MundoAcceptProxyProtocol ||
+		vless.MundoUseTLSCertificate {
+		t.Fatalf("non-mx protocol kept mundo fields: %+v", vless)
+	}
+
+	mx := normalizeMundoProtocolForResponse(&serverbiz.Protocol{
+		Type:      "mx",
+		Transport: "mundosql",
+	})
+	if mx.MundoUsername != "MundoUser" {
+		t.Fatalf("mx mundo username = %q, want MundoUser", mx.MundoUsername)
 	}
 }

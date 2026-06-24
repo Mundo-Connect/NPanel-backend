@@ -143,6 +143,144 @@ func TestMxConfigUnmarshalMc1CidrStringAlias(t *testing.T) {
 	}
 }
 
+func TestMxUriWithMundoSettings(t *testing.T) {
+	for _, transport := range []string{"mundordp", "mundosql"} {
+		t.Run(transport, func(t *testing.T) {
+			link := MxUri(proxy.Proxy{
+				Name:     "Mundo",
+				Server:   "example.com",
+				Port:     443,
+				Protocol: "mx",
+				Option: proxy.Mx{
+					Transport: transport,
+					TransportConfig: proxy.TransportConfig{
+						Username:               "admin",
+						CertificateFingerprint: "sha256:abc",
+						FakeTitle:              "Remote Desktop",
+						FakeMessage:            "Access denied",
+						AcceptProxyProtocol:    true,
+						UseTLSCertificate:      true,
+					},
+					Security: "tls",
+				},
+			}, "935b33c7-e128-49f2-816b-71070469cac2")
+
+			parsed, err := url.Parse(link)
+			if err != nil {
+				t.Fatalf("parse mx uri: %v", err)
+			}
+			query := parsed.Query()
+			for key, want := range map[string]string{
+				"type":                   transport,
+				"username":               "admin",
+				"certificateFingerprint": "sha256:abc",
+				"fakeTitle":              "Remote Desktop",
+				"fakeMessage":            "Access denied",
+				"acceptProxyProtocol":    "true",
+				"useTLSCertificate":      "true",
+			} {
+				if got := query.Get(key); got != want {
+					t.Fatalf("%s = %q, want %q; link=%s", key, got, want, link)
+				}
+			}
+		})
+	}
+}
+
+func TestVlessTrojanUriDoesNotEmitMundoTransports(t *testing.T) {
+	const uuid = "935b33c7-e128-49f2-816b-71070469cac2"
+	transportConfig := proxy.TransportConfig{
+		Username:               "admin",
+		CertificateFingerprint: "sha256:def",
+		FakeTitle:              "SQL Server",
+	}
+
+	for _, tc := range []struct {
+		name     string
+		protocol string
+		option   interface{}
+	}{
+		{
+			name:     "vless",
+			protocol: "vless",
+			option: proxy.Vless{
+				Transport:       "mundosql",
+				TransportConfig: transportConfig,
+			},
+		},
+		{
+			name:     "trojan",
+			protocol: "trojan",
+			option: proxy.Trojan{
+				Transport:       "mundosql",
+				TransportConfig: transportConfig,
+			},
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			link := buildProxy(proxy.Proxy{
+				Name:     "Mundo SQL",
+				Server:   "example.com",
+				Port:     443,
+				Protocol: tc.protocol,
+				Option:   tc.option,
+			}, uuid)
+			parsed, err := url.Parse(link)
+			if err != nil {
+				t.Fatalf("parse %s uri: %v", tc.protocol, err)
+			}
+			query := parsed.Query()
+			if got := query.Get("type"); got == "mundosql" || got == "mundordp" {
+				t.Fatalf("type = %q, should not expose mundo transport in %s uri; link=%s", got, tc.protocol, link)
+			}
+			for _, key := range []string{"username", "certificateFingerprint", "fakeTitle", "fakeMessage", "acceptProxyProtocol", "useTLSCertificate"} {
+				if got := query.Get(key); got != "" {
+					t.Fatalf("%s = %q, should not be emitted in %s uri; link=%s", key, got, tc.protocol, link)
+				}
+			}
+		})
+	}
+}
+
+func TestVmessUriDoesNotEmitMundoTransport(t *testing.T) {
+	link := buildProxy(proxy.Proxy{
+		Name:     "Mundo RDP",
+		Server:   "example.com",
+		Port:     443,
+		Protocol: "vmess",
+		Option: proxy.Vmess{
+			Transport: "mundordp",
+			TransportConfig: proxy.TransportConfig{
+				Username:               "admin",
+				CertificateFingerprint: "sha256:abc",
+				FakeTitle:              "Remote Desktop",
+				AcceptProxyProtocol:    true,
+			},
+		},
+	}, "935b33c7-e128-49f2-816b-71070469cac2")
+
+	encoded := strings.TrimPrefix(link, "vmess://")
+	if padding := len(encoded) % 4; padding != 0 {
+		encoded += strings.Repeat("=", 4-padding)
+	}
+	decoded, err := base64.StdEncoding.DecodeString(encoded)
+	if err != nil {
+		t.Fatalf("decode vmess uri: %v", err)
+	}
+	var payload map[string]interface{}
+	if err := json.Unmarshal(decoded, &payload); err != nil {
+		t.Fatalf("unmarshal vmess uri payload: %v", err)
+	}
+	if got, _ := payload["net"].(string); got == "mundordp" || got == "mundosql" {
+		t.Fatalf("net = %q, should not expose mundo transport in vmess payload=%v", got, payload)
+	}
+	for _, key := range []string{"username", "certificateFingerprint", "fakeTitle", "fakeMessage", "acceptProxyProtocol", "useTLSCertificate"} {
+		if _, ok := payload[key]; ok {
+			t.Fatalf("%s should not be emitted in vmess payload=%v", key, payload)
+		}
+	}
+}
+
 func TestVlessTrojanUriWithMc1Aliases(t *testing.T) {
 	const uuid = "935b33c7-e128-49f2-816b-71070469cac2"
 	transportConfig := proxy.TransportConfig{

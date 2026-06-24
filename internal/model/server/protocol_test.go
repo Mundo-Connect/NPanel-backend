@@ -38,6 +38,29 @@ func TestUnmarshalProtocolsMxMc1Aliases(t *testing.T) {
 	}
 }
 
+func TestUnmarshalProtocolsMundoAliases(t *testing.T) {
+	protocols, err := UnmarshalProtocols(`[{"type":"mx","port":443,"enable":true,"transport":"mundordp","username":"alice","certificateFingerprint":"fp","fakeTitle":"Login","fakeMessage":"Denied","acceptProxyProtocol":true,"useTLSCertificate":true}]`)
+	if err != nil {
+		t.Fatalf("UnmarshalProtocols returned error: %v", err)
+	}
+	if len(protocols) != 1 {
+		t.Fatalf("protocol count = %d, want 1", len(protocols))
+	}
+	protocol := protocols[0]
+	if protocol.MundoUsername != "alice" {
+		t.Fatalf("MundoUsername = %q, want alice", protocol.MundoUsername)
+	}
+	if protocol.MundoCertificateFingerprint != "fp" {
+		t.Fatalf("MundoCertificateFingerprint = %q, want fp", protocol.MundoCertificateFingerprint)
+	}
+	if protocol.MundoFakeTitle != "Login" || protocol.MundoFakeMessage != "Denied" {
+		t.Fatalf("mundo fake fields = %q/%q, want Login/Denied", protocol.MundoFakeTitle, protocol.MundoFakeMessage)
+	}
+	if !protocol.MundoAcceptProxyProtocol || !protocol.MundoUseTLSCertificate {
+		t.Fatalf("mundo bool fields were not preserved: %+v", protocol)
+	}
+}
+
 func TestProtocolNormalizeSimnetClearsDisabledFallback(t *testing.T) {
 	protocol := &Protocol{
 		Type:                          "simnet",
