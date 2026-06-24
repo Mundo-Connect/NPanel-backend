@@ -15,6 +15,8 @@ func TestIsOfficialClient(t *testing.T) {
 		{"slaglab exact lower", "slaglab/0.4", true},
 		{"slaglab upper", "SlaGLab/0.4", true},
 		{"slag android", "Slag/1.0.0 (Android; Android W528JS release-keys; arm64) AnyiNet/2.0", true},
+		{"mundo connect", "mundoconnect/1.0", true},
+		{"mundo connect upper", "MundoConnect/1.0", true},
 
 		// 非白名单应隐藏实验协议
 		{"clash", "clash-verge/1.0", false},
@@ -59,6 +61,13 @@ func TestFilterSubscriptionNodesByUserAgent(t *testing.T) {
 		got := filterSubscriptionNodesByUserAgent(mkNodes(), "slaglab/0.4")
 		if len(got) != 8 {
 			t.Fatalf("expected 8 nodes for official client, got %d", len(got))
+		}
+	})
+
+	t.Run("official client mundoconnect keeps all nodes", func(t *testing.T) {
+		got := filterSubscriptionNodesByUserAgent(mkNodes(), "mundoconnect/1.0")
+		if len(got) != 8 {
+			t.Fatalf("expected 8 nodes for Mundo Connect, got %d", len(got))
 		}
 	})
 

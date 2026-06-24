@@ -82,6 +82,36 @@ func TestCompatQueryServerProtocolConfigFiltersEnabledProtocols(t *testing.T) {
 	}
 }
 
+func TestCompatQueryServerProtocolConfigKeepsDistinctMxTransports(t *testing.T) {
+	ctx := context.Background()
+	client := enttest.Open(t, "sqlite3", "file:compat_query_mx_protocols?mode=memory&cache=shared&_fk=1")
+	defer client.Close()
+
+	client.ProxyServer.Create().
+		SetID(3).
+		SetName("Mundo").
+		SetServerAddr("103.214.22.3").
+		SetProtocol(`[{"type":"mx","port":443,"enable":true,"security":"tls","transport":"mc1","path":"/mc1","host":"front.example.com","mode":"auto"},{"type":"mx","port":3389,"enable":true,"security":"tls","transport":"mundordp","username":"MundoUser"},{"type":"mx","port":3306,"enable":true,"security":"tls","transport":"mundosql","username":"mundouser"}]`).
+		SaveX(ctx)
+
+	service := &ServerService{}
+	resp, err := service.CompatQueryServerProtocolConfig(ctx, compatTestProvider{db: client}, &CompatLegacyQueryServerConfigRequest{
+		ServerID:  3,
+		Protocols: []string{"mx"},
+	})
+	if err != nil {
+		t.Fatalf("CompatQueryServerProtocolConfig returned error: %v", err)
+	}
+	if resp.Total != 3 {
+		t.Fatalf("Total = %d, want 3", resp.Total)
+	}
+	for i, want := range []string{"mc1", "mundordp", "mundosql"} {
+		if got := resp.Protocols[i].Transport; got != want {
+			t.Fatalf("protocol[%d].Transport = %q, want %q; protocols=%+v", i, got, want, resp.Protocols)
+		}
+	}
+}
+
 func TestCompatLegacyProtocolConfigMapIncludesMxMc1TransportConfig(t *testing.T) {
 	protocols, err := servermodel.UnmarshalProtocols(`[{"type":"mx","port":443,"enable":true,"security":"reality","sni":"sni.example.com","fingerprint":"chrome","reality_public_key":"public-key","reality_short_id":"short-id","transport":"mc1","path":"/mc1","host":"front.example.com","mode":"auto","cidrSegments":["127.0.0.0/24"]}]`)
 	if err != nil {

@@ -156,13 +156,7 @@ func (r *subscribeApplicationRepo) GetPreviewNodes(ctx context.Context) ([]*publ
 			continue
 		}
 
-		var matched *servermodel.Protocol
-		for _, protocol := range protocols {
-			if protocol != nil && protocol.Type == node.Protocol {
-				matched = protocol
-				break
-			}
-		}
+		matched, _, _ := matchNodeProtocolConfig(protocols, node.Protocol, node.Port)
 		if matched == nil {
 			r.log.Warnf("preview skip node %d: no protocol match for %s", node.ID, node.Protocol)
 			continue

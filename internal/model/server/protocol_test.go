@@ -1,6 +1,9 @@
 package server
 
-import "testing"
+import (
+	"errors"
+	"testing"
+)
 
 func TestUnmarshalProtocolsMxMc1Aliases(t *testing.T) {
 	for _, tc := range []struct {
@@ -58,6 +61,38 @@ func TestUnmarshalProtocolsMundoAliases(t *testing.T) {
 	}
 	if !protocol.MundoAcceptProxyProtocol || !protocol.MundoUseTLSCertificate {
 		t.Fatalf("mundo bool fields were not preserved: %+v", protocol)
+	}
+}
+
+func TestValidateProtocolsAllowsDistinctMxTransports(t *testing.T) {
+	err := ValidateProtocols([]*Protocol{
+		{Type: "mx", Transport: "mc1"},
+		{Type: "mx", Transport: "mundordp"},
+		{Type: "mx", Transport: "mundosql"},
+		{Type: "vless", Transport: "mc1"},
+	})
+	if err != nil {
+		t.Fatalf("ValidateProtocols returned error: %v", err)
+	}
+}
+
+func TestValidateProtocolsRejectsDuplicateMxTransport(t *testing.T) {
+	err := ValidateProtocols([]*Protocol{
+		{Type: "mx", Transport: "mc1"},
+		{Type: "mx", Transport: " MC1 "},
+	})
+	if !errors.Is(err, ErrDuplicateProtocolType) {
+		t.Fatalf("ValidateProtocols error = %v, want ErrDuplicateProtocolType", err)
+	}
+}
+
+func TestValidateProtocolsStillRejectsDuplicateRegularType(t *testing.T) {
+	err := ValidateProtocols([]*Protocol{
+		{Type: "vless", Transport: "mc1"},
+		{Type: "VLESS", Transport: "tcp"},
+	})
+	if !errors.Is(err, ErrDuplicateProtocolType) {
+		t.Fatalf("ValidateProtocols error = %v, want ErrDuplicateProtocolType", err)
 	}
 }
 

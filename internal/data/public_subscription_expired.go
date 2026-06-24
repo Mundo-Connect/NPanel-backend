@@ -101,13 +101,7 @@ func (r *publicSubscriptionRepo) createExpiredNodesFromDB(ctx context.Context, u
 			continue
 		}
 
-		var matched *servermodel.Protocol
-		for _, protocol := range protocols {
-			if protocol != nil && protocol.Type == node.Protocol {
-				matched = protocol
-				break
-			}
-		}
+		matched, _, _ := matchNodeProtocolConfig(protocols, node.Protocol, node.Port)
 		if matched == nil {
 			continue
 		}

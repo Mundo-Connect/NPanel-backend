@@ -334,7 +334,7 @@ func (uc *SubscriptionUseCase) GetSubscribeConfig(ctx context.Context, req *v1.G
 
 func filterSubscriptionNodesByUserAgent(nodes []*NodeInfo, userAgent string) []*NodeInfo {
 	// 默认剔除实验性协议/网络（simnet/omniflow/mx/mc1/mundordp/mundosql）。
-	// 仅当请求来自自有客户端/SDK（UA 命中 omnxt 或 slaglab）时才放行。
+	// 仅当请求来自自有客户端/SDK（UA 命中 omnxt、slaglab 或 mundoconnect）时才放行。
 	// 开源客户端不支持这两个新协议，且必须搭配我方节点列表与 SDK 才能使用。
 	if len(nodes) == 0 || isOfficialClient(userAgent) {
 		return nodes
@@ -360,6 +360,7 @@ func isOfficialClient(userAgent string) bool {
 
 	// 自有客户端/SDK 的 UA 关键字白名单
 	officialKeywords := []string{
+		"mundoconnect/",
 		"omnxt",
 		"slag/",
 		"slaglab",
