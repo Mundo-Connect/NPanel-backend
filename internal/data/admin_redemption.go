@@ -7,6 +7,7 @@ import (
 	"math/big"
 	"time"
 
+	"github.com/go-kratos/kratos/v2/log"
 	v1 "github.com/npanel-dev/NPanel-backend/api/admin/redemption/v1"
 	"github.com/npanel-dev/NPanel-backend/ent"
 	"github.com/npanel-dev/NPanel-backend/ent/proxyredemptioncode"
@@ -14,7 +15,6 @@ import (
 	"github.com/npanel-dev/NPanel-backend/ent/proxysubscribe"
 	redemptionbiz "github.com/npanel-dev/NPanel-backend/internal/biz/admin/redemption"
 	"github.com/npanel-dev/NPanel-backend/internal/responsecode"
-	"github.com/go-kratos/kratos/v2/log"
 )
 
 type adminRedemptionRepo struct {
@@ -87,7 +87,12 @@ func (r *adminRedemptionRepo) CreateRedemptionCode(ctx context.Context, req *v1.
 }
 
 func (r *adminRedemptionRepo) UpdateRedemptionCode(ctx context.Context, req *v1.UpdateRedemptionCodeRequest) error {
-	code, err := r.data.db.ProxyRedemptionCode.Query().Where(proxyredemptioncode.IDEQ(req.Id)).Only(ctx)
+	code, err := r.data.db.ProxyRedemptionCode.Query().
+		Where(
+			proxyredemptioncode.IDEQ(req.Id),
+			proxyredemptioncode.DeletedAtIsNil(),
+		).
+		Only(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
 			return responsecode.NewKratosError(responsecode.ErrRedemptionCodeNotFound)
@@ -116,7 +121,12 @@ func (r *adminRedemptionRepo) UpdateRedemptionCode(ctx context.Context, req *v1.
 }
 
 func (r *adminRedemptionRepo) ToggleRedemptionCodeStatus(ctx context.Context, req *v1.ToggleRedemptionCodeStatusRequest) error {
-	code, err := r.data.db.ProxyRedemptionCode.Query().Where(proxyredemptioncode.IDEQ(req.Id)).Only(ctx)
+	code, err := r.data.db.ProxyRedemptionCode.Query().
+		Where(
+			proxyredemptioncode.IDEQ(req.Id),
+			proxyredemptioncode.DeletedAtIsNil(),
+		).
+		Only(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
 			return responsecode.NewKratosError(responsecode.ErrInvalidParams)
@@ -127,8 +137,23 @@ func (r *adminRedemptionRepo) ToggleRedemptionCodeStatus(ctx context.Context, re
 }
 
 func (r *adminRedemptionRepo) DeleteRedemptionCode(ctx context.Context, id int64) error {
-	_, err := r.data.db.ProxyRedemptionCode.Delete().Where(proxyredemptioncode.IDEQ(id)).Exec(ctx)
-	return err
+	now := time.Now()
+	affected, err := r.data.db.ProxyRedemptionCode.Update().
+		Where(
+			proxyredemptioncode.IDEQ(id),
+			proxyredemptioncode.DeletedAtIsNil(),
+		).
+		SetStatus(0).
+		SetDeletedAt(now).
+		SetUpdatedAt(now).
+		Save(ctx)
+	if err != nil {
+		return err
+	}
+	if affected == 0 {
+		return responsecode.NewKratosError(responsecode.ErrRedemptionCodeNotFound)
+	}
+	return nil
 }
 
 func (r *adminRedemptionRepo) BatchDeleteRedemptionCode(ctx context.Context, ids []int64) error {
@@ -141,7 +166,7 @@ func (r *adminRedemptionRepo) BatchDeleteRedemptionCode(ctx context.Context, ids
 }
 
 func (r *adminRedemptionRepo) GetRedemptionCodeList(ctx context.Context, req *v1.GetRedemptionCodeListRequest) ([]*ent.ProxyRedemptionCode, int32, error) {
-	query := r.data.db.ProxyRedemptionCode.Query()
+	query := r.data.db.ProxyRedemptionCode.Query().Where(proxyredemptioncode.DeletedAtIsNil())
 	if req.SubscribePlan != 0 {
 		query = query.Where(proxyredemptioncode.SubscribePlanEQ(req.SubscribePlan))
 	}
