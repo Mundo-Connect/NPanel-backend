@@ -116,6 +116,10 @@ service RoutingService {
   rpc ListRoutingHealthReports(ListRoutingHealthReportsRequest) returns (ListRoutingHealthReportsReply) {
     option (google.api.http) = { get: "/v1/admin/routing/health_reports" };
   }
+
+  rpc ListRoutingRouteEvents(ListRoutingRouteEventsRequest) returns (ListRoutingRouteEventsReply) {
+    option (google.api.http) = { get: "/v1/admin/routing/route_events" };
+  }
 }
 
 message RouteProfile {
@@ -307,6 +311,48 @@ message ListRoutingHealthReportsReply {
   int32 code = 1;
   string message = 2;
   RoutingHealthReportListData data = 3;
+}
+
+message RoutingRouteEvent {
+  int64 id = 1;
+  string reporter_type = 2;
+  string reporter_id = 3;
+  string profile_code = 4;
+  string routing_hash = 5;
+  string event_type = 6;
+  string subject = 7;
+  string rule_id = 8;
+  string rule_name = 9;
+  string action_type = 10;
+  string outbound_tag = 11;
+  string dns_resolver_tag = 12;
+  string fallback_target = 13;
+  string status = 14;
+  int32 latency_ms = 15;
+  string error = 16;
+  int64 event_at = 17;
+  string event_json = 18;
+  int64 created_at = 19;
+  int64 updated_at = 20;
+}
+
+message ListRoutingRouteEventsRequest {
+  int64 page = 1;
+  int64 size = 2;
+  string event_type = 3;
+  string profile_code = 4;
+  string reporter_type = 5;
+}
+
+message RoutingRouteEventListData {
+  repeated RoutingRouteEvent list = 1;
+  int32 total = 2;
+}
+
+message ListRoutingRouteEventsReply {
+  int32 code = 1;
+  string message = 2;
+  RoutingRouteEventListData data = 3;
 }
 
 message RoutingHealthItem {

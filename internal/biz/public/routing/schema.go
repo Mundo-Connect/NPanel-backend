@@ -214,3 +214,27 @@ type HealthReportItem struct {
 	CheckedAt           string `json:"checked_at,omitempty"`
 	ReportJSON          string `json:"report_json,omitempty"`
 }
+
+type RouteEventRequest struct {
+	ReporterType string           `json:"reporter_type,omitempty"`
+	ReporterID   string           `json:"reporter_id,omitempty"`
+	ProfileCode  string           `json:"profile_code,omitempty"`
+	RoutingHash  string           `json:"routing_hash,omitempty"`
+	Events       []RouteEventItem `json:"events"`
+}
+
+type RouteEventItem struct {
+	EventType      string `json:"event_type"`
+	Subject        string `json:"subject,omitempty"`
+	RuleID         string `json:"rule_id,omitempty"`
+	RuleName       string `json:"rule_name,omitempty"`
+	ActionType     string `json:"action_type,omitempty"`
+	OutboundTag    string `json:"outbound_tag,omitempty"`
+	DNSResolverTag string `json:"dns_resolver_tag,omitempty"`
+	FallbackTarget string `json:"fallback_target,omitempty"`
+	Status         string `json:"status,omitempty"`
+	LatencyMS      int    `json:"latency_ms,omitempty"`
+	Error          string `json:"error,omitempty"`
+	EventAt        string `json:"event_at,omitempty"`
+	EventJSON      string `json:"event_json,omitempty"`
+}

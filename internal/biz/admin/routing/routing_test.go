@@ -13,6 +13,7 @@ type fakeRoutingRepo struct {
 	profiles      []*RouteProfile
 	rules         []*RouteRule
 	healthReports []*RoutingHealthReport
+	routeEvents   []*RoutingRouteEvent
 	tokenScope    ScopeContext
 }
 
@@ -89,6 +90,36 @@ func (r fakeRoutingRepo) SaveHealthReports(context.Context, []*RoutingHealthRepo
 }
 func (r fakeRoutingRepo) ListHealthReports(context.Context, int, int, string, string, string) ([]*RoutingHealthReport, int32, error) {
 	return r.healthReports, int32(len(r.healthReports)), nil
+}
+func (r fakeRoutingRepo) SaveRouteEvents(context.Context, []*RoutingRouteEvent) error {
+	return nil
+}
+func (r fakeRoutingRepo) ListRouteEvents(context.Context, int, int, string, string, string) ([]*RoutingRouteEvent, int32, error) {
+	return r.routeEvents, int32(len(r.routeEvents)), nil
+}
+
+func TestRecordRouteEventAcceptsRouteDecision(t *testing.T) {
+	uc := NewRoutingUsecase(fakeRoutingRepo{}, log.DefaultLogger)
+
+	err := uc.RecordRouteEvent(context.Background(), publicrouting.RouteEventRequest{
+		ReporterType: "client",
+		ReporterID:   "device-1",
+		ProfileCode:  "user_profile",
+		RoutingHash:  "hash-1",
+		Events: []publicrouting.RouteEventItem{
+			{
+				EventType:   "route_decision",
+				Subject:     "openai.com",
+				RuleID:      "rule_openai",
+				ActionType:  "outbound",
+				OutboundTag: "unlock:openai:us",
+				Status:      "matched",
+			},
+		},
+	})
+	if err != nil {
+		t.Fatalf("RecordRouteEvent() error = %v", err)
+	}
 }
 
 func TestBuildConfigFallsBackToFixtureWhenStoreIsEmpty(t *testing.T) {

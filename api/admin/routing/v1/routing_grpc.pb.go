@@ -42,6 +42,7 @@ const (
 	RoutingService_PreviewRouteConfig_FullMethodName       = "/api.admin.routing.v1.RoutingService/PreviewRouteConfig"
 	RoutingService_GetRoutingOverview_FullMethodName       = "/api.admin.routing.v1.RoutingService/GetRoutingOverview"
 	RoutingService_ListRoutingHealthReports_FullMethodName = "/api.admin.routing.v1.RoutingService/ListRoutingHealthReports"
+	RoutingService_ListRoutingRouteEvents_FullMethodName   = "/api.admin.routing.v1.RoutingService/ListRoutingRouteEvents"
 )
 
 // RoutingServiceClient is the client API for RoutingService service.
@@ -71,6 +72,7 @@ type RoutingServiceClient interface {
 	PreviewRouteConfig(ctx context.Context, in *PreviewRouteConfigRequest, opts ...grpc.CallOption) (*PreviewRouteConfigReply, error)
 	GetRoutingOverview(ctx context.Context, in *GetRoutingOverviewRequest, opts ...grpc.CallOption) (*GetRoutingOverviewReply, error)
 	ListRoutingHealthReports(ctx context.Context, in *ListRoutingHealthReportsRequest, opts ...grpc.CallOption) (*ListRoutingHealthReportsReply, error)
+	ListRoutingRouteEvents(ctx context.Context, in *ListRoutingRouteEventsRequest, opts ...grpc.CallOption) (*ListRoutingRouteEventsReply, error)
 }
 
 type routingServiceClient struct {
@@ -311,6 +313,16 @@ func (c *routingServiceClient) ListRoutingHealthReports(ctx context.Context, in 
 	return out, nil
 }
 
+func (c *routingServiceClient) ListRoutingRouteEvents(ctx context.Context, in *ListRoutingRouteEventsRequest, opts ...grpc.CallOption) (*ListRoutingRouteEventsReply, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListRoutingRouteEventsReply)
+	err := c.cc.Invoke(ctx, RoutingService_ListRoutingRouteEvents_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // RoutingServiceServer is the server API for RoutingService service.
 // All implementations must embed UnimplementedRoutingServiceServer
 // for forward compatibility.
@@ -338,6 +350,7 @@ type RoutingServiceServer interface {
 	PreviewRouteConfig(context.Context, *PreviewRouteConfigRequest) (*PreviewRouteConfigReply, error)
 	GetRoutingOverview(context.Context, *GetRoutingOverviewRequest) (*GetRoutingOverviewReply, error)
 	ListRoutingHealthReports(context.Context, *ListRoutingHealthReportsRequest) (*ListRoutingHealthReportsReply, error)
+	ListRoutingRouteEvents(context.Context, *ListRoutingRouteEventsRequest) (*ListRoutingRouteEventsReply, error)
 	mustEmbedUnimplementedRoutingServiceServer()
 }
 
@@ -416,6 +429,9 @@ func (UnimplementedRoutingServiceServer) GetRoutingOverview(context.Context, *Ge
 }
 func (UnimplementedRoutingServiceServer) ListRoutingHealthReports(context.Context, *ListRoutingHealthReportsRequest) (*ListRoutingHealthReportsReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListRoutingHealthReports not implemented")
+}
+func (UnimplementedRoutingServiceServer) ListRoutingRouteEvents(context.Context, *ListRoutingRouteEventsRequest) (*ListRoutingRouteEventsReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListRoutingRouteEvents not implemented")
 }
 func (UnimplementedRoutingServiceServer) mustEmbedUnimplementedRoutingServiceServer() {}
 func (UnimplementedRoutingServiceServer) testEmbeddedByValue()                        {}
@@ -852,6 +868,24 @@ func _RoutingService_ListRoutingHealthReports_Handler(srv interface{}, ctx conte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _RoutingService_ListRoutingRouteEvents_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListRoutingRouteEventsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RoutingServiceServer).ListRoutingRouteEvents(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: RoutingService_ListRoutingRouteEvents_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RoutingServiceServer).ListRoutingRouteEvents(ctx, req.(*ListRoutingRouteEventsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // RoutingService_ServiceDesc is the grpc.ServiceDesc for RoutingService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -950,6 +984,10 @@ var RoutingService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListRoutingHealthReports",
 			Handler:    _RoutingService_ListRoutingHealthReports_Handler,
+		},
+		{
+			MethodName: "ListRoutingRouteEvents",
+			Handler:    _RoutingService_ListRoutingRouteEvents_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -201,6 +201,18 @@ func (f ProxyRoutingProfileFunc) Mutate(ctx context.Context, m ent.Mutation) (en
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ProxyRoutingProfileMutation", m)
 }
 
+// The ProxyRoutingRouteEventFunc type is an adapter to allow the use of ordinary
+// function as ProxyRoutingRouteEvent mutator.
+type ProxyRoutingRouteEventFunc func(context.Context, *ent.ProxyRoutingRouteEventMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ProxyRoutingRouteEventFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ProxyRoutingRouteEventMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ProxyRoutingRouteEventMutation", m)
+}
+
 // The ProxyRoutingRuleFunc type is an adapter to allow the use of ordinary
 // function as ProxyRoutingRule mutator.
 type ProxyRoutingRuleFunc func(context.Context, *ent.ProxyRoutingRuleMutation) (ent.Value, error)

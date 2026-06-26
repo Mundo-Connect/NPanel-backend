@@ -2268,6 +2268,39 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/api.admin.routing.v1.ListRouteProfilesReply'
+    /v1/admin/routing/route_events:
+        get:
+            tags:
+                - RoutingService
+            operationId: RoutingService_ListRoutingRouteEvents
+            parameters:
+                - name: page
+                  in: query
+                  schema:
+                    type: string
+                - name: size
+                  in: query
+                  schema:
+                    type: string
+                - name: eventType
+                  in: query
+                  schema:
+                    type: string
+                - name: profileCode
+                  in: query
+                  schema:
+                    type: string
+                - name: reporterType
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.admin.routing.v1.ListRoutingRouteEventsReply'
     /v1/admin/routing/rule:
         put:
             tags:
@@ -9132,6 +9165,16 @@ components:
                     type: string
                 data:
                     $ref: '#/components/schemas/api.admin.routing.v1.RoutingHealthReportListData'
+        api.admin.routing.v1.ListRoutingRouteEventsReply:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/api.admin.routing.v1.RoutingRouteEventListData'
         api.admin.routing.v1.ListUnlockServicesReply:
             type: object
             properties:
@@ -9504,6 +9547,60 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/api.admin.routing.v1.RoutingAuditEvent'
+        api.admin.routing.v1.RoutingRouteEvent:
+            type: object
+            properties:
+                id:
+                    type: string
+                reporterType:
+                    type: string
+                reporterId:
+                    type: string
+                profileCode:
+                    type: string
+                routingHash:
+                    type: string
+                eventType:
+                    type: string
+                subject:
+                    type: string
+                ruleId:
+                    type: string
+                ruleName:
+                    type: string
+                actionType:
+                    type: string
+                outboundTag:
+                    type: string
+                dnsResolverTag:
+                    type: string
+                fallbackTarget:
+                    type: string
+                status:
+                    type: string
+                latencyMs:
+                    type: integer
+                    format: int32
+                error:
+                    type: string
+                eventAt:
+                    type: string
+                eventJson:
+                    type: string
+                createdAt:
+                    type: string
+                updatedAt:
+                    type: string
+        api.admin.routing.v1.RoutingRouteEventListData:
+            type: object
+            properties:
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.admin.routing.v1.RoutingRouteEvent'
+                total:
+                    type: integer
+                    format: int32
         api.admin.routing.v1.UnlockService:
             type: object
             properties:

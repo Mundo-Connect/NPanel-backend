@@ -54,6 +54,9 @@ type ProxyRoutingOutbound func(*sql.Selector)
 // ProxyRoutingProfile is the predicate function for proxyroutingprofile builders.
 type ProxyRoutingProfile func(*sql.Selector)
 
+// ProxyRoutingRouteEvent is the predicate function for proxyroutingrouteevent builders.
+type ProxyRoutingRouteEvent func(*sql.Selector)
+
 // ProxyRoutingRule is the predicate function for proxyroutingrule builders.
 type ProxyRoutingRule func(*sql.Selector)
 

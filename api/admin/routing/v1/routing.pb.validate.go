@@ -6939,6 +6939,535 @@ var _ interface {
 	ErrorName() string
 } = ListRoutingHealthReportsReplyValidationError{}
 
+// Validate checks the field values on RoutingRouteEvent with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *RoutingRouteEvent) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on RoutingRouteEvent with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// RoutingRouteEventMultiError, or nil if none found.
+func (m *RoutingRouteEvent) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *RoutingRouteEvent) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Id
+
+	// no validation rules for ReporterType
+
+	// no validation rules for ReporterId
+
+	// no validation rules for ProfileCode
+
+	// no validation rules for RoutingHash
+
+	// no validation rules for EventType
+
+	// no validation rules for Subject
+
+	// no validation rules for RuleId
+
+	// no validation rules for RuleName
+
+	// no validation rules for ActionType
+
+	// no validation rules for OutboundTag
+
+	// no validation rules for DnsResolverTag
+
+	// no validation rules for FallbackTarget
+
+	// no validation rules for Status
+
+	// no validation rules for LatencyMs
+
+	// no validation rules for Error
+
+	// no validation rules for EventAt
+
+	// no validation rules for EventJson
+
+	// no validation rules for CreatedAt
+
+	// no validation rules for UpdatedAt
+
+	if len(errors) > 0 {
+		return RoutingRouteEventMultiError(errors)
+	}
+
+	return nil
+}
+
+// RoutingRouteEventMultiError is an error wrapping multiple validation errors
+// returned by RoutingRouteEvent.ValidateAll() if the designated constraints
+// aren't met.
+type RoutingRouteEventMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m RoutingRouteEventMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m RoutingRouteEventMultiError) AllErrors() []error { return m }
+
+// RoutingRouteEventValidationError is the validation error returned by
+// RoutingRouteEvent.Validate if the designated constraints aren't met.
+type RoutingRouteEventValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RoutingRouteEventValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RoutingRouteEventValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RoutingRouteEventValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RoutingRouteEventValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RoutingRouteEventValidationError) ErrorName() string {
+	return "RoutingRouteEventValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e RoutingRouteEventValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRoutingRouteEvent.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RoutingRouteEventValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RoutingRouteEventValidationError{}
+
+// Validate checks the field values on ListRoutingRouteEventsRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *ListRoutingRouteEventsRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ListRoutingRouteEventsRequest with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the result is a list of violation errors wrapped in
+// ListRoutingRouteEventsRequestMultiError, or nil if none found.
+func (m *ListRoutingRouteEventsRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ListRoutingRouteEventsRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Page
+
+	// no validation rules for Size
+
+	// no validation rules for EventType
+
+	// no validation rules for ProfileCode
+
+	// no validation rules for ReporterType
+
+	if len(errors) > 0 {
+		return ListRoutingRouteEventsRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// ListRoutingRouteEventsRequestMultiError is an error wrapping multiple
+// validation errors returned by ListRoutingRouteEventsRequest.ValidateAll()
+// if the designated constraints aren't met.
+type ListRoutingRouteEventsRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ListRoutingRouteEventsRequestMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ListRoutingRouteEventsRequestMultiError) AllErrors() []error { return m }
+
+// ListRoutingRouteEventsRequestValidationError is the validation error
+// returned by ListRoutingRouteEventsRequest.Validate if the designated
+// constraints aren't met.
+type ListRoutingRouteEventsRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ListRoutingRouteEventsRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ListRoutingRouteEventsRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ListRoutingRouteEventsRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ListRoutingRouteEventsRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ListRoutingRouteEventsRequestValidationError) ErrorName() string {
+	return "ListRoutingRouteEventsRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ListRoutingRouteEventsRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sListRoutingRouteEventsRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ListRoutingRouteEventsRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ListRoutingRouteEventsRequestValidationError{}
+
+// Validate checks the field values on RoutingRouteEventListData with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *RoutingRouteEventListData) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on RoutingRouteEventListData with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// RoutingRouteEventListDataMultiError, or nil if none found.
+func (m *RoutingRouteEventListData) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *RoutingRouteEventListData) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	for idx, item := range m.GetList() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, RoutingRouteEventListDataValidationError{
+						field:  fmt.Sprintf("List[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, RoutingRouteEventListDataValidationError{
+						field:  fmt.Sprintf("List[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return RoutingRouteEventListDataValidationError{
+					field:  fmt.Sprintf("List[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	// no validation rules for Total
+
+	if len(errors) > 0 {
+		return RoutingRouteEventListDataMultiError(errors)
+	}
+
+	return nil
+}
+
+// RoutingRouteEventListDataMultiError is an error wrapping multiple validation
+// errors returned by RoutingRouteEventListData.ValidateAll() if the
+// designated constraints aren't met.
+type RoutingRouteEventListDataMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m RoutingRouteEventListDataMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m RoutingRouteEventListDataMultiError) AllErrors() []error { return m }
+
+// RoutingRouteEventListDataValidationError is the validation error returned by
+// RoutingRouteEventListData.Validate if the designated constraints aren't met.
+type RoutingRouteEventListDataValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RoutingRouteEventListDataValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RoutingRouteEventListDataValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RoutingRouteEventListDataValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RoutingRouteEventListDataValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RoutingRouteEventListDataValidationError) ErrorName() string {
+	return "RoutingRouteEventListDataValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e RoutingRouteEventListDataValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRoutingRouteEventListData.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RoutingRouteEventListDataValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RoutingRouteEventListDataValidationError{}
+
+// Validate checks the field values on ListRoutingRouteEventsReply with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *ListRoutingRouteEventsReply) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ListRoutingRouteEventsReply with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ListRoutingRouteEventsReplyMultiError, or nil if none found.
+func (m *ListRoutingRouteEventsReply) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ListRoutingRouteEventsReply) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Code
+
+	// no validation rules for Message
+
+	if all {
+		switch v := interface{}(m.GetData()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ListRoutingRouteEventsReplyValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ListRoutingRouteEventsReplyValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetData()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ListRoutingRouteEventsReplyValidationError{
+				field:  "Data",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return ListRoutingRouteEventsReplyMultiError(errors)
+	}
+
+	return nil
+}
+
+// ListRoutingRouteEventsReplyMultiError is an error wrapping multiple
+// validation errors returned by ListRoutingRouteEventsReply.ValidateAll() if
+// the designated constraints aren't met.
+type ListRoutingRouteEventsReplyMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ListRoutingRouteEventsReplyMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ListRoutingRouteEventsReplyMultiError) AllErrors() []error { return m }
+
+// ListRoutingRouteEventsReplyValidationError is the validation error returned
+// by ListRoutingRouteEventsReply.Validate if the designated constraints
+// aren't met.
+type ListRoutingRouteEventsReplyValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ListRoutingRouteEventsReplyValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ListRoutingRouteEventsReplyValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ListRoutingRouteEventsReplyValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ListRoutingRouteEventsReplyValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ListRoutingRouteEventsReplyValidationError) ErrorName() string {
+	return "ListRoutingRouteEventsReplyValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ListRoutingRouteEventsReplyValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sListRoutingRouteEventsReply.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ListRoutingRouteEventsReplyValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ListRoutingRouteEventsReplyValidationError{}
+
 // Validate checks the field values on RoutingHealthItem with the rules defined
 // in the proto definition for this message. If any rules are violated, the
 // first error encountered is returned, or nil if there are no violations.

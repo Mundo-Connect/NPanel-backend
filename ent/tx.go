@@ -44,6 +44,8 @@ type Tx struct {
 	ProxyRoutingOutbound *ProxyRoutingOutboundClient
 	// ProxyRoutingProfile is the client for interacting with the ProxyRoutingProfile builders.
 	ProxyRoutingProfile *ProxyRoutingProfileClient
+	// ProxyRoutingRouteEvent is the client for interacting with the ProxyRoutingRouteEvent builders.
+	ProxyRoutingRouteEvent *ProxyRoutingRouteEventClient
 	// ProxyRoutingRule is the client for interacting with the ProxyRoutingRule builders.
 	ProxyRoutingRule *ProxyRoutingRuleClient
 	// ProxyRoutingUnlockService is the client for interacting with the ProxyRoutingUnlockService builders.
@@ -235,6 +237,7 @@ func (tx *Tx) init() {
 	tx.ProxyRoutingHealthReport = NewProxyRoutingHealthReportClient(tx.config)
 	tx.ProxyRoutingOutbound = NewProxyRoutingOutboundClient(tx.config)
 	tx.ProxyRoutingProfile = NewProxyRoutingProfileClient(tx.config)
+	tx.ProxyRoutingRouteEvent = NewProxyRoutingRouteEventClient(tx.config)
 	tx.ProxyRoutingRule = NewProxyRoutingRuleClient(tx.config)
 	tx.ProxyRoutingUnlockService = NewProxyRoutingUnlockServiceClient(tx.config)
 	tx.ProxySchemaMigrations = NewProxySchemaMigrationsClient(tx.config)

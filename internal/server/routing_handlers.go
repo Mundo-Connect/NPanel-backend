@@ -30,6 +30,7 @@ func registerRoutingPreviewRoutes(srv *http.Server, routing *adminroutingservice
 	srv.HandleFunc("/v1/public/routing/config", handleRoutingConfig(routing, cache))
 	srv.HandleFunc("/v1/public/routing/preview", handleRoutingPreview(routing, cache))
 	srv.HandleFunc("/v1/public/routing/health_report", handleRoutingHealthReport(routing))
+	srv.HandleFunc("/v1/public/routing/route_event", handleRoutingRouteEvent(routing))
 }
 
 func handleRoutingConfig(routing *adminroutingservice.RoutingService, cache *publicRoutingCache) nethttp.HandlerFunc {
@@ -104,6 +105,32 @@ func handleRoutingHealthReport(routing *adminroutingservice.RoutingService) neth
 		}
 		if err := routing.RecordHealthReport(r.Context(), req); err != nil {
 			writeRoutingError(w, nethttp.StatusBadRequest, 400, "invalid health report request")
+			return
+		}
+		writeRoutingOK(w, map[string]bool{"accepted": true})
+	}
+}
+
+func handleRoutingRouteEvent(routing *adminroutingservice.RoutingService) nethttp.HandlerFunc {
+	return func(w nethttp.ResponseWriter, r *nethttp.Request) {
+		if r.Method != nethttp.MethodPost {
+			writeRoutingError(w, nethttp.StatusMethodNotAllowed, 405, "method not allowed")
+			return
+		}
+
+		var req publicrouting.RouteEventRequest
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			writeRoutingError(w, nethttp.StatusBadRequest, 400, "invalid route event request")
+			return
+		}
+		if req.ReporterID == "" {
+			req.ReporterID = firstNonEmptyString(r.Header.Get("X-Device-ID"), r.Header.Get("X-Reporter-ID"), r.RemoteAddr)
+		}
+		if req.ReporterType == "" {
+			req.ReporterType = firstNonEmptyString(r.Header.Get("X-Reporter-Type"), "client")
+		}
+		if err := routing.RecordRouteEvent(r.Context(), req); err != nil {
+			writeRoutingError(w, nethttp.StatusBadRequest, 400, "invalid route event request")
 			return
 		}
 		writeRoutingOK(w, map[string]bool{"accepted": true})

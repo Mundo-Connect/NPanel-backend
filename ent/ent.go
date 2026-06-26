@@ -28,6 +28,7 @@ import (
 	"github.com/npanel-dev/NPanel-backend/ent/proxyroutinghealthreport"
 	"github.com/npanel-dev/NPanel-backend/ent/proxyroutingoutbound"
 	"github.com/npanel-dev/NPanel-backend/ent/proxyroutingprofile"
+	"github.com/npanel-dev/NPanel-backend/ent/proxyroutingrouteevent"
 	"github.com/npanel-dev/NPanel-backend/ent/proxyroutingrule"
 	"github.com/npanel-dev/NPanel-backend/ent/proxyroutingunlockservice"
 	"github.com/npanel-dev/NPanel-backend/ent/proxyschemamigrations"
@@ -126,6 +127,7 @@ func checkColumn(t, c string) error {
 			proxyroutinghealthreport.Table:    proxyroutinghealthreport.ValidColumn,
 			proxyroutingoutbound.Table:        proxyroutingoutbound.ValidColumn,
 			proxyroutingprofile.Table:         proxyroutingprofile.ValidColumn,
+			proxyroutingrouteevent.Table:      proxyroutingrouteevent.ValidColumn,
 			proxyroutingrule.Table:            proxyroutingrule.ValidColumn,
 			proxyroutingunlockservice.Table:   proxyroutingunlockservice.ValidColumn,
 			proxyschemamigrations.Table:       proxyschemamigrations.ValidColumn,

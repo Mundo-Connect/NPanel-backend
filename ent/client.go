@@ -31,6 +31,7 @@ import (
 	"github.com/npanel-dev/NPanel-backend/ent/proxyroutinghealthreport"
 	"github.com/npanel-dev/NPanel-backend/ent/proxyroutingoutbound"
 	"github.com/npanel-dev/NPanel-backend/ent/proxyroutingprofile"
+	"github.com/npanel-dev/NPanel-backend/ent/proxyroutingrouteevent"
 	"github.com/npanel-dev/NPanel-backend/ent/proxyroutingrule"
 	"github.com/npanel-dev/NPanel-backend/ent/proxyroutingunlockservice"
 	"github.com/npanel-dev/NPanel-backend/ent/proxyschemamigrations"
@@ -92,6 +93,8 @@ type Client struct {
 	ProxyRoutingOutbound *ProxyRoutingOutboundClient
 	// ProxyRoutingProfile is the client for interacting with the ProxyRoutingProfile builders.
 	ProxyRoutingProfile *ProxyRoutingProfileClient
+	// ProxyRoutingRouteEvent is the client for interacting with the ProxyRoutingRouteEvent builders.
+	ProxyRoutingRouteEvent *ProxyRoutingRouteEventClient
 	// ProxyRoutingRule is the client for interacting with the ProxyRoutingRule builders.
 	ProxyRoutingRule *ProxyRoutingRuleClient
 	// ProxyRoutingUnlockService is the client for interacting with the ProxyRoutingUnlockService builders.
@@ -163,6 +166,7 @@ func (c *Client) init() {
 	c.ProxyRoutingHealthReport = NewProxyRoutingHealthReportClient(c.config)
 	c.ProxyRoutingOutbound = NewProxyRoutingOutboundClient(c.config)
 	c.ProxyRoutingProfile = NewProxyRoutingProfileClient(c.config)
+	c.ProxyRoutingRouteEvent = NewProxyRoutingRouteEventClient(c.config)
 	c.ProxyRoutingRule = NewProxyRoutingRuleClient(c.config)
 	c.ProxyRoutingUnlockService = NewProxyRoutingUnlockServiceClient(c.config)
 	c.ProxySchemaMigrations = NewProxySchemaMigrationsClient(c.config)
@@ -293,6 +297,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		ProxyRoutingHealthReport:    NewProxyRoutingHealthReportClient(cfg),
 		ProxyRoutingOutbound:        NewProxyRoutingOutboundClient(cfg),
 		ProxyRoutingProfile:         NewProxyRoutingProfileClient(cfg),
+		ProxyRoutingRouteEvent:      NewProxyRoutingRouteEventClient(cfg),
 		ProxyRoutingRule:            NewProxyRoutingRuleClient(cfg),
 		ProxyRoutingUnlockService:   NewProxyRoutingUnlockServiceClient(cfg),
 		ProxySchemaMigrations:       NewProxySchemaMigrationsClient(cfg),
@@ -350,6 +355,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		ProxyRoutingHealthReport:    NewProxyRoutingHealthReportClient(cfg),
 		ProxyRoutingOutbound:        NewProxyRoutingOutboundClient(cfg),
 		ProxyRoutingProfile:         NewProxyRoutingProfileClient(cfg),
+		ProxyRoutingRouteEvent:      NewProxyRoutingRouteEventClient(cfg),
 		ProxyRoutingRule:            NewProxyRoutingRuleClient(cfg),
 		ProxyRoutingUnlockService:   NewProxyRoutingUnlockServiceClient(cfg),
 		ProxySchemaMigrations:       NewProxySchemaMigrationsClient(cfg),
@@ -405,13 +411,14 @@ func (c *Client) Use(hooks ...Hook) {
 		c.ProxyDocument, c.ProxyGroupHistory, c.ProxyGroupHistoryDetail, c.ProxyNode,
 		c.ProxyOrder, c.ProxyPayment, c.ProxyRedemptionCode, c.ProxyRedemptionRecord,
 		c.ProxyRoutingDNSResolver, c.ProxyRoutingHealthReport, c.ProxyRoutingOutbound,
-		c.ProxyRoutingProfile, c.ProxyRoutingRule, c.ProxyRoutingUnlockService,
-		c.ProxySchemaMigrations, c.ProxyServer, c.ProxyServerGroup, c.ProxySubscribe,
-		c.ProxySubscribeApplication, c.ProxySubscribeCategory, c.ProxySubscribeGroup,
-		c.ProxySubscribePriceOption, c.ProxySystem, c.ProxySystemLog, c.ProxyTask,
-		c.ProxyTicket, c.ProxyTicketFollow, c.ProxyTrafficLog, c.ProxyUser,
-		c.ProxyUserAuthMethod, c.ProxyUserDevice, c.ProxyUserDeviceOnlineRecord,
-		c.ProxyUserSubscribe, c.ProxyUserWithdrawal,
+		c.ProxyRoutingProfile, c.ProxyRoutingRouteEvent, c.ProxyRoutingRule,
+		c.ProxyRoutingUnlockService, c.ProxySchemaMigrations, c.ProxyServer,
+		c.ProxyServerGroup, c.ProxySubscribe, c.ProxySubscribeApplication,
+		c.ProxySubscribeCategory, c.ProxySubscribeGroup, c.ProxySubscribePriceOption,
+		c.ProxySystem, c.ProxySystemLog, c.ProxyTask, c.ProxyTicket,
+		c.ProxyTicketFollow, c.ProxyTrafficLog, c.ProxyUser, c.ProxyUserAuthMethod,
+		c.ProxyUserDevice, c.ProxyUserDeviceOnlineRecord, c.ProxyUserSubscribe,
+		c.ProxyUserWithdrawal,
 	} {
 		n.Use(hooks...)
 	}
@@ -425,13 +432,14 @@ func (c *Client) Intercept(interceptors ...Interceptor) {
 		c.ProxyDocument, c.ProxyGroupHistory, c.ProxyGroupHistoryDetail, c.ProxyNode,
 		c.ProxyOrder, c.ProxyPayment, c.ProxyRedemptionCode, c.ProxyRedemptionRecord,
 		c.ProxyRoutingDNSResolver, c.ProxyRoutingHealthReport, c.ProxyRoutingOutbound,
-		c.ProxyRoutingProfile, c.ProxyRoutingRule, c.ProxyRoutingUnlockService,
-		c.ProxySchemaMigrations, c.ProxyServer, c.ProxyServerGroup, c.ProxySubscribe,
-		c.ProxySubscribeApplication, c.ProxySubscribeCategory, c.ProxySubscribeGroup,
-		c.ProxySubscribePriceOption, c.ProxySystem, c.ProxySystemLog, c.ProxyTask,
-		c.ProxyTicket, c.ProxyTicketFollow, c.ProxyTrafficLog, c.ProxyUser,
-		c.ProxyUserAuthMethod, c.ProxyUserDevice, c.ProxyUserDeviceOnlineRecord,
-		c.ProxyUserSubscribe, c.ProxyUserWithdrawal,
+		c.ProxyRoutingProfile, c.ProxyRoutingRouteEvent, c.ProxyRoutingRule,
+		c.ProxyRoutingUnlockService, c.ProxySchemaMigrations, c.ProxyServer,
+		c.ProxyServerGroup, c.ProxySubscribe, c.ProxySubscribeApplication,
+		c.ProxySubscribeCategory, c.ProxySubscribeGroup, c.ProxySubscribePriceOption,
+		c.ProxySystem, c.ProxySystemLog, c.ProxyTask, c.ProxyTicket,
+		c.ProxyTicketFollow, c.ProxyTrafficLog, c.ProxyUser, c.ProxyUserAuthMethod,
+		c.ProxyUserDevice, c.ProxyUserDeviceOnlineRecord, c.ProxyUserSubscribe,
+		c.ProxyUserWithdrawal,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -472,6 +480,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.ProxyRoutingOutbound.mutate(ctx, m)
 	case *ProxyRoutingProfileMutation:
 		return c.ProxyRoutingProfile.mutate(ctx, m)
+	case *ProxyRoutingRouteEventMutation:
+		return c.ProxyRoutingRouteEvent.mutate(ctx, m)
 	case *ProxyRoutingRuleMutation:
 		return c.ProxyRoutingRule.mutate(ctx, m)
 	case *ProxyRoutingUnlockServiceMutation:
@@ -2694,6 +2704,139 @@ func (c *ProxyRoutingProfileClient) mutate(ctx context.Context, m *ProxyRoutingP
 		return (&ProxyRoutingProfileDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown ProxyRoutingProfile mutation op: %q", m.Op())
+	}
+}
+
+// ProxyRoutingRouteEventClient is a client for the ProxyRoutingRouteEvent schema.
+type ProxyRoutingRouteEventClient struct {
+	config
+}
+
+// NewProxyRoutingRouteEventClient returns a client for the ProxyRoutingRouteEvent from the given config.
+func NewProxyRoutingRouteEventClient(c config) *ProxyRoutingRouteEventClient {
+	return &ProxyRoutingRouteEventClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `proxyroutingrouteevent.Hooks(f(g(h())))`.
+func (c *ProxyRoutingRouteEventClient) Use(hooks ...Hook) {
+	c.hooks.ProxyRoutingRouteEvent = append(c.hooks.ProxyRoutingRouteEvent, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `proxyroutingrouteevent.Intercept(f(g(h())))`.
+func (c *ProxyRoutingRouteEventClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ProxyRoutingRouteEvent = append(c.inters.ProxyRoutingRouteEvent, interceptors...)
+}
+
+// Create returns a builder for creating a ProxyRoutingRouteEvent entity.
+func (c *ProxyRoutingRouteEventClient) Create() *ProxyRoutingRouteEventCreate {
+	mutation := newProxyRoutingRouteEventMutation(c.config, OpCreate)
+	return &ProxyRoutingRouteEventCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ProxyRoutingRouteEvent entities.
+func (c *ProxyRoutingRouteEventClient) CreateBulk(builders ...*ProxyRoutingRouteEventCreate) *ProxyRoutingRouteEventCreateBulk {
+	return &ProxyRoutingRouteEventCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ProxyRoutingRouteEventClient) MapCreateBulk(slice any, setFunc func(*ProxyRoutingRouteEventCreate, int)) *ProxyRoutingRouteEventCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ProxyRoutingRouteEventCreateBulk{err: fmt.Errorf("calling to ProxyRoutingRouteEventClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ProxyRoutingRouteEventCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ProxyRoutingRouteEventCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ProxyRoutingRouteEvent.
+func (c *ProxyRoutingRouteEventClient) Update() *ProxyRoutingRouteEventUpdate {
+	mutation := newProxyRoutingRouteEventMutation(c.config, OpUpdate)
+	return &ProxyRoutingRouteEventUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ProxyRoutingRouteEventClient) UpdateOne(_m *ProxyRoutingRouteEvent) *ProxyRoutingRouteEventUpdateOne {
+	mutation := newProxyRoutingRouteEventMutation(c.config, OpUpdateOne, withProxyRoutingRouteEvent(_m))
+	return &ProxyRoutingRouteEventUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ProxyRoutingRouteEventClient) UpdateOneID(id int64) *ProxyRoutingRouteEventUpdateOne {
+	mutation := newProxyRoutingRouteEventMutation(c.config, OpUpdateOne, withProxyRoutingRouteEventID(id))
+	return &ProxyRoutingRouteEventUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ProxyRoutingRouteEvent.
+func (c *ProxyRoutingRouteEventClient) Delete() *ProxyRoutingRouteEventDelete {
+	mutation := newProxyRoutingRouteEventMutation(c.config, OpDelete)
+	return &ProxyRoutingRouteEventDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ProxyRoutingRouteEventClient) DeleteOne(_m *ProxyRoutingRouteEvent) *ProxyRoutingRouteEventDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ProxyRoutingRouteEventClient) DeleteOneID(id int64) *ProxyRoutingRouteEventDeleteOne {
+	builder := c.Delete().Where(proxyroutingrouteevent.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ProxyRoutingRouteEventDeleteOne{builder}
+}
+
+// Query returns a query builder for ProxyRoutingRouteEvent.
+func (c *ProxyRoutingRouteEventClient) Query() *ProxyRoutingRouteEventQuery {
+	return &ProxyRoutingRouteEventQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeProxyRoutingRouteEvent},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ProxyRoutingRouteEvent entity by its id.
+func (c *ProxyRoutingRouteEventClient) Get(ctx context.Context, id int64) (*ProxyRoutingRouteEvent, error) {
+	return c.Query().Where(proxyroutingrouteevent.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ProxyRoutingRouteEventClient) GetX(ctx context.Context, id int64) *ProxyRoutingRouteEvent {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *ProxyRoutingRouteEventClient) Hooks() []Hook {
+	return c.hooks.ProxyRoutingRouteEvent
+}
+
+// Interceptors returns the client interceptors.
+func (c *ProxyRoutingRouteEventClient) Interceptors() []Interceptor {
+	return c.inters.ProxyRoutingRouteEvent
+}
+
+func (c *ProxyRoutingRouteEventClient) mutate(ctx context.Context, m *ProxyRoutingRouteEventMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ProxyRoutingRouteEventCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ProxyRoutingRouteEventUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ProxyRoutingRouteEventUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ProxyRoutingRouteEventDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ProxyRoutingRouteEvent mutation op: %q", m.Op())
 	}
 }
 
@@ -5678,25 +5821,26 @@ type (
 		ProxyGroupHistory, ProxyGroupHistoryDetail, ProxyNode, ProxyOrder,
 		ProxyPayment, ProxyRedemptionCode, ProxyRedemptionRecord,
 		ProxyRoutingDNSResolver, ProxyRoutingHealthReport, ProxyRoutingOutbound,
-		ProxyRoutingProfile, ProxyRoutingRule, ProxyRoutingUnlockService,
-		ProxySchemaMigrations, ProxyServer, ProxyServerGroup, ProxySubscribe,
-		ProxySubscribeApplication, ProxySubscribeCategory, ProxySubscribeGroup,
-		ProxySubscribePriceOption, ProxySystem, ProxySystemLog, ProxyTask, ProxyTicket,
-		ProxyTicketFollow, ProxyTrafficLog, ProxyUser, ProxyUserAuthMethod,
-		ProxyUserDevice, ProxyUserDeviceOnlineRecord, ProxyUserSubscribe,
-		ProxyUserWithdrawal []ent.Hook
+		ProxyRoutingProfile, ProxyRoutingRouteEvent, ProxyRoutingRule,
+		ProxyRoutingUnlockService, ProxySchemaMigrations, ProxyServer,
+		ProxyServerGroup, ProxySubscribe, ProxySubscribeApplication,
+		ProxySubscribeCategory, ProxySubscribeGroup, ProxySubscribePriceOption,
+		ProxySystem, ProxySystemLog, ProxyTask, ProxyTicket, ProxyTicketFollow,
+		ProxyTrafficLog, ProxyUser, ProxyUserAuthMethod, ProxyUserDevice,
+		ProxyUserDeviceOnlineRecord, ProxyUserSubscribe, ProxyUserWithdrawal []ent.Hook
 	}
 	inters struct {
 		ProxyAds, ProxyAnnouncement, ProxyAuthMethod, ProxyCoupon, ProxyDocument,
 		ProxyGroupHistory, ProxyGroupHistoryDetail, ProxyNode, ProxyOrder,
 		ProxyPayment, ProxyRedemptionCode, ProxyRedemptionRecord,
 		ProxyRoutingDNSResolver, ProxyRoutingHealthReport, ProxyRoutingOutbound,
-		ProxyRoutingProfile, ProxyRoutingRule, ProxyRoutingUnlockService,
-		ProxySchemaMigrations, ProxyServer, ProxyServerGroup, ProxySubscribe,
-		ProxySubscribeApplication, ProxySubscribeCategory, ProxySubscribeGroup,
-		ProxySubscribePriceOption, ProxySystem, ProxySystemLog, ProxyTask, ProxyTicket,
-		ProxyTicketFollow, ProxyTrafficLog, ProxyUser, ProxyUserAuthMethod,
-		ProxyUserDevice, ProxyUserDeviceOnlineRecord, ProxyUserSubscribe,
+		ProxyRoutingProfile, ProxyRoutingRouteEvent, ProxyRoutingRule,
+		ProxyRoutingUnlockService, ProxySchemaMigrations, ProxyServer,
+		ProxyServerGroup, ProxySubscribe, ProxySubscribeApplication,
+		ProxySubscribeCategory, ProxySubscribeGroup, ProxySubscribePriceOption,
+		ProxySystem, ProxySystemLog, ProxyTask, ProxyTicket, ProxyTicketFollow,
+		ProxyTrafficLog, ProxyUser, ProxyUserAuthMethod, ProxyUserDevice,
+		ProxyUserDeviceOnlineRecord, ProxyUserSubscribe,
 		ProxyUserWithdrawal []ent.Interceptor
 	}
 )

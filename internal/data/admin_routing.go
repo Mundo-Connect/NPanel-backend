@@ -11,6 +11,7 @@ import (
 	"github.com/npanel-dev/NPanel-backend/ent/proxyroutinghealthreport"
 	"github.com/npanel-dev/NPanel-backend/ent/proxyroutingoutbound"
 	"github.com/npanel-dev/NPanel-backend/ent/proxyroutingprofile"
+	"github.com/npanel-dev/NPanel-backend/ent/proxyroutingrouteevent"
 	"github.com/npanel-dev/NPanel-backend/ent/proxyroutingrule"
 	"github.com/npanel-dev/NPanel-backend/ent/proxyroutingunlockservice"
 	"github.com/npanel-dev/NPanel-backend/ent/proxyusersubscribe"
@@ -477,6 +478,65 @@ func (r *adminRoutingRepo) ListHealthReports(ctx context.Context, page, size int
 	return items, int32(total), nil
 }
 
+func (r *adminRoutingRepo) SaveRouteEvents(ctx context.Context, events []*routingbiz.RoutingRouteEvent) error {
+	for _, event := range events {
+		if event == nil {
+			continue
+		}
+		if _, err := r.data.db.ProxyRoutingRouteEvent.Create().
+			SetReporterType(event.ReporterType).
+			SetReporterID(event.ReporterID).
+			SetProfileCode(event.ProfileCode).
+			SetRoutingHash(event.RoutingHash).
+			SetEventType(event.EventType).
+			SetSubject(event.Subject).
+			SetRuleID(event.RuleID).
+			SetRuleName(event.RuleName).
+			SetActionType(event.ActionType).
+			SetOutboundTag(event.OutboundTag).
+			SetDNSResolverTag(event.DNSResolverTag).
+			SetFallbackTarget(event.FallbackTarget).
+			SetStatus(event.Status).
+			SetLatencyMs(event.LatencyMS).
+			SetError(event.Error).
+			SetEventAt(event.EventAt).
+			SetEventJSON(event.EventJSON).
+			Save(ctx); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (r *adminRoutingRepo) ListRouteEvents(ctx context.Context, page, size int, eventType, profileCode, reporterType string) ([]*routingbiz.RoutingRouteEvent, int32, error) {
+	query := r.data.db.ProxyRoutingRouteEvent.Query()
+	if eventType != "" {
+		query = query.Where(proxyroutingrouteevent.EventTypeEQ(eventType))
+	}
+	if profileCode != "" {
+		query = query.Where(proxyroutingrouteevent.ProfileCodeContains(profileCode))
+	}
+	if reporterType != "" {
+		query = query.Where(proxyroutingrouteevent.ReporterTypeEQ(reporterType))
+	}
+	total, err := query.Count(ctx)
+	if err != nil {
+		return nil, 0, err
+	}
+	pos, err := query.Order(proxyroutingrouteevent.ByEventAt(sql.OrderDesc()), proxyroutingrouteevent.ByID(sql.OrderDesc())).
+		Offset((page - 1) * size).
+		Limit(size).
+		All(ctx)
+	if err != nil {
+		return nil, 0, err
+	}
+	items := make([]*routingbiz.RoutingRouteEvent, 0, len(pos))
+	for _, po := range pos {
+		items = append(items, routeEventToModel(po))
+	}
+	return items, int32(total), nil
+}
+
 func profileToModel(po *ent.ProxyRoutingProfile) *routingbiz.RouteProfile {
 	return &routingbiz.RouteProfile{
 		ID:          po.ID,
@@ -515,6 +575,31 @@ func healthReportToModel(po *ent.ProxyRoutingHealthReport) *routingbiz.RoutingHe
 		ReportJSON:          po.ReportJSON,
 		CreatedAt:           po.CreatedAt,
 		UpdatedAt:           po.UpdatedAt,
+	}
+}
+
+func routeEventToModel(po *ent.ProxyRoutingRouteEvent) *routingbiz.RoutingRouteEvent {
+	return &routingbiz.RoutingRouteEvent{
+		ID:             po.ID,
+		ReporterType:   po.ReporterType,
+		ReporterID:     po.ReporterID,
+		ProfileCode:    po.ProfileCode,
+		RoutingHash:    po.RoutingHash,
+		EventType:      po.EventType,
+		Subject:        po.Subject,
+		RuleID:         po.RuleID,
+		RuleName:       po.RuleName,
+		ActionType:     po.ActionType,
+		OutboundTag:    po.OutboundTag,
+		DNSResolverTag: po.DNSResolverTag,
+		FallbackTarget: po.FallbackTarget,
+		Status:         po.Status,
+		LatencyMS:      po.LatencyMs,
+		Error:          po.Error,
+		EventAt:        po.EventAt,
+		EventJSON:      po.EventJSON,
+		CreatedAt:      po.CreatedAt,
+		UpdatedAt:      po.UpdatedAt,
 	}
 }
 

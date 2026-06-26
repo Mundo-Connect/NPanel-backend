@@ -33,6 +33,10 @@ func (s *RoutingService) RecordHealthReport(ctx context.Context, req publicrouti
 	return s.uc.RecordHealthReport(ctx, req)
 }
 
+func (s *RoutingService) RecordRouteEvent(ctx context.Context, req publicrouting.RouteEventRequest) error {
+	return s.uc.RecordRouteEvent(ctx, req)
+}
+
 func (s *RoutingService) ListRouteProfiles(ctx context.Context, req *v1.ListRouteProfilesRequest) (*v1.ListRouteProfilesReply, error) {
 	items, total, err := s.uc.ListProfiles(ctx, int(req.Page), int(req.Size), req.Search, nil)
 	if err != nil {
@@ -279,6 +283,22 @@ func (s *RoutingService) ListRoutingHealthReports(ctx context.Context, req *v1.L
 	}, nil
 }
 
+func (s *RoutingService) ListRoutingRouteEvents(ctx context.Context, req *v1.ListRoutingRouteEventsRequest) (*v1.ListRoutingRouteEventsReply, error) {
+	items, total, err := s.uc.ListRouteEvents(ctx, int(req.Page), int(req.Size), req.EventType, req.ProfileCode, req.ReporterType)
+	if err != nil {
+		return nil, err
+	}
+	list := make([]*v1.RoutingRouteEvent, 0, len(items))
+	for _, item := range items {
+		list = append(list, routeEventToProto(item))
+	}
+	return &v1.ListRoutingRouteEventsReply{
+		Code:    successCode,
+		Message: "success",
+		Data:    &v1.RoutingRouteEventListData{List: list, Total: total},
+	}, nil
+}
+
 func routeProfileFromProto(item *v1.RouteProfile) *routingbiz.RouteProfile {
 	if item == nil {
 		return &routingbiz.RouteProfile{}
@@ -321,6 +341,34 @@ func healthReportToProto(item *routingbiz.RoutingHealthReport) *v1.RoutingHealth
 		ReportJson:          item.ReportJSON,
 		CreatedAt:           item.CreatedAt.Unix(),
 		UpdatedAt:           item.UpdatedAt.Unix(),
+	}
+}
+
+func routeEventToProto(item *routingbiz.RoutingRouteEvent) *v1.RoutingRouteEvent {
+	if item == nil {
+		return nil
+	}
+	return &v1.RoutingRouteEvent{
+		Id:             item.ID,
+		ReporterType:   item.ReporterType,
+		ReporterId:     item.ReporterID,
+		ProfileCode:    item.ProfileCode,
+		RoutingHash:    item.RoutingHash,
+		EventType:      item.EventType,
+		Subject:        item.Subject,
+		RuleId:         item.RuleID,
+		RuleName:       item.RuleName,
+		ActionType:     item.ActionType,
+		OutboundTag:    item.OutboundTag,
+		DnsResolverTag: item.DNSResolverTag,
+		FallbackTarget: item.FallbackTarget,
+		Status:         item.Status,
+		LatencyMs:      int32(item.LatencyMS),
+		Error:          item.Error,
+		EventAt:        item.EventAt.Unix(),
+		EventJson:      item.EventJSON,
+		CreatedAt:      item.CreatedAt.Unix(),
+		UpdatedAt:      item.UpdatedAt.Unix(),
 	}
 }
 

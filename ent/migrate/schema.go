@@ -382,6 +382,35 @@ var (
 		Columns:    RoutingProfileColumns,
 		PrimaryKey: []*schema.Column{RoutingProfileColumns[0]},
 	}
+	// RoutingRouteEventColumns holds the columns for the "routing_route_event" table.
+	RoutingRouteEventColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "Routing route event ID"},
+		{Name: "reporter_type", Type: field.TypeString, Size: 32, Comment: "client/node/backend", Default: "client"},
+		{Name: "reporter_id", Type: field.TypeString, Size: 128, Comment: "Reporter identifier", Default: ""},
+		{Name: "profile_code", Type: field.TypeString, Size: 128, Comment: "Routing profile code", Default: ""},
+		{Name: "routing_hash", Type: field.TypeString, Size: 128, Comment: "Routing hash", Default: ""},
+		{Name: "event_type", Type: field.TypeString, Size: 64, Comment: "route_decision/route_fallback/outbound_health_changed/dns_resolver_health_changed"},
+		{Name: "subject", Type: field.TypeString, Size: 256, Comment: "Domain, IP, service or target", Default: ""},
+		{Name: "rule_id", Type: field.TypeString, Size: 128, Comment: "Matched rule ID", Default: ""},
+		{Name: "rule_name", Type: field.TypeString, Size: 128, Comment: "Matched rule name", Default: ""},
+		{Name: "action_type", Type: field.TypeString, Size: 32, Comment: "direct/proxy/reject/dns_resolver/outbound", Default: ""},
+		{Name: "outbound_tag", Type: field.TypeString, Size: 128, Comment: "Outbound tag", Default: ""},
+		{Name: "dns_resolver_tag", Type: field.TypeString, Size: 128, Comment: "DNS resolver tag", Default: ""},
+		{Name: "fallback_target", Type: field.TypeString, Size: 128, Comment: "Fallback target", Default: ""},
+		{Name: "status", Type: field.TypeString, Size: 32, Comment: "matched/fallback/healthy/failed/degraded/unknown", Default: "unknown"},
+		{Name: "latency_ms", Type: field.TypeInt, Comment: "Latency in milliseconds", Default: 0},
+		{Name: "error", Type: field.TypeString, Nullable: true, Size: 2147483647, Comment: "Event error"},
+		{Name: "event_at", Type: field.TypeTime, Comment: "Event time"},
+		{Name: "event_json", Type: field.TypeString, Size: 2147483647, Comment: "Raw route event JSON", Default: "{}"},
+		{Name: "created_at", Type: field.TypeTime, Comment: "Created at"},
+		{Name: "updated_at", Type: field.TypeTime, Comment: "Updated at"},
+	}
+	// RoutingRouteEventTable holds the schema information for the "routing_route_event" table.
+	RoutingRouteEventTable = &schema.Table{
+		Name:       "routing_route_event",
+		Columns:    RoutingRouteEventColumns,
+		PrimaryKey: []*schema.Column{RoutingRouteEventColumns[0]},
+	}
 	// RoutingRuleColumns holds the columns for the "routing_rule" table.
 	RoutingRuleColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "Routing Rule ID"},
@@ -859,6 +888,7 @@ var (
 		RoutingHealthReportTable,
 		RoutingOutboundTable,
 		RoutingProfileTable,
+		RoutingRouteEventTable,
 		RoutingRuleTable,
 		RoutingUnlockServiceTable,
 		SchemaMigrationsTable,
@@ -934,6 +964,9 @@ func init() {
 	}
 	RoutingProfileTable.Annotation = &entsql.Annotation{
 		Table: "routing_profile",
+	}
+	RoutingRouteEventTable.Annotation = &entsql.Annotation{
+		Table: "routing_route_event",
 	}
 	RoutingRuleTable.Annotation = &entsql.Annotation{
 		Table: "routing_rule",

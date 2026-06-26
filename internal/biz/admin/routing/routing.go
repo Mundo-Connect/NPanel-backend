@@ -118,6 +118,29 @@ type RoutingHealthReport struct {
 	UpdatedAt           time.Time
 }
 
+type RoutingRouteEvent struct {
+	ID             int64
+	ReporterType   string
+	ReporterID     string
+	ProfileCode    string
+	RoutingHash    string
+	EventType      string
+	Subject        string
+	RuleID         string
+	RuleName       string
+	ActionType     string
+	OutboundTag    string
+	DNSResolverTag string
+	FallbackTarget string
+	Status         string
+	LatencyMS      int
+	Error          string
+	EventAt        time.Time
+	EventJSON      string
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
+}
+
 type RoutingEnforceGuard struct {
 	Key    string
 	Label  string
@@ -194,6 +217,8 @@ type RoutingRepo interface {
 	ResolveScopeBySubscribeToken(context.Context, string) (ScopeContext, error)
 	SaveHealthReports(context.Context, []*RoutingHealthReport) error
 	ListHealthReports(context.Context, int, int, string, string, string) ([]*RoutingHealthReport, int32, error)
+	SaveRouteEvents(context.Context, []*RoutingRouteEvent) error
+	ListRouteEvents(context.Context, int, int, string, string, string) ([]*RoutingRouteEvent, int32, error)
 }
 
 type RoutingUsecase struct {
@@ -401,6 +426,19 @@ func (uc *RoutingUsecase) RecordHealthReport(ctx context.Context, req publicrout
 func (uc *RoutingUsecase) ListHealthReports(ctx context.Context, page, size int, subjectType, subjectKey, reporterType string) ([]*RoutingHealthReport, int32, error) {
 	page, size = normalizePage(page, size)
 	return uc.repo.ListHealthReports(ctx, page, size, subjectType, subjectKey, reporterType)
+}
+
+func (uc *RoutingUsecase) RecordRouteEvent(ctx context.Context, req publicrouting.RouteEventRequest) error {
+	events, err := routeEventsFromRequest(req, time.Now())
+	if err != nil {
+		return err
+	}
+	return uc.repo.SaveRouteEvents(ctx, events)
+}
+
+func (uc *RoutingUsecase) ListRouteEvents(ctx context.Context, page, size int, eventType, profileCode, reporterType string) ([]*RoutingRouteEvent, int32, error) {
+	page, size = normalizePage(page, size)
+	return uc.repo.ListRouteEvents(ctx, page, size, eventType, profileCode, reporterType)
 }
 
 func (uc *RoutingUsecase) Preview(ctx context.Context, req PreviewRequest) (PreviewResult, error) {
@@ -772,6 +810,77 @@ func normalizeHealthSubjectType(kind string) string {
 func normalizeHealthStatus(status string) string {
 	switch strings.ToLower(strings.TrimSpace(status)) {
 	case "healthy", "ok", "failed", "degraded", "stale", "disabled", "unknown":
+		return strings.ToLower(strings.TrimSpace(status))
+	case "":
+		return "unknown"
+	default:
+		return "degraded"
+	}
+}
+
+func routeEventsFromRequest(req publicrouting.RouteEventRequest, now time.Time) ([]*RoutingRouteEvent, error) {
+	req.ReporterType = firstNonEmpty(strings.TrimSpace(req.ReporterType), "client")
+	req.ReporterID = strings.TrimSpace(req.ReporterID)
+	req.ProfileCode = strings.TrimSpace(req.ProfileCode)
+	req.RoutingHash = strings.TrimSpace(req.RoutingHash)
+	if len(req.Events) == 0 {
+		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+	}
+
+	events := make([]*RoutingRouteEvent, 0, len(req.Events))
+	for _, item := range req.Events {
+		eventType := normalizeRouteEventType(item.EventType)
+		if eventType == "" {
+			return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+		}
+		eventAt := parseRFC3339(item.EventAt)
+		if eventAt.IsZero() {
+			eventAt = now
+		}
+		events = append(events, &RoutingRouteEvent{
+			ReporterType:   req.ReporterType,
+			ReporterID:     req.ReporterID,
+			ProfileCode:    req.ProfileCode,
+			RoutingHash:    req.RoutingHash,
+			EventType:      eventType,
+			Subject:        strings.TrimSpace(item.Subject),
+			RuleID:         strings.TrimSpace(item.RuleID),
+			RuleName:       strings.TrimSpace(item.RuleName),
+			ActionType:     normalizeRouteActionType(item.ActionType),
+			OutboundTag:    strings.TrimSpace(item.OutboundTag),
+			DNSResolverTag: strings.TrimSpace(item.DNSResolverTag),
+			FallbackTarget: strings.TrimSpace(item.FallbackTarget),
+			Status:         normalizeRouteEventStatus(item.Status),
+			LatencyMS:      item.LatencyMS,
+			Error:          strings.TrimSpace(item.Error),
+			EventAt:        eventAt,
+			EventJSON:      normalizeJSONWithDefault(item.EventJSON, "{}"),
+		})
+	}
+	return events, nil
+}
+
+func normalizeRouteEventType(eventType string) string {
+	switch strings.ToLower(strings.TrimSpace(eventType)) {
+	case "route_decision", "route_fallback", "outbound_health_changed", "dns_resolver_health_changed":
+		return strings.ToLower(strings.TrimSpace(eventType))
+	default:
+		return ""
+	}
+}
+
+func normalizeRouteActionType(actionType string) string {
+	switch strings.ToLower(strings.TrimSpace(actionType)) {
+	case "direct", "proxy", "reject", "dns_resolver", "outbound":
+		return strings.ToLower(strings.TrimSpace(actionType))
+	default:
+		return strings.TrimSpace(actionType)
+	}
+}
+
+func normalizeRouteEventStatus(status string) string {
+	switch strings.ToLower(strings.TrimSpace(status)) {
+	case "matched", "fallback", "healthy", "ok", "failed", "degraded", "disabled", "unknown":
 		return strings.ToLower(strings.TrimSpace(status))
 	case "":
 		return "unknown"
