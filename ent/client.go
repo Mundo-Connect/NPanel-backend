@@ -27,6 +27,11 @@ import (
 	"github.com/npanel-dev/NPanel-backend/ent/proxypayment"
 	"github.com/npanel-dev/NPanel-backend/ent/proxyredemptioncode"
 	"github.com/npanel-dev/NPanel-backend/ent/proxyredemptionrecord"
+	"github.com/npanel-dev/NPanel-backend/ent/proxyroutingdnsresolver"
+	"github.com/npanel-dev/NPanel-backend/ent/proxyroutingoutbound"
+	"github.com/npanel-dev/NPanel-backend/ent/proxyroutingprofile"
+	"github.com/npanel-dev/NPanel-backend/ent/proxyroutingrule"
+	"github.com/npanel-dev/NPanel-backend/ent/proxyroutingunlockservice"
 	"github.com/npanel-dev/NPanel-backend/ent/proxyschemamigrations"
 	"github.com/npanel-dev/NPanel-backend/ent/proxyserver"
 	"github.com/npanel-dev/NPanel-backend/ent/proxyservergroup"
@@ -78,6 +83,16 @@ type Client struct {
 	ProxyRedemptionCode *ProxyRedemptionCodeClient
 	// ProxyRedemptionRecord is the client for interacting with the ProxyRedemptionRecord builders.
 	ProxyRedemptionRecord *ProxyRedemptionRecordClient
+	// ProxyRoutingDNSResolver is the client for interacting with the ProxyRoutingDNSResolver builders.
+	ProxyRoutingDNSResolver *ProxyRoutingDNSResolverClient
+	// ProxyRoutingOutbound is the client for interacting with the ProxyRoutingOutbound builders.
+	ProxyRoutingOutbound *ProxyRoutingOutboundClient
+	// ProxyRoutingProfile is the client for interacting with the ProxyRoutingProfile builders.
+	ProxyRoutingProfile *ProxyRoutingProfileClient
+	// ProxyRoutingRule is the client for interacting with the ProxyRoutingRule builders.
+	ProxyRoutingRule *ProxyRoutingRuleClient
+	// ProxyRoutingUnlockService is the client for interacting with the ProxyRoutingUnlockService builders.
+	ProxyRoutingUnlockService *ProxyRoutingUnlockServiceClient
 	// ProxySchemaMigrations is the client for interacting with the ProxySchemaMigrations builders.
 	ProxySchemaMigrations *ProxySchemaMigrationsClient
 	// ProxyServer is the client for interacting with the ProxyServer builders.
@@ -141,6 +156,11 @@ func (c *Client) init() {
 	c.ProxyPayment = NewProxyPaymentClient(c.config)
 	c.ProxyRedemptionCode = NewProxyRedemptionCodeClient(c.config)
 	c.ProxyRedemptionRecord = NewProxyRedemptionRecordClient(c.config)
+	c.ProxyRoutingDNSResolver = NewProxyRoutingDNSResolverClient(c.config)
+	c.ProxyRoutingOutbound = NewProxyRoutingOutboundClient(c.config)
+	c.ProxyRoutingProfile = NewProxyRoutingProfileClient(c.config)
+	c.ProxyRoutingRule = NewProxyRoutingRuleClient(c.config)
+	c.ProxyRoutingUnlockService = NewProxyRoutingUnlockServiceClient(c.config)
 	c.ProxySchemaMigrations = NewProxySchemaMigrationsClient(c.config)
 	c.ProxyServer = NewProxyServerClient(c.config)
 	c.ProxyServerGroup = NewProxyServerGroupClient(c.config)
@@ -265,6 +285,11 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		ProxyPayment:                NewProxyPaymentClient(cfg),
 		ProxyRedemptionCode:         NewProxyRedemptionCodeClient(cfg),
 		ProxyRedemptionRecord:       NewProxyRedemptionRecordClient(cfg),
+		ProxyRoutingDNSResolver:     NewProxyRoutingDNSResolverClient(cfg),
+		ProxyRoutingOutbound:        NewProxyRoutingOutboundClient(cfg),
+		ProxyRoutingProfile:         NewProxyRoutingProfileClient(cfg),
+		ProxyRoutingRule:            NewProxyRoutingRuleClient(cfg),
+		ProxyRoutingUnlockService:   NewProxyRoutingUnlockServiceClient(cfg),
 		ProxySchemaMigrations:       NewProxySchemaMigrationsClient(cfg),
 		ProxyServer:                 NewProxyServerClient(cfg),
 		ProxyServerGroup:            NewProxyServerGroupClient(cfg),
@@ -316,6 +341,11 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		ProxyPayment:                NewProxyPaymentClient(cfg),
 		ProxyRedemptionCode:         NewProxyRedemptionCodeClient(cfg),
 		ProxyRedemptionRecord:       NewProxyRedemptionRecordClient(cfg),
+		ProxyRoutingDNSResolver:     NewProxyRoutingDNSResolverClient(cfg),
+		ProxyRoutingOutbound:        NewProxyRoutingOutboundClient(cfg),
+		ProxyRoutingProfile:         NewProxyRoutingProfileClient(cfg),
+		ProxyRoutingRule:            NewProxyRoutingRuleClient(cfg),
+		ProxyRoutingUnlockService:   NewProxyRoutingUnlockServiceClient(cfg),
 		ProxySchemaMigrations:       NewProxySchemaMigrationsClient(cfg),
 		ProxyServer:                 NewProxyServerClient(cfg),
 		ProxyServerGroup:            NewProxyServerGroupClient(cfg),
@@ -368,7 +398,9 @@ func (c *Client) Use(hooks ...Hook) {
 		c.ProxyAds, c.ProxyAnnouncement, c.ProxyAuthMethod, c.ProxyCoupon,
 		c.ProxyDocument, c.ProxyGroupHistory, c.ProxyGroupHistoryDetail, c.ProxyNode,
 		c.ProxyOrder, c.ProxyPayment, c.ProxyRedemptionCode, c.ProxyRedemptionRecord,
-		c.ProxySchemaMigrations, c.ProxyServer, c.ProxyServerGroup, c.ProxySubscribe,
+		c.ProxyRoutingDNSResolver, c.ProxyRoutingOutbound, c.ProxyRoutingProfile,
+		c.ProxyRoutingRule, c.ProxyRoutingUnlockService, c.ProxySchemaMigrations,
+		c.ProxyServer, c.ProxyServerGroup, c.ProxySubscribe,
 		c.ProxySubscribeApplication, c.ProxySubscribeCategory, c.ProxySubscribeGroup,
 		c.ProxySubscribePriceOption, c.ProxySystem, c.ProxySystemLog, c.ProxyTask,
 		c.ProxyTicket, c.ProxyTicketFollow, c.ProxyTrafficLog, c.ProxyUser,
@@ -386,7 +418,9 @@ func (c *Client) Intercept(interceptors ...Interceptor) {
 		c.ProxyAds, c.ProxyAnnouncement, c.ProxyAuthMethod, c.ProxyCoupon,
 		c.ProxyDocument, c.ProxyGroupHistory, c.ProxyGroupHistoryDetail, c.ProxyNode,
 		c.ProxyOrder, c.ProxyPayment, c.ProxyRedemptionCode, c.ProxyRedemptionRecord,
-		c.ProxySchemaMigrations, c.ProxyServer, c.ProxyServerGroup, c.ProxySubscribe,
+		c.ProxyRoutingDNSResolver, c.ProxyRoutingOutbound, c.ProxyRoutingProfile,
+		c.ProxyRoutingRule, c.ProxyRoutingUnlockService, c.ProxySchemaMigrations,
+		c.ProxyServer, c.ProxyServerGroup, c.ProxySubscribe,
 		c.ProxySubscribeApplication, c.ProxySubscribeCategory, c.ProxySubscribeGroup,
 		c.ProxySubscribePriceOption, c.ProxySystem, c.ProxySystemLog, c.ProxyTask,
 		c.ProxyTicket, c.ProxyTicketFollow, c.ProxyTrafficLog, c.ProxyUser,
@@ -424,6 +458,16 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.ProxyRedemptionCode.mutate(ctx, m)
 	case *ProxyRedemptionRecordMutation:
 		return c.ProxyRedemptionRecord.mutate(ctx, m)
+	case *ProxyRoutingDNSResolverMutation:
+		return c.ProxyRoutingDNSResolver.mutate(ctx, m)
+	case *ProxyRoutingOutboundMutation:
+		return c.ProxyRoutingOutbound.mutate(ctx, m)
+	case *ProxyRoutingProfileMutation:
+		return c.ProxyRoutingProfile.mutate(ctx, m)
+	case *ProxyRoutingRuleMutation:
+		return c.ProxyRoutingRule.mutate(ctx, m)
+	case *ProxyRoutingUnlockServiceMutation:
+		return c.ProxyRoutingUnlockService.mutate(ctx, m)
 	case *ProxySchemaMigrationsMutation:
 		return c.ProxySchemaMigrations.mutate(ctx, m)
 	case *ProxyServerMutation:
@@ -2110,6 +2154,671 @@ func (c *ProxyRedemptionRecordClient) mutate(ctx context.Context, m *ProxyRedemp
 		return (&ProxyRedemptionRecordDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown ProxyRedemptionRecord mutation op: %q", m.Op())
+	}
+}
+
+// ProxyRoutingDNSResolverClient is a client for the ProxyRoutingDNSResolver schema.
+type ProxyRoutingDNSResolverClient struct {
+	config
+}
+
+// NewProxyRoutingDNSResolverClient returns a client for the ProxyRoutingDNSResolver from the given config.
+func NewProxyRoutingDNSResolverClient(c config) *ProxyRoutingDNSResolverClient {
+	return &ProxyRoutingDNSResolverClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `proxyroutingdnsresolver.Hooks(f(g(h())))`.
+func (c *ProxyRoutingDNSResolverClient) Use(hooks ...Hook) {
+	c.hooks.ProxyRoutingDNSResolver = append(c.hooks.ProxyRoutingDNSResolver, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `proxyroutingdnsresolver.Intercept(f(g(h())))`.
+func (c *ProxyRoutingDNSResolverClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ProxyRoutingDNSResolver = append(c.inters.ProxyRoutingDNSResolver, interceptors...)
+}
+
+// Create returns a builder for creating a ProxyRoutingDNSResolver entity.
+func (c *ProxyRoutingDNSResolverClient) Create() *ProxyRoutingDNSResolverCreate {
+	mutation := newProxyRoutingDNSResolverMutation(c.config, OpCreate)
+	return &ProxyRoutingDNSResolverCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ProxyRoutingDNSResolver entities.
+func (c *ProxyRoutingDNSResolverClient) CreateBulk(builders ...*ProxyRoutingDNSResolverCreate) *ProxyRoutingDNSResolverCreateBulk {
+	return &ProxyRoutingDNSResolverCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ProxyRoutingDNSResolverClient) MapCreateBulk(slice any, setFunc func(*ProxyRoutingDNSResolverCreate, int)) *ProxyRoutingDNSResolverCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ProxyRoutingDNSResolverCreateBulk{err: fmt.Errorf("calling to ProxyRoutingDNSResolverClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ProxyRoutingDNSResolverCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ProxyRoutingDNSResolverCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ProxyRoutingDNSResolver.
+func (c *ProxyRoutingDNSResolverClient) Update() *ProxyRoutingDNSResolverUpdate {
+	mutation := newProxyRoutingDNSResolverMutation(c.config, OpUpdate)
+	return &ProxyRoutingDNSResolverUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ProxyRoutingDNSResolverClient) UpdateOne(_m *ProxyRoutingDNSResolver) *ProxyRoutingDNSResolverUpdateOne {
+	mutation := newProxyRoutingDNSResolverMutation(c.config, OpUpdateOne, withProxyRoutingDNSResolver(_m))
+	return &ProxyRoutingDNSResolverUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ProxyRoutingDNSResolverClient) UpdateOneID(id int64) *ProxyRoutingDNSResolverUpdateOne {
+	mutation := newProxyRoutingDNSResolverMutation(c.config, OpUpdateOne, withProxyRoutingDNSResolverID(id))
+	return &ProxyRoutingDNSResolverUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ProxyRoutingDNSResolver.
+func (c *ProxyRoutingDNSResolverClient) Delete() *ProxyRoutingDNSResolverDelete {
+	mutation := newProxyRoutingDNSResolverMutation(c.config, OpDelete)
+	return &ProxyRoutingDNSResolverDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ProxyRoutingDNSResolverClient) DeleteOne(_m *ProxyRoutingDNSResolver) *ProxyRoutingDNSResolverDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ProxyRoutingDNSResolverClient) DeleteOneID(id int64) *ProxyRoutingDNSResolverDeleteOne {
+	builder := c.Delete().Where(proxyroutingdnsresolver.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ProxyRoutingDNSResolverDeleteOne{builder}
+}
+
+// Query returns a query builder for ProxyRoutingDNSResolver.
+func (c *ProxyRoutingDNSResolverClient) Query() *ProxyRoutingDNSResolverQuery {
+	return &ProxyRoutingDNSResolverQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeProxyRoutingDNSResolver},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ProxyRoutingDNSResolver entity by its id.
+func (c *ProxyRoutingDNSResolverClient) Get(ctx context.Context, id int64) (*ProxyRoutingDNSResolver, error) {
+	return c.Query().Where(proxyroutingdnsresolver.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ProxyRoutingDNSResolverClient) GetX(ctx context.Context, id int64) *ProxyRoutingDNSResolver {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *ProxyRoutingDNSResolverClient) Hooks() []Hook {
+	return c.hooks.ProxyRoutingDNSResolver
+}
+
+// Interceptors returns the client interceptors.
+func (c *ProxyRoutingDNSResolverClient) Interceptors() []Interceptor {
+	return c.inters.ProxyRoutingDNSResolver
+}
+
+func (c *ProxyRoutingDNSResolverClient) mutate(ctx context.Context, m *ProxyRoutingDNSResolverMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ProxyRoutingDNSResolverCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ProxyRoutingDNSResolverUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ProxyRoutingDNSResolverUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ProxyRoutingDNSResolverDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ProxyRoutingDNSResolver mutation op: %q", m.Op())
+	}
+}
+
+// ProxyRoutingOutboundClient is a client for the ProxyRoutingOutbound schema.
+type ProxyRoutingOutboundClient struct {
+	config
+}
+
+// NewProxyRoutingOutboundClient returns a client for the ProxyRoutingOutbound from the given config.
+func NewProxyRoutingOutboundClient(c config) *ProxyRoutingOutboundClient {
+	return &ProxyRoutingOutboundClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `proxyroutingoutbound.Hooks(f(g(h())))`.
+func (c *ProxyRoutingOutboundClient) Use(hooks ...Hook) {
+	c.hooks.ProxyRoutingOutbound = append(c.hooks.ProxyRoutingOutbound, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `proxyroutingoutbound.Intercept(f(g(h())))`.
+func (c *ProxyRoutingOutboundClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ProxyRoutingOutbound = append(c.inters.ProxyRoutingOutbound, interceptors...)
+}
+
+// Create returns a builder for creating a ProxyRoutingOutbound entity.
+func (c *ProxyRoutingOutboundClient) Create() *ProxyRoutingOutboundCreate {
+	mutation := newProxyRoutingOutboundMutation(c.config, OpCreate)
+	return &ProxyRoutingOutboundCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ProxyRoutingOutbound entities.
+func (c *ProxyRoutingOutboundClient) CreateBulk(builders ...*ProxyRoutingOutboundCreate) *ProxyRoutingOutboundCreateBulk {
+	return &ProxyRoutingOutboundCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ProxyRoutingOutboundClient) MapCreateBulk(slice any, setFunc func(*ProxyRoutingOutboundCreate, int)) *ProxyRoutingOutboundCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ProxyRoutingOutboundCreateBulk{err: fmt.Errorf("calling to ProxyRoutingOutboundClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ProxyRoutingOutboundCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ProxyRoutingOutboundCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ProxyRoutingOutbound.
+func (c *ProxyRoutingOutboundClient) Update() *ProxyRoutingOutboundUpdate {
+	mutation := newProxyRoutingOutboundMutation(c.config, OpUpdate)
+	return &ProxyRoutingOutboundUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ProxyRoutingOutboundClient) UpdateOne(_m *ProxyRoutingOutbound) *ProxyRoutingOutboundUpdateOne {
+	mutation := newProxyRoutingOutboundMutation(c.config, OpUpdateOne, withProxyRoutingOutbound(_m))
+	return &ProxyRoutingOutboundUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ProxyRoutingOutboundClient) UpdateOneID(id int64) *ProxyRoutingOutboundUpdateOne {
+	mutation := newProxyRoutingOutboundMutation(c.config, OpUpdateOne, withProxyRoutingOutboundID(id))
+	return &ProxyRoutingOutboundUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ProxyRoutingOutbound.
+func (c *ProxyRoutingOutboundClient) Delete() *ProxyRoutingOutboundDelete {
+	mutation := newProxyRoutingOutboundMutation(c.config, OpDelete)
+	return &ProxyRoutingOutboundDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ProxyRoutingOutboundClient) DeleteOne(_m *ProxyRoutingOutbound) *ProxyRoutingOutboundDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ProxyRoutingOutboundClient) DeleteOneID(id int64) *ProxyRoutingOutboundDeleteOne {
+	builder := c.Delete().Where(proxyroutingoutbound.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ProxyRoutingOutboundDeleteOne{builder}
+}
+
+// Query returns a query builder for ProxyRoutingOutbound.
+func (c *ProxyRoutingOutboundClient) Query() *ProxyRoutingOutboundQuery {
+	return &ProxyRoutingOutboundQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeProxyRoutingOutbound},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ProxyRoutingOutbound entity by its id.
+func (c *ProxyRoutingOutboundClient) Get(ctx context.Context, id int64) (*ProxyRoutingOutbound, error) {
+	return c.Query().Where(proxyroutingoutbound.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ProxyRoutingOutboundClient) GetX(ctx context.Context, id int64) *ProxyRoutingOutbound {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *ProxyRoutingOutboundClient) Hooks() []Hook {
+	return c.hooks.ProxyRoutingOutbound
+}
+
+// Interceptors returns the client interceptors.
+func (c *ProxyRoutingOutboundClient) Interceptors() []Interceptor {
+	return c.inters.ProxyRoutingOutbound
+}
+
+func (c *ProxyRoutingOutboundClient) mutate(ctx context.Context, m *ProxyRoutingOutboundMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ProxyRoutingOutboundCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ProxyRoutingOutboundUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ProxyRoutingOutboundUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ProxyRoutingOutboundDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ProxyRoutingOutbound mutation op: %q", m.Op())
+	}
+}
+
+// ProxyRoutingProfileClient is a client for the ProxyRoutingProfile schema.
+type ProxyRoutingProfileClient struct {
+	config
+}
+
+// NewProxyRoutingProfileClient returns a client for the ProxyRoutingProfile from the given config.
+func NewProxyRoutingProfileClient(c config) *ProxyRoutingProfileClient {
+	return &ProxyRoutingProfileClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `proxyroutingprofile.Hooks(f(g(h())))`.
+func (c *ProxyRoutingProfileClient) Use(hooks ...Hook) {
+	c.hooks.ProxyRoutingProfile = append(c.hooks.ProxyRoutingProfile, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `proxyroutingprofile.Intercept(f(g(h())))`.
+func (c *ProxyRoutingProfileClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ProxyRoutingProfile = append(c.inters.ProxyRoutingProfile, interceptors...)
+}
+
+// Create returns a builder for creating a ProxyRoutingProfile entity.
+func (c *ProxyRoutingProfileClient) Create() *ProxyRoutingProfileCreate {
+	mutation := newProxyRoutingProfileMutation(c.config, OpCreate)
+	return &ProxyRoutingProfileCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ProxyRoutingProfile entities.
+func (c *ProxyRoutingProfileClient) CreateBulk(builders ...*ProxyRoutingProfileCreate) *ProxyRoutingProfileCreateBulk {
+	return &ProxyRoutingProfileCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ProxyRoutingProfileClient) MapCreateBulk(slice any, setFunc func(*ProxyRoutingProfileCreate, int)) *ProxyRoutingProfileCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ProxyRoutingProfileCreateBulk{err: fmt.Errorf("calling to ProxyRoutingProfileClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ProxyRoutingProfileCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ProxyRoutingProfileCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ProxyRoutingProfile.
+func (c *ProxyRoutingProfileClient) Update() *ProxyRoutingProfileUpdate {
+	mutation := newProxyRoutingProfileMutation(c.config, OpUpdate)
+	return &ProxyRoutingProfileUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ProxyRoutingProfileClient) UpdateOne(_m *ProxyRoutingProfile) *ProxyRoutingProfileUpdateOne {
+	mutation := newProxyRoutingProfileMutation(c.config, OpUpdateOne, withProxyRoutingProfile(_m))
+	return &ProxyRoutingProfileUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ProxyRoutingProfileClient) UpdateOneID(id int64) *ProxyRoutingProfileUpdateOne {
+	mutation := newProxyRoutingProfileMutation(c.config, OpUpdateOne, withProxyRoutingProfileID(id))
+	return &ProxyRoutingProfileUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ProxyRoutingProfile.
+func (c *ProxyRoutingProfileClient) Delete() *ProxyRoutingProfileDelete {
+	mutation := newProxyRoutingProfileMutation(c.config, OpDelete)
+	return &ProxyRoutingProfileDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ProxyRoutingProfileClient) DeleteOne(_m *ProxyRoutingProfile) *ProxyRoutingProfileDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ProxyRoutingProfileClient) DeleteOneID(id int64) *ProxyRoutingProfileDeleteOne {
+	builder := c.Delete().Where(proxyroutingprofile.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ProxyRoutingProfileDeleteOne{builder}
+}
+
+// Query returns a query builder for ProxyRoutingProfile.
+func (c *ProxyRoutingProfileClient) Query() *ProxyRoutingProfileQuery {
+	return &ProxyRoutingProfileQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeProxyRoutingProfile},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ProxyRoutingProfile entity by its id.
+func (c *ProxyRoutingProfileClient) Get(ctx context.Context, id int64) (*ProxyRoutingProfile, error) {
+	return c.Query().Where(proxyroutingprofile.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ProxyRoutingProfileClient) GetX(ctx context.Context, id int64) *ProxyRoutingProfile {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *ProxyRoutingProfileClient) Hooks() []Hook {
+	return c.hooks.ProxyRoutingProfile
+}
+
+// Interceptors returns the client interceptors.
+func (c *ProxyRoutingProfileClient) Interceptors() []Interceptor {
+	return c.inters.ProxyRoutingProfile
+}
+
+func (c *ProxyRoutingProfileClient) mutate(ctx context.Context, m *ProxyRoutingProfileMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ProxyRoutingProfileCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ProxyRoutingProfileUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ProxyRoutingProfileUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ProxyRoutingProfileDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ProxyRoutingProfile mutation op: %q", m.Op())
+	}
+}
+
+// ProxyRoutingRuleClient is a client for the ProxyRoutingRule schema.
+type ProxyRoutingRuleClient struct {
+	config
+}
+
+// NewProxyRoutingRuleClient returns a client for the ProxyRoutingRule from the given config.
+func NewProxyRoutingRuleClient(c config) *ProxyRoutingRuleClient {
+	return &ProxyRoutingRuleClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `proxyroutingrule.Hooks(f(g(h())))`.
+func (c *ProxyRoutingRuleClient) Use(hooks ...Hook) {
+	c.hooks.ProxyRoutingRule = append(c.hooks.ProxyRoutingRule, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `proxyroutingrule.Intercept(f(g(h())))`.
+func (c *ProxyRoutingRuleClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ProxyRoutingRule = append(c.inters.ProxyRoutingRule, interceptors...)
+}
+
+// Create returns a builder for creating a ProxyRoutingRule entity.
+func (c *ProxyRoutingRuleClient) Create() *ProxyRoutingRuleCreate {
+	mutation := newProxyRoutingRuleMutation(c.config, OpCreate)
+	return &ProxyRoutingRuleCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ProxyRoutingRule entities.
+func (c *ProxyRoutingRuleClient) CreateBulk(builders ...*ProxyRoutingRuleCreate) *ProxyRoutingRuleCreateBulk {
+	return &ProxyRoutingRuleCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ProxyRoutingRuleClient) MapCreateBulk(slice any, setFunc func(*ProxyRoutingRuleCreate, int)) *ProxyRoutingRuleCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ProxyRoutingRuleCreateBulk{err: fmt.Errorf("calling to ProxyRoutingRuleClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ProxyRoutingRuleCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ProxyRoutingRuleCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ProxyRoutingRule.
+func (c *ProxyRoutingRuleClient) Update() *ProxyRoutingRuleUpdate {
+	mutation := newProxyRoutingRuleMutation(c.config, OpUpdate)
+	return &ProxyRoutingRuleUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ProxyRoutingRuleClient) UpdateOne(_m *ProxyRoutingRule) *ProxyRoutingRuleUpdateOne {
+	mutation := newProxyRoutingRuleMutation(c.config, OpUpdateOne, withProxyRoutingRule(_m))
+	return &ProxyRoutingRuleUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ProxyRoutingRuleClient) UpdateOneID(id int64) *ProxyRoutingRuleUpdateOne {
+	mutation := newProxyRoutingRuleMutation(c.config, OpUpdateOne, withProxyRoutingRuleID(id))
+	return &ProxyRoutingRuleUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ProxyRoutingRule.
+func (c *ProxyRoutingRuleClient) Delete() *ProxyRoutingRuleDelete {
+	mutation := newProxyRoutingRuleMutation(c.config, OpDelete)
+	return &ProxyRoutingRuleDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ProxyRoutingRuleClient) DeleteOne(_m *ProxyRoutingRule) *ProxyRoutingRuleDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ProxyRoutingRuleClient) DeleteOneID(id int64) *ProxyRoutingRuleDeleteOne {
+	builder := c.Delete().Where(proxyroutingrule.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ProxyRoutingRuleDeleteOne{builder}
+}
+
+// Query returns a query builder for ProxyRoutingRule.
+func (c *ProxyRoutingRuleClient) Query() *ProxyRoutingRuleQuery {
+	return &ProxyRoutingRuleQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeProxyRoutingRule},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ProxyRoutingRule entity by its id.
+func (c *ProxyRoutingRuleClient) Get(ctx context.Context, id int64) (*ProxyRoutingRule, error) {
+	return c.Query().Where(proxyroutingrule.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ProxyRoutingRuleClient) GetX(ctx context.Context, id int64) *ProxyRoutingRule {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *ProxyRoutingRuleClient) Hooks() []Hook {
+	return c.hooks.ProxyRoutingRule
+}
+
+// Interceptors returns the client interceptors.
+func (c *ProxyRoutingRuleClient) Interceptors() []Interceptor {
+	return c.inters.ProxyRoutingRule
+}
+
+func (c *ProxyRoutingRuleClient) mutate(ctx context.Context, m *ProxyRoutingRuleMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ProxyRoutingRuleCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ProxyRoutingRuleUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ProxyRoutingRuleUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ProxyRoutingRuleDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ProxyRoutingRule mutation op: %q", m.Op())
+	}
+}
+
+// ProxyRoutingUnlockServiceClient is a client for the ProxyRoutingUnlockService schema.
+type ProxyRoutingUnlockServiceClient struct {
+	config
+}
+
+// NewProxyRoutingUnlockServiceClient returns a client for the ProxyRoutingUnlockService from the given config.
+func NewProxyRoutingUnlockServiceClient(c config) *ProxyRoutingUnlockServiceClient {
+	return &ProxyRoutingUnlockServiceClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `proxyroutingunlockservice.Hooks(f(g(h())))`.
+func (c *ProxyRoutingUnlockServiceClient) Use(hooks ...Hook) {
+	c.hooks.ProxyRoutingUnlockService = append(c.hooks.ProxyRoutingUnlockService, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `proxyroutingunlockservice.Intercept(f(g(h())))`.
+func (c *ProxyRoutingUnlockServiceClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ProxyRoutingUnlockService = append(c.inters.ProxyRoutingUnlockService, interceptors...)
+}
+
+// Create returns a builder for creating a ProxyRoutingUnlockService entity.
+func (c *ProxyRoutingUnlockServiceClient) Create() *ProxyRoutingUnlockServiceCreate {
+	mutation := newProxyRoutingUnlockServiceMutation(c.config, OpCreate)
+	return &ProxyRoutingUnlockServiceCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ProxyRoutingUnlockService entities.
+func (c *ProxyRoutingUnlockServiceClient) CreateBulk(builders ...*ProxyRoutingUnlockServiceCreate) *ProxyRoutingUnlockServiceCreateBulk {
+	return &ProxyRoutingUnlockServiceCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ProxyRoutingUnlockServiceClient) MapCreateBulk(slice any, setFunc func(*ProxyRoutingUnlockServiceCreate, int)) *ProxyRoutingUnlockServiceCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ProxyRoutingUnlockServiceCreateBulk{err: fmt.Errorf("calling to ProxyRoutingUnlockServiceClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ProxyRoutingUnlockServiceCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ProxyRoutingUnlockServiceCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ProxyRoutingUnlockService.
+func (c *ProxyRoutingUnlockServiceClient) Update() *ProxyRoutingUnlockServiceUpdate {
+	mutation := newProxyRoutingUnlockServiceMutation(c.config, OpUpdate)
+	return &ProxyRoutingUnlockServiceUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ProxyRoutingUnlockServiceClient) UpdateOne(_m *ProxyRoutingUnlockService) *ProxyRoutingUnlockServiceUpdateOne {
+	mutation := newProxyRoutingUnlockServiceMutation(c.config, OpUpdateOne, withProxyRoutingUnlockService(_m))
+	return &ProxyRoutingUnlockServiceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ProxyRoutingUnlockServiceClient) UpdateOneID(id int64) *ProxyRoutingUnlockServiceUpdateOne {
+	mutation := newProxyRoutingUnlockServiceMutation(c.config, OpUpdateOne, withProxyRoutingUnlockServiceID(id))
+	return &ProxyRoutingUnlockServiceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ProxyRoutingUnlockService.
+func (c *ProxyRoutingUnlockServiceClient) Delete() *ProxyRoutingUnlockServiceDelete {
+	mutation := newProxyRoutingUnlockServiceMutation(c.config, OpDelete)
+	return &ProxyRoutingUnlockServiceDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ProxyRoutingUnlockServiceClient) DeleteOne(_m *ProxyRoutingUnlockService) *ProxyRoutingUnlockServiceDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ProxyRoutingUnlockServiceClient) DeleteOneID(id int64) *ProxyRoutingUnlockServiceDeleteOne {
+	builder := c.Delete().Where(proxyroutingunlockservice.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ProxyRoutingUnlockServiceDeleteOne{builder}
+}
+
+// Query returns a query builder for ProxyRoutingUnlockService.
+func (c *ProxyRoutingUnlockServiceClient) Query() *ProxyRoutingUnlockServiceQuery {
+	return &ProxyRoutingUnlockServiceQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeProxyRoutingUnlockService},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ProxyRoutingUnlockService entity by its id.
+func (c *ProxyRoutingUnlockServiceClient) Get(ctx context.Context, id int64) (*ProxyRoutingUnlockService, error) {
+	return c.Query().Where(proxyroutingunlockservice.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ProxyRoutingUnlockServiceClient) GetX(ctx context.Context, id int64) *ProxyRoutingUnlockService {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *ProxyRoutingUnlockServiceClient) Hooks() []Hook {
+	return c.hooks.ProxyRoutingUnlockService
+}
+
+// Interceptors returns the client interceptors.
+func (c *ProxyRoutingUnlockServiceClient) Interceptors() []Interceptor {
+	return c.inters.ProxyRoutingUnlockService
+}
+
+func (c *ProxyRoutingUnlockServiceClient) mutate(ctx context.Context, m *ProxyRoutingUnlockServiceMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ProxyRoutingUnlockServiceCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ProxyRoutingUnlockServiceUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ProxyRoutingUnlockServiceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ProxyRoutingUnlockServiceDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ProxyRoutingUnlockService mutation op: %q", m.Op())
 	}
 }
 
@@ -4827,22 +5536,25 @@ type (
 		ProxyAds, ProxyAnnouncement, ProxyAuthMethod, ProxyCoupon, ProxyDocument,
 		ProxyGroupHistory, ProxyGroupHistoryDetail, ProxyNode, ProxyOrder,
 		ProxyPayment, ProxyRedemptionCode, ProxyRedemptionRecord,
-		ProxySchemaMigrations, ProxyServer, ProxyServerGroup, ProxySubscribe,
-		ProxySubscribeApplication, ProxySubscribeCategory, ProxySubscribeGroup,
-		ProxySubscribePriceOption, ProxySystem, ProxySystemLog, ProxyTask, ProxyTicket,
-		ProxyTicketFollow, ProxyTrafficLog, ProxyUser, ProxyUserAuthMethod,
-		ProxyUserDevice, ProxyUserDeviceOnlineRecord, ProxyUserSubscribe,
-		ProxyUserWithdrawal []ent.Hook
+		ProxyRoutingDNSResolver, ProxyRoutingOutbound, ProxyRoutingProfile,
+		ProxyRoutingRule, ProxyRoutingUnlockService, ProxySchemaMigrations,
+		ProxyServer, ProxyServerGroup, ProxySubscribe, ProxySubscribeApplication,
+		ProxySubscribeCategory, ProxySubscribeGroup, ProxySubscribePriceOption,
+		ProxySystem, ProxySystemLog, ProxyTask, ProxyTicket, ProxyTicketFollow,
+		ProxyTrafficLog, ProxyUser, ProxyUserAuthMethod, ProxyUserDevice,
+		ProxyUserDeviceOnlineRecord, ProxyUserSubscribe, ProxyUserWithdrawal []ent.Hook
 	}
 	inters struct {
 		ProxyAds, ProxyAnnouncement, ProxyAuthMethod, ProxyCoupon, ProxyDocument,
 		ProxyGroupHistory, ProxyGroupHistoryDetail, ProxyNode, ProxyOrder,
 		ProxyPayment, ProxyRedemptionCode, ProxyRedemptionRecord,
-		ProxySchemaMigrations, ProxyServer, ProxyServerGroup, ProxySubscribe,
-		ProxySubscribeApplication, ProxySubscribeCategory, ProxySubscribeGroup,
-		ProxySubscribePriceOption, ProxySystem, ProxySystemLog, ProxyTask, ProxyTicket,
-		ProxyTicketFollow, ProxyTrafficLog, ProxyUser, ProxyUserAuthMethod,
-		ProxyUserDevice, ProxyUserDeviceOnlineRecord, ProxyUserSubscribe,
+		ProxyRoutingDNSResolver, ProxyRoutingOutbound, ProxyRoutingProfile,
+		ProxyRoutingRule, ProxyRoutingUnlockService, ProxySchemaMigrations,
+		ProxyServer, ProxyServerGroup, ProxySubscribe, ProxySubscribeApplication,
+		ProxySubscribeCategory, ProxySubscribeGroup, ProxySubscribePriceOption,
+		ProxySystem, ProxySystemLog, ProxyTask, ProxyTicket, ProxyTicketFollow,
+		ProxyTrafficLog, ProxyUser, ProxyUserAuthMethod, ProxyUserDevice,
+		ProxyUserDeviceOnlineRecord, ProxyUserSubscribe,
 		ProxyUserWithdrawal []ent.Interceptor
 	}
 )

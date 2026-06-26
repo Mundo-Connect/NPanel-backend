@@ -1,0 +1,254 @@
+syntax = "proto3";
+
+package api.admin.routing.v1;
+
+import "google/api/annotations.proto";
+
+option go_package = "github.com/npanel-dev/NPanel-backend/api/admin/routing/v1;v1";
+
+service RoutingService {
+  rpc ListRouteProfiles(ListRouteProfilesRequest) returns (ListRouteProfilesReply) {
+    option (google.api.http) = { get: "/v1/admin/routing/profiles" };
+  }
+  rpc CreateRouteProfile(CreateRouteProfileRequest) returns (RouteProfileReply) {
+    option (google.api.http) = {
+      post: "/v1/admin/routing/profile"
+      body: "*"
+    };
+  }
+  rpc UpdateRouteProfile(UpdateRouteProfileRequest) returns (RouteProfileReply) {
+    option (google.api.http) = {
+      put: "/v1/admin/routing/profile"
+      body: "*"
+    };
+  }
+  rpc DeleteRouteProfile(DeleteRouteProfileRequest) returns (DeleteRouteItemReply) {
+    option (google.api.http) = { delete: "/v1/admin/routing/profile" };
+  }
+
+  rpc ListRouteRules(ListRouteRulesRequest) returns (ListRouteRulesReply) {
+    option (google.api.http) = { get: "/v1/admin/routing/rules" };
+  }
+  rpc CreateRouteRule(CreateRouteRuleRequest) returns (RouteRuleReply) {
+    option (google.api.http) = {
+      post: "/v1/admin/routing/rule"
+      body: "*"
+    };
+  }
+  rpc UpdateRouteRule(UpdateRouteRuleRequest) returns (RouteRuleReply) {
+    option (google.api.http) = {
+      put: "/v1/admin/routing/rule"
+      body: "*"
+    };
+  }
+  rpc DeleteRouteRule(DeleteRouteRuleRequest) returns (DeleteRouteItemReply) {
+    option (google.api.http) = { delete: "/v1/admin/routing/rule" };
+  }
+
+  rpc ListDnsResolvers(ListDnsResolversRequest) returns (ListDnsResolversReply) {
+    option (google.api.http) = { get: "/v1/admin/routing/dns_resolvers" };
+  }
+  rpc CreateDnsResolver(CreateDnsResolverRequest) returns (DnsResolverReply) {
+    option (google.api.http) = {
+      post: "/v1/admin/routing/dns_resolver"
+      body: "*"
+    };
+  }
+  rpc UpdateDnsResolver(UpdateDnsResolverRequest) returns (DnsResolverReply) {
+    option (google.api.http) = {
+      put: "/v1/admin/routing/dns_resolver"
+      body: "*"
+    };
+  }
+  rpc DeleteDnsResolver(DeleteDnsResolverRequest) returns (DeleteRouteItemReply) {
+    option (google.api.http) = { delete: "/v1/admin/routing/dns_resolver" };
+  }
+
+  rpc ListRouteOutbounds(ListRouteOutboundsRequest) returns (ListRouteOutboundsReply) {
+    option (google.api.http) = { get: "/v1/admin/routing/outbounds" };
+  }
+  rpc CreateRouteOutbound(CreateRouteOutboundRequest) returns (RouteOutboundReply) {
+    option (google.api.http) = {
+      post: "/v1/admin/routing/outbound"
+      body: "*"
+    };
+  }
+  rpc UpdateRouteOutbound(UpdateRouteOutboundRequest) returns (RouteOutboundReply) {
+    option (google.api.http) = {
+      put: "/v1/admin/routing/outbound"
+      body: "*"
+    };
+  }
+  rpc DeleteRouteOutbound(DeleteRouteOutboundRequest) returns (DeleteRouteItemReply) {
+    option (google.api.http) = { delete: "/v1/admin/routing/outbound" };
+  }
+
+  rpc ListUnlockServices(ListUnlockServicesRequest) returns (ListUnlockServicesReply) {
+    option (google.api.http) = { get: "/v1/admin/routing/unlock_services" };
+  }
+  rpc CreateUnlockService(CreateUnlockServiceRequest) returns (UnlockServiceReply) {
+    option (google.api.http) = {
+      post: "/v1/admin/routing/unlock_service"
+      body: "*"
+    };
+  }
+  rpc UpdateUnlockService(UpdateUnlockServiceRequest) returns (UnlockServiceReply) {
+    option (google.api.http) = {
+      put: "/v1/admin/routing/unlock_service"
+      body: "*"
+    };
+  }
+  rpc DeleteUnlockService(DeleteUnlockServiceRequest) returns (DeleteRouteItemReply) {
+    option (google.api.http) = { delete: "/v1/admin/routing/unlock_service" };
+  }
+
+  rpc PreviewRouteConfig(PreviewRouteConfigRequest) returns (PreviewRouteConfigReply) {
+    option (google.api.http) = {
+      post: "/v1/admin/routing/preview"
+      body: "*"
+    };
+  }
+}
+
+message RouteProfile {
+  int64 id = 1;
+  string code = 2;
+  string name = 3;
+  string description = 4;
+  string scope_type = 5;
+  string scope_id = 6;
+  int32 priority = 7;
+  string mode = 8;
+  bool enabled = 9;
+  string profile_json = 10;
+  int64 created_at = 11;
+  int64 updated_at = 12;
+}
+
+message RouteRule {
+  int64 id = 1;
+  int64 profile_id = 2;
+  string name = 3;
+  int32 priority = 4;
+  bool enabled = 5;
+  string service_code = 6;
+  string matcher_json = 7;
+  string action_json = 8;
+  int64 created_at = 9;
+  int64 updated_at = 10;
+}
+
+message DnsResolver {
+  int64 id = 1;
+  string tag = 2;
+  string name = 3;
+  string proto = 4;
+  string address = 5;
+  int32 port = 6;
+  bool enabled = 7;
+  string resolver_json = 8;
+  int64 created_at = 9;
+  int64 updated_at = 10;
+}
+
+message RouteOutbound {
+  int64 id = 1;
+  string tag = 2;
+  string name = 3;
+  string type = 4;
+  string region = 5;
+  bool enabled = 6;
+  string outbound_json = 7;
+  int64 created_at = 8;
+  int64 updated_at = 9;
+}
+
+message UnlockService {
+  int64 id = 1;
+  string code = 2;
+  string name = 3;
+  string category = 4;
+  bool enabled = 5;
+  string service_json = 6;
+  int64 created_at = 7;
+  int64 updated_at = 8;
+}
+
+message ListRouteProfilesRequest { int64 page = 1; int64 size = 2; string search = 3; }
+message CreateRouteProfileRequest { RouteProfile profile = 1; }
+message UpdateRouteProfileRequest { RouteProfile profile = 1; }
+message DeleteRouteProfileRequest { int64 id = 1; }
+message RouteProfileData { RouteProfile profile = 1; }
+message RouteProfileListData { repeated RouteProfile list = 1; int32 total = 2; }
+message RouteProfileReply { int32 code = 1; string message = 2; RouteProfileData data = 3; }
+message ListRouteProfilesReply { int32 code = 1; string message = 2; RouteProfileListData data = 3; }
+
+message ListRouteRulesRequest { int64 page = 1; int64 size = 2; int64 profile_id = 3; string search = 4; }
+message CreateRouteRuleRequest { RouteRule rule = 1; }
+message UpdateRouteRuleRequest { RouteRule rule = 1; }
+message DeleteRouteRuleRequest { int64 id = 1; }
+message RouteRuleData { RouteRule rule = 1; }
+message RouteRuleListData { repeated RouteRule list = 1; int32 total = 2; }
+message RouteRuleReply { int32 code = 1; string message = 2; RouteRuleData data = 3; }
+message ListRouteRulesReply { int32 code = 1; string message = 2; RouteRuleListData data = 3; }
+
+message ListDnsResolversRequest { int64 page = 1; int64 size = 2; string search = 3; }
+message CreateDnsResolverRequest { DnsResolver resolver = 1; }
+message UpdateDnsResolverRequest { DnsResolver resolver = 1; }
+message DeleteDnsResolverRequest { int64 id = 1; }
+message DnsResolverData { DnsResolver resolver = 1; }
+message DnsResolverListData { repeated DnsResolver list = 1; int32 total = 2; }
+message DnsResolverReply { int32 code = 1; string message = 2; DnsResolverData data = 3; }
+message ListDnsResolversReply { int32 code = 1; string message = 2; DnsResolverListData data = 3; }
+
+message ListRouteOutboundsRequest { int64 page = 1; int64 size = 2; string search = 3; }
+message CreateRouteOutboundRequest { RouteOutbound outbound = 1; }
+message UpdateRouteOutboundRequest { RouteOutbound outbound = 1; }
+message DeleteRouteOutboundRequest { int64 id = 1; }
+message RouteOutboundData { RouteOutbound outbound = 1; }
+message RouteOutboundListData { repeated RouteOutbound list = 1; int32 total = 2; }
+message RouteOutboundReply { int32 code = 1; string message = 2; RouteOutboundData data = 3; }
+message ListRouteOutboundsReply { int32 code = 1; string message = 2; RouteOutboundListData data = 3; }
+
+message ListUnlockServicesRequest { int64 page = 1; int64 size = 2; string search = 3; }
+message CreateUnlockServiceRequest { UnlockService service = 1; }
+message UpdateUnlockServiceRequest { UnlockService service = 1; }
+message DeleteUnlockServiceRequest { int64 id = 1; }
+message UnlockServiceData { UnlockService service = 1; }
+message UnlockServiceListData { repeated UnlockService list = 1; int32 total = 2; }
+message UnlockServiceReply { int32 code = 1; string message = 2; UnlockServiceData data = 3; }
+message ListUnlockServicesReply { int32 code = 1; string message = 2; UnlockServiceListData data = 3; }
+
+message DeleteRouteItemData { bool success = 1; }
+message DeleteRouteItemReply { int32 code = 1; string message = 2; DeleteRouteItemData data = 3; }
+
+message PreviewRouteConfigRequest {
+  string domain = 1;
+  string ip = 2;
+  int32 port = 3;
+  int64 user_id = 4;
+  int64 node_id = 5;
+  repeated string supported_features = 6;
+}
+
+message PreviewRouteResult {
+  string routing_hash = 1;
+  string profile_code = 2;
+  string profile_name = 3;
+  bool matched = 4;
+  string rule_id = 5;
+  string rule_name = 6;
+  string action_type = 7;
+  string dns_resolver_tag = 8;
+  string outbound_tag = 9;
+  string fallback_policy = 10;
+  repeated string unsupported_features = 11;
+  string effective_mode = 12;
+  bool execution_enabled = 13;
+}
+
+message PreviewRouteConfigReply {
+  int32 code = 1;
+  string message = 2;
+  PreviewRouteResult data = 3;
+}

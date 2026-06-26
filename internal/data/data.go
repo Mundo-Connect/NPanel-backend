@@ -43,6 +43,7 @@ var ProviderSet = wire.NewSet(
 	NewAdminMarketingRepo,
 	NewOrderRepo,
 	NewAdminPaymentRepo,
+	NewAdminRoutingRepo,
 	NewAdminServerRepo,
 	NewAdminNodeRepo,
 	NewAdminMigrationRepo,

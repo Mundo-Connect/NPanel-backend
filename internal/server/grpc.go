@@ -14,6 +14,7 @@ import (
 	adminorderv1 "github.com/npanel-dev/NPanel-backend/api/admin/order/v1"
 	adminpaymentv1 "github.com/npanel-dev/NPanel-backend/api/admin/payment/v1"
 	adminredemptionv1 "github.com/npanel-dev/NPanel-backend/api/admin/redemption/v1"
+	adminroutingv1 "github.com/npanel-dev/NPanel-backend/api/admin/routing/v1"
 	adminserverv1 "github.com/npanel-dev/NPanel-backend/api/admin/server/v1"
 	adminsubscribev1 "github.com/npanel-dev/NPanel-backend/api/admin/subscribe/v1"
 	adminsystemv1 "github.com/npanel-dev/NPanel-backend/api/admin/system/v1"
@@ -42,6 +43,7 @@ import (
 	adminorderservice "github.com/npanel-dev/NPanel-backend/internal/service/admin/order"
 	adminpaymentservice "github.com/npanel-dev/NPanel-backend/internal/service/admin/payment"
 	adminredemptionservice "github.com/npanel-dev/NPanel-backend/internal/service/admin/redemption"
+	adminroutingservice "github.com/npanel-dev/NPanel-backend/internal/service/admin/routing"
 	adminserverservice "github.com/npanel-dev/NPanel-backend/internal/service/admin/server"
 	adminsubscribeservice "github.com/npanel-dev/NPanel-backend/internal/service/admin/subscribe"
 	adminsystemservice "github.com/npanel-dev/NPanel-backend/internal/service/admin/system"
@@ -61,7 +63,7 @@ import (
 )
 
 // NewGRPCServer new a gRPC server
-func NewGRPCServer(c *conf.Server, authMiddleware *appmiddleware.ServiceContext, ads *adsservice.AdsService, announcement *announcementservice.AnnouncementService, application *applicationservice.SubscribeApplicationService, authmethod *authmethodservice.AuthMethodService, adminConsole *adminconsoleservice.ConsoleService, adminCoupon *admincouponservice.CouponService, adminDocument *admindocumentservice.DocumentService, adminLog *adminlogservice.LogService, adminMarketing *adminmarketingservice.MarketingService, adminOrder *adminorderservice.OrderService, adminPayment *adminpaymentservice.PaymentService, adminServer *adminserverservice.ServerService, adminSubscribe *adminsubscribeservice.SubscribeService, adminSystem *adminsystemservice.SystemService, adminTicket *adminticketservice.TicketService, adminRedemption *adminredemptionservice.RedemptionService, adminTool *admintoolservice.ToolService, adminGroup *maingroupservice.GroupService, adminUser *adminuserservice.UserService, adminUserAuthMethod *adminuserservice.UserAuthMethodService, adminUserDevice *adminuserservice.UserDeviceService, adminUserSubscribe *adminuserservice.UserSubscribeService, auth *authservice.AuthService, oauthSvc *authoauthservice.OAuthService, commonSvc *commonservice.CommonService, publicOrder *publicorderservice.PublicOrderService, publicPortal *publicportalservice.PortalService, publicTicket *publicticketservice.TicketService, publicUser *publicuserservice.UserService) *grpc.Server {
+func NewGRPCServer(c *conf.Server, authMiddleware *appmiddleware.ServiceContext, ads *adsservice.AdsService, announcement *announcementservice.AnnouncementService, application *applicationservice.SubscribeApplicationService, authmethod *authmethodservice.AuthMethodService, adminConsole *adminconsoleservice.ConsoleService, adminCoupon *admincouponservice.CouponService, adminDocument *admindocumentservice.DocumentService, adminLog *adminlogservice.LogService, adminMarketing *adminmarketingservice.MarketingService, adminOrder *adminorderservice.OrderService, adminPayment *adminpaymentservice.PaymentService, adminRouting *adminroutingservice.RoutingService, adminServer *adminserverservice.ServerService, adminSubscribe *adminsubscribeservice.SubscribeService, adminSystem *adminsystemservice.SystemService, adminTicket *adminticketservice.TicketService, adminRedemption *adminredemptionservice.RedemptionService, adminTool *admintoolservice.ToolService, adminGroup *maingroupservice.GroupService, adminUser *adminuserservice.UserService, adminUserAuthMethod *adminuserservice.UserAuthMethodService, adminUserDevice *adminuserservice.UserDeviceService, adminUserSubscribe *adminuserservice.UserSubscribeService, auth *authservice.AuthService, oauthSvc *authoauthservice.OAuthService, commonSvc *commonservice.CommonService, publicOrder *publicorderservice.PublicOrderService, publicPortal *publicportalservice.PortalService, publicTicket *publicticketservice.TicketService, publicUser *publicuserservice.UserService) *grpc.Server {
 	var opts = []grpc.ServerOption{
 		grpc.Middleware(
 			recovery.Recovery(),
@@ -89,6 +91,7 @@ func NewGRPCServer(c *conf.Server, authMiddleware *appmiddleware.ServiceContext,
 	adminmarketingv1.RegisterMarketingServiceServer(srv, adminMarketing)
 	adminorderv1.RegisterOrderServiceServer(srv, adminOrder)
 	adminpaymentv1.RegisterPaymentServiceServer(srv, adminPayment)
+	adminroutingv1.RegisterRoutingServiceServer(srv, adminRouting)
 	adminserverv1.RegisterServerServiceServer(srv, adminServer)
 	adminsubscribev1.RegisterSubscribeServer(srv, adminSubscribe)
 	adminsystemv1.RegisterSystemServiceServer(srv, adminSystem)

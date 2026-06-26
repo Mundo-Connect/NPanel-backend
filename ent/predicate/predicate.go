@@ -42,6 +42,21 @@ type ProxyRedemptionCode func(*sql.Selector)
 // ProxyRedemptionRecord is the predicate function for proxyredemptionrecord builders.
 type ProxyRedemptionRecord func(*sql.Selector)
 
+// ProxyRoutingDNSResolver is the predicate function for proxyroutingdnsresolver builders.
+type ProxyRoutingDNSResolver func(*sql.Selector)
+
+// ProxyRoutingOutbound is the predicate function for proxyroutingoutbound builders.
+type ProxyRoutingOutbound func(*sql.Selector)
+
+// ProxyRoutingProfile is the predicate function for proxyroutingprofile builders.
+type ProxyRoutingProfile func(*sql.Selector)
+
+// ProxyRoutingRule is the predicate function for proxyroutingrule builders.
+type ProxyRoutingRule func(*sql.Selector)
+
+// ProxyRoutingUnlockService is the predicate function for proxyroutingunlockservice builders.
+type ProxyRoutingUnlockService func(*sql.Selector)
+
 // ProxySchemaMigrations is the predicate function for proxyschemamigrations builders.
 type ProxySchemaMigrations func(*sql.Selector)
 

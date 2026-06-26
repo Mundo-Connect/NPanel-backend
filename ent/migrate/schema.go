@@ -296,6 +296,100 @@ var (
 			},
 		},
 	}
+	// RoutingDNSResolverColumns holds the columns for the "routing_dns_resolver" table.
+	RoutingDNSResolverColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "DNS Resolver ID"},
+		{Name: "tag", Type: field.TypeString, Unique: true, Size: 128, Comment: "Stable resolver tag"},
+		{Name: "name", Type: field.TypeString, Size: 255, Comment: "Resolver display name"},
+		{Name: "proto", Type: field.TypeString, Size: 32, Comment: "doh/dot/udp/tcp", Default: "doh"},
+		{Name: "address", Type: field.TypeString, Size: 512, Comment: "Resolver address"},
+		{Name: "port", Type: field.TypeInt, Comment: "Resolver port", Default: 443},
+		{Name: "enabled", Type: field.TypeBool, Comment: "Resolver enabled", Default: true},
+		{Name: "resolver_json", Type: field.TypeString, Size: 2147483647, Comment: "routing_profile.v1 DNS resolver JSON", Default: "{}"},
+		{Name: "created_at", Type: field.TypeTime, Comment: "Created at"},
+		{Name: "updated_at", Type: field.TypeTime, Comment: "Updated at"},
+	}
+	// RoutingDNSResolverTable holds the schema information for the "routing_dns_resolver" table.
+	RoutingDNSResolverTable = &schema.Table{
+		Name:       "routing_dns_resolver",
+		Columns:    RoutingDNSResolverColumns,
+		PrimaryKey: []*schema.Column{RoutingDNSResolverColumns[0]},
+	}
+	// RoutingOutboundColumns holds the columns for the "routing_outbound" table.
+	RoutingOutboundColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "Route Outbound ID"},
+		{Name: "tag", Type: field.TypeString, Unique: true, Size: 128, Comment: "Stable outbound tag"},
+		{Name: "name", Type: field.TypeString, Size: 255, Comment: "Outbound display name"},
+		{Name: "type", Type: field.TypeString, Size: 32, Comment: "node/node_group/external", Default: "node_group"},
+		{Name: "region", Type: field.TypeString, Size: 32, Comment: "Region code", Default: ""},
+		{Name: "enabled", Type: field.TypeBool, Comment: "Outbound enabled", Default: true},
+		{Name: "outbound_json", Type: field.TypeString, Size: 2147483647, Comment: "routing_profile.v1 outbound JSON", Default: "{}"},
+		{Name: "created_at", Type: field.TypeTime, Comment: "Created at"},
+		{Name: "updated_at", Type: field.TypeTime, Comment: "Updated at"},
+	}
+	// RoutingOutboundTable holds the schema information for the "routing_outbound" table.
+	RoutingOutboundTable = &schema.Table{
+		Name:       "routing_outbound",
+		Columns:    RoutingOutboundColumns,
+		PrimaryKey: []*schema.Column{RoutingOutboundColumns[0]},
+	}
+	// RoutingProfileColumns holds the columns for the "routing_profile" table.
+	RoutingProfileColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "Routing Profile ID"},
+		{Name: "code", Type: field.TypeString, Unique: true, Size: 128, Comment: "Stable profile code"},
+		{Name: "name", Type: field.TypeString, Size: 255, Comment: "Profile display name"},
+		{Name: "description", Type: field.TypeString, Nullable: true, Size: 2147483647, Comment: "Profile description"},
+		{Name: "scope_type", Type: field.TypeString, Size: 32, Comment: "user/plan/group/node/global", Default: "global"},
+		{Name: "scope_id", Type: field.TypeString, Size: 128, Comment: "Scope identifier", Default: "default"},
+		{Name: "priority", Type: field.TypeInt, Comment: "Lower priority matches first", Default: 100},
+		{Name: "mode", Type: field.TypeString, Size: 32, Comment: "off/observe/enforce", Default: "observe"},
+		{Name: "enabled", Type: field.TypeBool, Comment: "Profile enabled", Default: true},
+		{Name: "profile_json", Type: field.TypeString, Size: 2147483647, Comment: "routing_profile.v1 profile object JSON", Default: "{}"},
+		{Name: "created_at", Type: field.TypeTime, Comment: "Created at"},
+		{Name: "updated_at", Type: field.TypeTime, Comment: "Updated at"},
+	}
+	// RoutingProfileTable holds the schema information for the "routing_profile" table.
+	RoutingProfileTable = &schema.Table{
+		Name:       "routing_profile",
+		Columns:    RoutingProfileColumns,
+		PrimaryKey: []*schema.Column{RoutingProfileColumns[0]},
+	}
+	// RoutingRuleColumns holds the columns for the "routing_rule" table.
+	RoutingRuleColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "Routing Rule ID"},
+		{Name: "profile_id", Type: field.TypeInt64, Comment: "Bound routing_profile.id, 0 means default P1 profile", Default: 0},
+		{Name: "name", Type: field.TypeString, Size: 255, Comment: "Rule display name"},
+		{Name: "priority", Type: field.TypeInt, Comment: "Lower priority matches first", Default: 100},
+		{Name: "enabled", Type: field.TypeBool, Comment: "Rule enabled", Default: true},
+		{Name: "service_code", Type: field.TypeString, Size: 128, Comment: "Unlock service code", Default: ""},
+		{Name: "matcher_json", Type: field.TypeString, Size: 2147483647, Comment: "routing_profile.v1 matcher JSON", Default: "{}"},
+		{Name: "action_json", Type: field.TypeString, Size: 2147483647, Comment: "routing_profile.v1 action JSON", Default: "{}"},
+		{Name: "created_at", Type: field.TypeTime, Comment: "Created at"},
+		{Name: "updated_at", Type: field.TypeTime, Comment: "Updated at"},
+	}
+	// RoutingRuleTable holds the schema information for the "routing_rule" table.
+	RoutingRuleTable = &schema.Table{
+		Name:       "routing_rule",
+		Columns:    RoutingRuleColumns,
+		PrimaryKey: []*schema.Column{RoutingRuleColumns[0]},
+	}
+	// RoutingUnlockServiceColumns holds the columns for the "routing_unlock_service" table.
+	RoutingUnlockServiceColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "Unlock Service ID"},
+		{Name: "code", Type: field.TypeString, Unique: true, Size: 128, Comment: "Stable service code"},
+		{Name: "name", Type: field.TypeString, Size: 255, Comment: "Service display name"},
+		{Name: "category", Type: field.TypeString, Size: 128, Comment: "Service category", Default: ""},
+		{Name: "enabled", Type: field.TypeBool, Comment: "Service enabled", Default: true},
+		{Name: "service_json", Type: field.TypeString, Size: 2147483647, Comment: "routing_profile.v1 unlock service JSON", Default: "{}"},
+		{Name: "created_at", Type: field.TypeTime, Comment: "Created at"},
+		{Name: "updated_at", Type: field.TypeTime, Comment: "Updated at"},
+	}
+	// RoutingUnlockServiceTable holds the schema information for the "routing_unlock_service" table.
+	RoutingUnlockServiceTable = &schema.Table{
+		Name:       "routing_unlock_service",
+		Columns:    RoutingUnlockServiceColumns,
+		PrimaryKey: []*schema.Column{RoutingUnlockServiceColumns[0]},
+	}
 	// SchemaMigrationsColumns holds the columns for the "schema_migrations" table.
 	SchemaMigrationsColumns = []*schema.Column{
 		{Name: "version", Type: field.TypeInt64, Comment: "迁移版本号"},
@@ -733,6 +827,11 @@ var (
 		PaymentTable,
 		RedemptionCodeTable,
 		RedemptionRecordTable,
+		RoutingDNSResolverTable,
+		RoutingOutboundTable,
+		RoutingProfileTable,
+		RoutingRuleTable,
+		RoutingUnlockServiceTable,
 		SchemaMigrationsTable,
 		ServersTable,
 		NodeGroupTable,
@@ -794,6 +893,21 @@ func init() {
 	RedemptionRecordTable.ForeignKeys[1].RefTable = UserTable
 	RedemptionRecordTable.Annotation = &entsql.Annotation{
 		Table: "redemption_record",
+	}
+	RoutingDNSResolverTable.Annotation = &entsql.Annotation{
+		Table: "routing_dns_resolver",
+	}
+	RoutingOutboundTable.Annotation = &entsql.Annotation{
+		Table: "routing_outbound",
+	}
+	RoutingProfileTable.Annotation = &entsql.Annotation{
+		Table: "routing_profile",
+	}
+	RoutingRuleTable.Annotation = &entsql.Annotation{
+		Table: "routing_rule",
+	}
+	RoutingUnlockServiceTable.Annotation = &entsql.Annotation{
+		Table: "routing_unlock_service",
 	}
 	SchemaMigrationsTable.Annotation = &entsql.Annotation{
 		Table: "schema_migrations",

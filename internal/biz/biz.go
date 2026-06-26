@@ -16,6 +16,7 @@ import (
 	adminorder "github.com/npanel-dev/NPanel-backend/internal/biz/admin/order"
 	adminpayment "github.com/npanel-dev/NPanel-backend/internal/biz/admin/payment"
 	adminredemption "github.com/npanel-dev/NPanel-backend/internal/biz/admin/redemption"
+	adminrouting "github.com/npanel-dev/NPanel-backend/internal/biz/admin/routing"
 	adminserver "github.com/npanel-dev/NPanel-backend/internal/biz/admin/server"
 	adminsubscribe "github.com/npanel-dev/NPanel-backend/internal/biz/admin/subscribe"
 	adminsystem "github.com/npanel-dev/NPanel-backend/internal/biz/admin/system"
@@ -56,6 +57,7 @@ var ProviderSet = wire.NewSet(
 	adminorder.NewOrderUseCase,
 	adminpayment.NewPaymentUsecase,
 	adminserver.NewServerUsecase,
+	adminrouting.NewRoutingUsecase,
 	adminserver.NewNodeUsecase,
 	adminserver.NewMigrationUsecase,
 	adminsubscribe.NewSubscribeUseCase,

@@ -153,6 +153,66 @@ func (f ProxyRedemptionRecordFunc) Mutate(ctx context.Context, m ent.Mutation) (
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ProxyRedemptionRecordMutation", m)
 }
 
+// The ProxyRoutingDNSResolverFunc type is an adapter to allow the use of ordinary
+// function as ProxyRoutingDNSResolver mutator.
+type ProxyRoutingDNSResolverFunc func(context.Context, *ent.ProxyRoutingDNSResolverMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ProxyRoutingDNSResolverFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ProxyRoutingDNSResolverMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ProxyRoutingDNSResolverMutation", m)
+}
+
+// The ProxyRoutingOutboundFunc type is an adapter to allow the use of ordinary
+// function as ProxyRoutingOutbound mutator.
+type ProxyRoutingOutboundFunc func(context.Context, *ent.ProxyRoutingOutboundMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ProxyRoutingOutboundFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ProxyRoutingOutboundMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ProxyRoutingOutboundMutation", m)
+}
+
+// The ProxyRoutingProfileFunc type is an adapter to allow the use of ordinary
+// function as ProxyRoutingProfile mutator.
+type ProxyRoutingProfileFunc func(context.Context, *ent.ProxyRoutingProfileMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ProxyRoutingProfileFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ProxyRoutingProfileMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ProxyRoutingProfileMutation", m)
+}
+
+// The ProxyRoutingRuleFunc type is an adapter to allow the use of ordinary
+// function as ProxyRoutingRule mutator.
+type ProxyRoutingRuleFunc func(context.Context, *ent.ProxyRoutingRuleMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ProxyRoutingRuleFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ProxyRoutingRuleMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ProxyRoutingRuleMutation", m)
+}
+
+// The ProxyRoutingUnlockServiceFunc type is an adapter to allow the use of ordinary
+// function as ProxyRoutingUnlockService mutator.
+type ProxyRoutingUnlockServiceFunc func(context.Context, *ent.ProxyRoutingUnlockServiceMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ProxyRoutingUnlockServiceFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ProxyRoutingUnlockServiceMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ProxyRoutingUnlockServiceMutation", m)
+}
+
 // The ProxySchemaMigrationsFunc type is an adapter to allow the use of ordinary
 // function as ProxySchemaMigrations mutator.
 type ProxySchemaMigrationsFunc func(context.Context, *ent.ProxySchemaMigrationsMutation) (ent.Value, error)

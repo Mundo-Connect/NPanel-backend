@@ -24,6 +24,11 @@ import (
 	"github.com/npanel-dev/NPanel-backend/ent/proxypayment"
 	"github.com/npanel-dev/NPanel-backend/ent/proxyredemptioncode"
 	"github.com/npanel-dev/NPanel-backend/ent/proxyredemptionrecord"
+	"github.com/npanel-dev/NPanel-backend/ent/proxyroutingdnsresolver"
+	"github.com/npanel-dev/NPanel-backend/ent/proxyroutingoutbound"
+	"github.com/npanel-dev/NPanel-backend/ent/proxyroutingprofile"
+	"github.com/npanel-dev/NPanel-backend/ent/proxyroutingrule"
+	"github.com/npanel-dev/NPanel-backend/ent/proxyroutingunlockservice"
 	"github.com/npanel-dev/NPanel-backend/ent/proxyschemamigrations"
 	"github.com/npanel-dev/NPanel-backend/ent/proxyserver"
 	"github.com/npanel-dev/NPanel-backend/ent/proxyservergroup"
@@ -67,6 +72,11 @@ const (
 	TypeProxyPayment                = "ProxyPayment"
 	TypeProxyRedemptionCode         = "ProxyRedemptionCode"
 	TypeProxyRedemptionRecord       = "ProxyRedemptionRecord"
+	TypeProxyRoutingDNSResolver     = "ProxyRoutingDNSResolver"
+	TypeProxyRoutingOutbound        = "ProxyRoutingOutbound"
+	TypeProxyRoutingProfile         = "ProxyRoutingProfile"
+	TypeProxyRoutingRule            = "ProxyRoutingRule"
+	TypeProxyRoutingUnlockService   = "ProxyRoutingUnlockService"
 	TypeProxySchemaMigrations       = "ProxySchemaMigrations"
 	TypeProxyServer                 = "ProxyServer"
 	TypeProxyServerGroup            = "ProxyServerGroup"
@@ -12409,6 +12419,3935 @@ func (m *ProxyRedemptionRecordMutation) ResetEdge(name string) error {
 		return nil
 	}
 	return fmt.Errorf("unknown ProxyRedemptionRecord edge %s", name)
+}
+
+// ProxyRoutingDNSResolverMutation represents an operation that mutates the ProxyRoutingDNSResolver nodes in the graph.
+type ProxyRoutingDNSResolverMutation struct {
+	config
+	op            Op
+	typ           string
+	id            *int64
+	tag           *string
+	name          *string
+	proto         *string
+	address       *string
+	port          *int
+	addport       *int
+	enabled       *bool
+	resolver_json *string
+	created_at    *time.Time
+	updated_at    *time.Time
+	clearedFields map[string]struct{}
+	done          bool
+	oldValue      func(context.Context) (*ProxyRoutingDNSResolver, error)
+	predicates    []predicate.ProxyRoutingDNSResolver
+}
+
+var _ ent.Mutation = (*ProxyRoutingDNSResolverMutation)(nil)
+
+// proxyroutingdnsresolverOption allows management of the mutation configuration using functional options.
+type proxyroutingdnsresolverOption func(*ProxyRoutingDNSResolverMutation)
+
+// newProxyRoutingDNSResolverMutation creates new mutation for the ProxyRoutingDNSResolver entity.
+func newProxyRoutingDNSResolverMutation(c config, op Op, opts ...proxyroutingdnsresolverOption) *ProxyRoutingDNSResolverMutation {
+	m := &ProxyRoutingDNSResolverMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeProxyRoutingDNSResolver,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withProxyRoutingDNSResolverID sets the ID field of the mutation.
+func withProxyRoutingDNSResolverID(id int64) proxyroutingdnsresolverOption {
+	return func(m *ProxyRoutingDNSResolverMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *ProxyRoutingDNSResolver
+		)
+		m.oldValue = func(ctx context.Context) (*ProxyRoutingDNSResolver, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().ProxyRoutingDNSResolver.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withProxyRoutingDNSResolver sets the old ProxyRoutingDNSResolver of the mutation.
+func withProxyRoutingDNSResolver(node *ProxyRoutingDNSResolver) proxyroutingdnsresolverOption {
+	return func(m *ProxyRoutingDNSResolverMutation) {
+		m.oldValue = func(context.Context) (*ProxyRoutingDNSResolver, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m ProxyRoutingDNSResolverMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m ProxyRoutingDNSResolverMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of ProxyRoutingDNSResolver entities.
+func (m *ProxyRoutingDNSResolverMutation) SetID(id int64) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *ProxyRoutingDNSResolverMutation) ID() (id int64, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *ProxyRoutingDNSResolverMutation) IDs(ctx context.Context) ([]int64, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int64{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().ProxyRoutingDNSResolver.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetTag sets the "tag" field.
+func (m *ProxyRoutingDNSResolverMutation) SetTag(s string) {
+	m.tag = &s
+}
+
+// Tag returns the value of the "tag" field in the mutation.
+func (m *ProxyRoutingDNSResolverMutation) Tag() (r string, exists bool) {
+	v := m.tag
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTag returns the old "tag" field's value of the ProxyRoutingDNSResolver entity.
+// If the ProxyRoutingDNSResolver object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProxyRoutingDNSResolverMutation) OldTag(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTag is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTag requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTag: %w", err)
+	}
+	return oldValue.Tag, nil
+}
+
+// ResetTag resets all changes to the "tag" field.
+func (m *ProxyRoutingDNSResolverMutation) ResetTag() {
+	m.tag = nil
+}
+
+// SetName sets the "name" field.
+func (m *ProxyRoutingDNSResolverMutation) SetName(s string) {
+	m.name = &s
+}
+
+// Name returns the value of the "name" field in the mutation.
+func (m *ProxyRoutingDNSResolverMutation) Name() (r string, exists bool) {
+	v := m.name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldName returns the old "name" field's value of the ProxyRoutingDNSResolver entity.
+// If the ProxyRoutingDNSResolver object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProxyRoutingDNSResolverMutation) OldName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
+	}
+	return oldValue.Name, nil
+}
+
+// ResetName resets all changes to the "name" field.
+func (m *ProxyRoutingDNSResolverMutation) ResetName() {
+	m.name = nil
+}
+
+// SetProto sets the "proto" field.
+func (m *ProxyRoutingDNSResolverMutation) SetProto(s string) {
+	m.proto = &s
+}
+
+// Proto returns the value of the "proto" field in the mutation.
+func (m *ProxyRoutingDNSResolverMutation) Proto() (r string, exists bool) {
+	v := m.proto
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldProto returns the old "proto" field's value of the ProxyRoutingDNSResolver entity.
+// If the ProxyRoutingDNSResolver object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProxyRoutingDNSResolverMutation) OldProto(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldProto is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldProto requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldProto: %w", err)
+	}
+	return oldValue.Proto, nil
+}
+
+// ResetProto resets all changes to the "proto" field.
+func (m *ProxyRoutingDNSResolverMutation) ResetProto() {
+	m.proto = nil
+}
+
+// SetAddress sets the "address" field.
+func (m *ProxyRoutingDNSResolverMutation) SetAddress(s string) {
+	m.address = &s
+}
+
+// Address returns the value of the "address" field in the mutation.
+func (m *ProxyRoutingDNSResolverMutation) Address() (r string, exists bool) {
+	v := m.address
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAddress returns the old "address" field's value of the ProxyRoutingDNSResolver entity.
+// If the ProxyRoutingDNSResolver object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProxyRoutingDNSResolverMutation) OldAddress(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAddress is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAddress requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAddress: %w", err)
+	}
+	return oldValue.Address, nil
+}
+
+// ResetAddress resets all changes to the "address" field.
+func (m *ProxyRoutingDNSResolverMutation) ResetAddress() {
+	m.address = nil
+}
+
+// SetPort sets the "port" field.
+func (m *ProxyRoutingDNSResolverMutation) SetPort(i int) {
+	m.port = &i
+	m.addport = nil
+}
+
+// Port returns the value of the "port" field in the mutation.
+func (m *ProxyRoutingDNSResolverMutation) Port() (r int, exists bool) {
+	v := m.port
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPort returns the old "port" field's value of the ProxyRoutingDNSResolver entity.
+// If the ProxyRoutingDNSResolver object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProxyRoutingDNSResolverMutation) OldPort(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPort is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPort requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPort: %w", err)
+	}
+	return oldValue.Port, nil
+}
+
+// AddPort adds i to the "port" field.
+func (m *ProxyRoutingDNSResolverMutation) AddPort(i int) {
+	if m.addport != nil {
+		*m.addport += i
+	} else {
+		m.addport = &i
+	}
+}
+
+// AddedPort returns the value that was added to the "port" field in this mutation.
+func (m *ProxyRoutingDNSResolverMutation) AddedPort() (r int, exists bool) {
+	v := m.addport
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetPort resets all changes to the "port" field.
+func (m *ProxyRoutingDNSResolverMutation) ResetPort() {
+	m.port = nil
+	m.addport = nil
+}
+
+// SetEnabled sets the "enabled" field.
+func (m *ProxyRoutingDNSResolverMutation) SetEnabled(b bool) {
+	m.enabled = &b
+}
+
+// Enabled returns the value of the "enabled" field in the mutation.
+func (m *ProxyRoutingDNSResolverMutation) Enabled() (r bool, exists bool) {
+	v := m.enabled
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEnabled returns the old "enabled" field's value of the ProxyRoutingDNSResolver entity.
+// If the ProxyRoutingDNSResolver object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProxyRoutingDNSResolverMutation) OldEnabled(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEnabled is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEnabled requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEnabled: %w", err)
+	}
+	return oldValue.Enabled, nil
+}
+
+// ResetEnabled resets all changes to the "enabled" field.
+func (m *ProxyRoutingDNSResolverMutation) ResetEnabled() {
+	m.enabled = nil
+}
+
+// SetResolverJSON sets the "resolver_json" field.
+func (m *ProxyRoutingDNSResolverMutation) SetResolverJSON(s string) {
+	m.resolver_json = &s
+}
+
+// ResolverJSON returns the value of the "resolver_json" field in the mutation.
+func (m *ProxyRoutingDNSResolverMutation) ResolverJSON() (r string, exists bool) {
+	v := m.resolver_json
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldResolverJSON returns the old "resolver_json" field's value of the ProxyRoutingDNSResolver entity.
+// If the ProxyRoutingDNSResolver object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProxyRoutingDNSResolverMutation) OldResolverJSON(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldResolverJSON is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldResolverJSON requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldResolverJSON: %w", err)
+	}
+	return oldValue.ResolverJSON, nil
+}
+
+// ResetResolverJSON resets all changes to the "resolver_json" field.
+func (m *ProxyRoutingDNSResolverMutation) ResetResolverJSON() {
+	m.resolver_json = nil
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *ProxyRoutingDNSResolverMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *ProxyRoutingDNSResolverMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the ProxyRoutingDNSResolver entity.
+// If the ProxyRoutingDNSResolver object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProxyRoutingDNSResolverMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *ProxyRoutingDNSResolverMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *ProxyRoutingDNSResolverMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *ProxyRoutingDNSResolverMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the ProxyRoutingDNSResolver entity.
+// If the ProxyRoutingDNSResolver object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProxyRoutingDNSResolverMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *ProxyRoutingDNSResolverMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// Where appends a list predicates to the ProxyRoutingDNSResolverMutation builder.
+func (m *ProxyRoutingDNSResolverMutation) Where(ps ...predicate.ProxyRoutingDNSResolver) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the ProxyRoutingDNSResolverMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *ProxyRoutingDNSResolverMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.ProxyRoutingDNSResolver, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *ProxyRoutingDNSResolverMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *ProxyRoutingDNSResolverMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (ProxyRoutingDNSResolver).
+func (m *ProxyRoutingDNSResolverMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *ProxyRoutingDNSResolverMutation) Fields() []string {
+	fields := make([]string, 0, 9)
+	if m.tag != nil {
+		fields = append(fields, proxyroutingdnsresolver.FieldTag)
+	}
+	if m.name != nil {
+		fields = append(fields, proxyroutingdnsresolver.FieldName)
+	}
+	if m.proto != nil {
+		fields = append(fields, proxyroutingdnsresolver.FieldProto)
+	}
+	if m.address != nil {
+		fields = append(fields, proxyroutingdnsresolver.FieldAddress)
+	}
+	if m.port != nil {
+		fields = append(fields, proxyroutingdnsresolver.FieldPort)
+	}
+	if m.enabled != nil {
+		fields = append(fields, proxyroutingdnsresolver.FieldEnabled)
+	}
+	if m.resolver_json != nil {
+		fields = append(fields, proxyroutingdnsresolver.FieldResolverJSON)
+	}
+	if m.created_at != nil {
+		fields = append(fields, proxyroutingdnsresolver.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, proxyroutingdnsresolver.FieldUpdatedAt)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *ProxyRoutingDNSResolverMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case proxyroutingdnsresolver.FieldTag:
+		return m.Tag()
+	case proxyroutingdnsresolver.FieldName:
+		return m.Name()
+	case proxyroutingdnsresolver.FieldProto:
+		return m.Proto()
+	case proxyroutingdnsresolver.FieldAddress:
+		return m.Address()
+	case proxyroutingdnsresolver.FieldPort:
+		return m.Port()
+	case proxyroutingdnsresolver.FieldEnabled:
+		return m.Enabled()
+	case proxyroutingdnsresolver.FieldResolverJSON:
+		return m.ResolverJSON()
+	case proxyroutingdnsresolver.FieldCreatedAt:
+		return m.CreatedAt()
+	case proxyroutingdnsresolver.FieldUpdatedAt:
+		return m.UpdatedAt()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *ProxyRoutingDNSResolverMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case proxyroutingdnsresolver.FieldTag:
+		return m.OldTag(ctx)
+	case proxyroutingdnsresolver.FieldName:
+		return m.OldName(ctx)
+	case proxyroutingdnsresolver.FieldProto:
+		return m.OldProto(ctx)
+	case proxyroutingdnsresolver.FieldAddress:
+		return m.OldAddress(ctx)
+	case proxyroutingdnsresolver.FieldPort:
+		return m.OldPort(ctx)
+	case proxyroutingdnsresolver.FieldEnabled:
+		return m.OldEnabled(ctx)
+	case proxyroutingdnsresolver.FieldResolverJSON:
+		return m.OldResolverJSON(ctx)
+	case proxyroutingdnsresolver.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case proxyroutingdnsresolver.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	}
+	return nil, fmt.Errorf("unknown ProxyRoutingDNSResolver field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ProxyRoutingDNSResolverMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case proxyroutingdnsresolver.FieldTag:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTag(v)
+		return nil
+	case proxyroutingdnsresolver.FieldName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetName(v)
+		return nil
+	case proxyroutingdnsresolver.FieldProto:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetProto(v)
+		return nil
+	case proxyroutingdnsresolver.FieldAddress:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAddress(v)
+		return nil
+	case proxyroutingdnsresolver.FieldPort:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPort(v)
+		return nil
+	case proxyroutingdnsresolver.FieldEnabled:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEnabled(v)
+		return nil
+	case proxyroutingdnsresolver.FieldResolverJSON:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetResolverJSON(v)
+		return nil
+	case proxyroutingdnsresolver.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case proxyroutingdnsresolver.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	}
+	return fmt.Errorf("unknown ProxyRoutingDNSResolver field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *ProxyRoutingDNSResolverMutation) AddedFields() []string {
+	var fields []string
+	if m.addport != nil {
+		fields = append(fields, proxyroutingdnsresolver.FieldPort)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *ProxyRoutingDNSResolverMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case proxyroutingdnsresolver.FieldPort:
+		return m.AddedPort()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ProxyRoutingDNSResolverMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case proxyroutingdnsresolver.FieldPort:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddPort(v)
+		return nil
+	}
+	return fmt.Errorf("unknown ProxyRoutingDNSResolver numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *ProxyRoutingDNSResolverMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *ProxyRoutingDNSResolverMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *ProxyRoutingDNSResolverMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown ProxyRoutingDNSResolver nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *ProxyRoutingDNSResolverMutation) ResetField(name string) error {
+	switch name {
+	case proxyroutingdnsresolver.FieldTag:
+		m.ResetTag()
+		return nil
+	case proxyroutingdnsresolver.FieldName:
+		m.ResetName()
+		return nil
+	case proxyroutingdnsresolver.FieldProto:
+		m.ResetProto()
+		return nil
+	case proxyroutingdnsresolver.FieldAddress:
+		m.ResetAddress()
+		return nil
+	case proxyroutingdnsresolver.FieldPort:
+		m.ResetPort()
+		return nil
+	case proxyroutingdnsresolver.FieldEnabled:
+		m.ResetEnabled()
+		return nil
+	case proxyroutingdnsresolver.FieldResolverJSON:
+		m.ResetResolverJSON()
+		return nil
+	case proxyroutingdnsresolver.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case proxyroutingdnsresolver.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	}
+	return fmt.Errorf("unknown ProxyRoutingDNSResolver field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *ProxyRoutingDNSResolverMutation) AddedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *ProxyRoutingDNSResolverMutation) AddedIDs(name string) []ent.Value {
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *ProxyRoutingDNSResolverMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *ProxyRoutingDNSResolverMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *ProxyRoutingDNSResolverMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *ProxyRoutingDNSResolverMutation) EdgeCleared(name string) bool {
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *ProxyRoutingDNSResolverMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown ProxyRoutingDNSResolver unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *ProxyRoutingDNSResolverMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown ProxyRoutingDNSResolver edge %s", name)
+}
+
+// ProxyRoutingOutboundMutation represents an operation that mutates the ProxyRoutingOutbound nodes in the graph.
+type ProxyRoutingOutboundMutation struct {
+	config
+	op            Op
+	typ           string
+	id            *int64
+	tag           *string
+	name          *string
+	_type         *string
+	region        *string
+	enabled       *bool
+	outbound_json *string
+	created_at    *time.Time
+	updated_at    *time.Time
+	clearedFields map[string]struct{}
+	done          bool
+	oldValue      func(context.Context) (*ProxyRoutingOutbound, error)
+	predicates    []predicate.ProxyRoutingOutbound
+}
+
+var _ ent.Mutation = (*ProxyRoutingOutboundMutation)(nil)
+
+// proxyroutingoutboundOption allows management of the mutation configuration using functional options.
+type proxyroutingoutboundOption func(*ProxyRoutingOutboundMutation)
+
+// newProxyRoutingOutboundMutation creates new mutation for the ProxyRoutingOutbound entity.
+func newProxyRoutingOutboundMutation(c config, op Op, opts ...proxyroutingoutboundOption) *ProxyRoutingOutboundMutation {
+	m := &ProxyRoutingOutboundMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeProxyRoutingOutbound,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withProxyRoutingOutboundID sets the ID field of the mutation.
+func withProxyRoutingOutboundID(id int64) proxyroutingoutboundOption {
+	return func(m *ProxyRoutingOutboundMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *ProxyRoutingOutbound
+		)
+		m.oldValue = func(ctx context.Context) (*ProxyRoutingOutbound, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().ProxyRoutingOutbound.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withProxyRoutingOutbound sets the old ProxyRoutingOutbound of the mutation.
+func withProxyRoutingOutbound(node *ProxyRoutingOutbound) proxyroutingoutboundOption {
+	return func(m *ProxyRoutingOutboundMutation) {
+		m.oldValue = func(context.Context) (*ProxyRoutingOutbound, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m ProxyRoutingOutboundMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m ProxyRoutingOutboundMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of ProxyRoutingOutbound entities.
+func (m *ProxyRoutingOutboundMutation) SetID(id int64) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *ProxyRoutingOutboundMutation) ID() (id int64, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *ProxyRoutingOutboundMutation) IDs(ctx context.Context) ([]int64, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int64{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().ProxyRoutingOutbound.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetTag sets the "tag" field.
+func (m *ProxyRoutingOutboundMutation) SetTag(s string) {
+	m.tag = &s
+}
+
+// Tag returns the value of the "tag" field in the mutation.
+func (m *ProxyRoutingOutboundMutation) Tag() (r string, exists bool) {
+	v := m.tag
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTag returns the old "tag" field's value of the ProxyRoutingOutbound entity.
+// If the ProxyRoutingOutbound object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProxyRoutingOutboundMutation) OldTag(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTag is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTag requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTag: %w", err)
+	}
+	return oldValue.Tag, nil
+}
+
+// ResetTag resets all changes to the "tag" field.
+func (m *ProxyRoutingOutboundMutation) ResetTag() {
+	m.tag = nil
+}
+
+// SetName sets the "name" field.
+func (m *ProxyRoutingOutboundMutation) SetName(s string) {
+	m.name = &s
+}
+
+// Name returns the value of the "name" field in the mutation.
+func (m *ProxyRoutingOutboundMutation) Name() (r string, exists bool) {
+	v := m.name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldName returns the old "name" field's value of the ProxyRoutingOutbound entity.
+// If the ProxyRoutingOutbound object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProxyRoutingOutboundMutation) OldName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
+	}
+	return oldValue.Name, nil
+}
+
+// ResetName resets all changes to the "name" field.
+func (m *ProxyRoutingOutboundMutation) ResetName() {
+	m.name = nil
+}
+
+// SetType sets the "type" field.
+func (m *ProxyRoutingOutboundMutation) SetType(s string) {
+	m._type = &s
+}
+
+// GetType returns the value of the "type" field in the mutation.
+func (m *ProxyRoutingOutboundMutation) GetType() (r string, exists bool) {
+	v := m._type
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldType returns the old "type" field's value of the ProxyRoutingOutbound entity.
+// If the ProxyRoutingOutbound object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProxyRoutingOutboundMutation) OldType(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldType is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldType requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldType: %w", err)
+	}
+	return oldValue.Type, nil
+}
+
+// ResetType resets all changes to the "type" field.
+func (m *ProxyRoutingOutboundMutation) ResetType() {
+	m._type = nil
+}
+
+// SetRegion sets the "region" field.
+func (m *ProxyRoutingOutboundMutation) SetRegion(s string) {
+	m.region = &s
+}
+
+// Region returns the value of the "region" field in the mutation.
+func (m *ProxyRoutingOutboundMutation) Region() (r string, exists bool) {
+	v := m.region
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRegion returns the old "region" field's value of the ProxyRoutingOutbound entity.
+// If the ProxyRoutingOutbound object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProxyRoutingOutboundMutation) OldRegion(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRegion is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRegion requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRegion: %w", err)
+	}
+	return oldValue.Region, nil
+}
+
+// ResetRegion resets all changes to the "region" field.
+func (m *ProxyRoutingOutboundMutation) ResetRegion() {
+	m.region = nil
+}
+
+// SetEnabled sets the "enabled" field.
+func (m *ProxyRoutingOutboundMutation) SetEnabled(b bool) {
+	m.enabled = &b
+}
+
+// Enabled returns the value of the "enabled" field in the mutation.
+func (m *ProxyRoutingOutboundMutation) Enabled() (r bool, exists bool) {
+	v := m.enabled
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEnabled returns the old "enabled" field's value of the ProxyRoutingOutbound entity.
+// If the ProxyRoutingOutbound object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProxyRoutingOutboundMutation) OldEnabled(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEnabled is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEnabled requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEnabled: %w", err)
+	}
+	return oldValue.Enabled, nil
+}
+
+// ResetEnabled resets all changes to the "enabled" field.
+func (m *ProxyRoutingOutboundMutation) ResetEnabled() {
+	m.enabled = nil
+}
+
+// SetOutboundJSON sets the "outbound_json" field.
+func (m *ProxyRoutingOutboundMutation) SetOutboundJSON(s string) {
+	m.outbound_json = &s
+}
+
+// OutboundJSON returns the value of the "outbound_json" field in the mutation.
+func (m *ProxyRoutingOutboundMutation) OutboundJSON() (r string, exists bool) {
+	v := m.outbound_json
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldOutboundJSON returns the old "outbound_json" field's value of the ProxyRoutingOutbound entity.
+// If the ProxyRoutingOutbound object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProxyRoutingOutboundMutation) OldOutboundJSON(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldOutboundJSON is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldOutboundJSON requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldOutboundJSON: %w", err)
+	}
+	return oldValue.OutboundJSON, nil
+}
+
+// ResetOutboundJSON resets all changes to the "outbound_json" field.
+func (m *ProxyRoutingOutboundMutation) ResetOutboundJSON() {
+	m.outbound_json = nil
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *ProxyRoutingOutboundMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *ProxyRoutingOutboundMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the ProxyRoutingOutbound entity.
+// If the ProxyRoutingOutbound object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProxyRoutingOutboundMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *ProxyRoutingOutboundMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *ProxyRoutingOutboundMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *ProxyRoutingOutboundMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the ProxyRoutingOutbound entity.
+// If the ProxyRoutingOutbound object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProxyRoutingOutboundMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *ProxyRoutingOutboundMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// Where appends a list predicates to the ProxyRoutingOutboundMutation builder.
+func (m *ProxyRoutingOutboundMutation) Where(ps ...predicate.ProxyRoutingOutbound) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the ProxyRoutingOutboundMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *ProxyRoutingOutboundMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.ProxyRoutingOutbound, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *ProxyRoutingOutboundMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *ProxyRoutingOutboundMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (ProxyRoutingOutbound).
+func (m *ProxyRoutingOutboundMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *ProxyRoutingOutboundMutation) Fields() []string {
+	fields := make([]string, 0, 8)
+	if m.tag != nil {
+		fields = append(fields, proxyroutingoutbound.FieldTag)
+	}
+	if m.name != nil {
+		fields = append(fields, proxyroutingoutbound.FieldName)
+	}
+	if m._type != nil {
+		fields = append(fields, proxyroutingoutbound.FieldType)
+	}
+	if m.region != nil {
+		fields = append(fields, proxyroutingoutbound.FieldRegion)
+	}
+	if m.enabled != nil {
+		fields = append(fields, proxyroutingoutbound.FieldEnabled)
+	}
+	if m.outbound_json != nil {
+		fields = append(fields, proxyroutingoutbound.FieldOutboundJSON)
+	}
+	if m.created_at != nil {
+		fields = append(fields, proxyroutingoutbound.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, proxyroutingoutbound.FieldUpdatedAt)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *ProxyRoutingOutboundMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case proxyroutingoutbound.FieldTag:
+		return m.Tag()
+	case proxyroutingoutbound.FieldName:
+		return m.Name()
+	case proxyroutingoutbound.FieldType:
+		return m.GetType()
+	case proxyroutingoutbound.FieldRegion:
+		return m.Region()
+	case proxyroutingoutbound.FieldEnabled:
+		return m.Enabled()
+	case proxyroutingoutbound.FieldOutboundJSON:
+		return m.OutboundJSON()
+	case proxyroutingoutbound.FieldCreatedAt:
+		return m.CreatedAt()
+	case proxyroutingoutbound.FieldUpdatedAt:
+		return m.UpdatedAt()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *ProxyRoutingOutboundMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case proxyroutingoutbound.FieldTag:
+		return m.OldTag(ctx)
+	case proxyroutingoutbound.FieldName:
+		return m.OldName(ctx)
+	case proxyroutingoutbound.FieldType:
+		return m.OldType(ctx)
+	case proxyroutingoutbound.FieldRegion:
+		return m.OldRegion(ctx)
+	case proxyroutingoutbound.FieldEnabled:
+		return m.OldEnabled(ctx)
+	case proxyroutingoutbound.FieldOutboundJSON:
+		return m.OldOutboundJSON(ctx)
+	case proxyroutingoutbound.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case proxyroutingoutbound.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	}
+	return nil, fmt.Errorf("unknown ProxyRoutingOutbound field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ProxyRoutingOutboundMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case proxyroutingoutbound.FieldTag:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTag(v)
+		return nil
+	case proxyroutingoutbound.FieldName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetName(v)
+		return nil
+	case proxyroutingoutbound.FieldType:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetType(v)
+		return nil
+	case proxyroutingoutbound.FieldRegion:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRegion(v)
+		return nil
+	case proxyroutingoutbound.FieldEnabled:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEnabled(v)
+		return nil
+	case proxyroutingoutbound.FieldOutboundJSON:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetOutboundJSON(v)
+		return nil
+	case proxyroutingoutbound.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case proxyroutingoutbound.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	}
+	return fmt.Errorf("unknown ProxyRoutingOutbound field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *ProxyRoutingOutboundMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *ProxyRoutingOutboundMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ProxyRoutingOutboundMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown ProxyRoutingOutbound numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *ProxyRoutingOutboundMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *ProxyRoutingOutboundMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *ProxyRoutingOutboundMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown ProxyRoutingOutbound nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *ProxyRoutingOutboundMutation) ResetField(name string) error {
+	switch name {
+	case proxyroutingoutbound.FieldTag:
+		m.ResetTag()
+		return nil
+	case proxyroutingoutbound.FieldName:
+		m.ResetName()
+		return nil
+	case proxyroutingoutbound.FieldType:
+		m.ResetType()
+		return nil
+	case proxyroutingoutbound.FieldRegion:
+		m.ResetRegion()
+		return nil
+	case proxyroutingoutbound.FieldEnabled:
+		m.ResetEnabled()
+		return nil
+	case proxyroutingoutbound.FieldOutboundJSON:
+		m.ResetOutboundJSON()
+		return nil
+	case proxyroutingoutbound.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case proxyroutingoutbound.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	}
+	return fmt.Errorf("unknown ProxyRoutingOutbound field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *ProxyRoutingOutboundMutation) AddedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *ProxyRoutingOutboundMutation) AddedIDs(name string) []ent.Value {
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *ProxyRoutingOutboundMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *ProxyRoutingOutboundMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *ProxyRoutingOutboundMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *ProxyRoutingOutboundMutation) EdgeCleared(name string) bool {
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *ProxyRoutingOutboundMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown ProxyRoutingOutbound unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *ProxyRoutingOutboundMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown ProxyRoutingOutbound edge %s", name)
+}
+
+// ProxyRoutingProfileMutation represents an operation that mutates the ProxyRoutingProfile nodes in the graph.
+type ProxyRoutingProfileMutation struct {
+	config
+	op            Op
+	typ           string
+	id            *int64
+	code          *string
+	name          *string
+	description   *string
+	scope_type    *string
+	scope_id      *string
+	priority      *int
+	addpriority   *int
+	mode          *string
+	enabled       *bool
+	profile_json  *string
+	created_at    *time.Time
+	updated_at    *time.Time
+	clearedFields map[string]struct{}
+	done          bool
+	oldValue      func(context.Context) (*ProxyRoutingProfile, error)
+	predicates    []predicate.ProxyRoutingProfile
+}
+
+var _ ent.Mutation = (*ProxyRoutingProfileMutation)(nil)
+
+// proxyroutingprofileOption allows management of the mutation configuration using functional options.
+type proxyroutingprofileOption func(*ProxyRoutingProfileMutation)
+
+// newProxyRoutingProfileMutation creates new mutation for the ProxyRoutingProfile entity.
+func newProxyRoutingProfileMutation(c config, op Op, opts ...proxyroutingprofileOption) *ProxyRoutingProfileMutation {
+	m := &ProxyRoutingProfileMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeProxyRoutingProfile,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withProxyRoutingProfileID sets the ID field of the mutation.
+func withProxyRoutingProfileID(id int64) proxyroutingprofileOption {
+	return func(m *ProxyRoutingProfileMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *ProxyRoutingProfile
+		)
+		m.oldValue = func(ctx context.Context) (*ProxyRoutingProfile, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().ProxyRoutingProfile.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withProxyRoutingProfile sets the old ProxyRoutingProfile of the mutation.
+func withProxyRoutingProfile(node *ProxyRoutingProfile) proxyroutingprofileOption {
+	return func(m *ProxyRoutingProfileMutation) {
+		m.oldValue = func(context.Context) (*ProxyRoutingProfile, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m ProxyRoutingProfileMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m ProxyRoutingProfileMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of ProxyRoutingProfile entities.
+func (m *ProxyRoutingProfileMutation) SetID(id int64) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *ProxyRoutingProfileMutation) ID() (id int64, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *ProxyRoutingProfileMutation) IDs(ctx context.Context) ([]int64, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int64{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().ProxyRoutingProfile.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCode sets the "code" field.
+func (m *ProxyRoutingProfileMutation) SetCode(s string) {
+	m.code = &s
+}
+
+// Code returns the value of the "code" field in the mutation.
+func (m *ProxyRoutingProfileMutation) Code() (r string, exists bool) {
+	v := m.code
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCode returns the old "code" field's value of the ProxyRoutingProfile entity.
+// If the ProxyRoutingProfile object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProxyRoutingProfileMutation) OldCode(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCode is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCode requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCode: %w", err)
+	}
+	return oldValue.Code, nil
+}
+
+// ResetCode resets all changes to the "code" field.
+func (m *ProxyRoutingProfileMutation) ResetCode() {
+	m.code = nil
+}
+
+// SetName sets the "name" field.
+func (m *ProxyRoutingProfileMutation) SetName(s string) {
+	m.name = &s
+}
+
+// Name returns the value of the "name" field in the mutation.
+func (m *ProxyRoutingProfileMutation) Name() (r string, exists bool) {
+	v := m.name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldName returns the old "name" field's value of the ProxyRoutingProfile entity.
+// If the ProxyRoutingProfile object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProxyRoutingProfileMutation) OldName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
+	}
+	return oldValue.Name, nil
+}
+
+// ResetName resets all changes to the "name" field.
+func (m *ProxyRoutingProfileMutation) ResetName() {
+	m.name = nil
+}
+
+// SetDescription sets the "description" field.
+func (m *ProxyRoutingProfileMutation) SetDescription(s string) {
+	m.description = &s
+}
+
+// Description returns the value of the "description" field in the mutation.
+func (m *ProxyRoutingProfileMutation) Description() (r string, exists bool) {
+	v := m.description
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDescription returns the old "description" field's value of the ProxyRoutingProfile entity.
+// If the ProxyRoutingProfile object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProxyRoutingProfileMutation) OldDescription(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDescription is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDescription requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDescription: %w", err)
+	}
+	return oldValue.Description, nil
+}
+
+// ClearDescription clears the value of the "description" field.
+func (m *ProxyRoutingProfileMutation) ClearDescription() {
+	m.description = nil
+	m.clearedFields[proxyroutingprofile.FieldDescription] = struct{}{}
+}
+
+// DescriptionCleared returns if the "description" field was cleared in this mutation.
+func (m *ProxyRoutingProfileMutation) DescriptionCleared() bool {
+	_, ok := m.clearedFields[proxyroutingprofile.FieldDescription]
+	return ok
+}
+
+// ResetDescription resets all changes to the "description" field.
+func (m *ProxyRoutingProfileMutation) ResetDescription() {
+	m.description = nil
+	delete(m.clearedFields, proxyroutingprofile.FieldDescription)
+}
+
+// SetScopeType sets the "scope_type" field.
+func (m *ProxyRoutingProfileMutation) SetScopeType(s string) {
+	m.scope_type = &s
+}
+
+// ScopeType returns the value of the "scope_type" field in the mutation.
+func (m *ProxyRoutingProfileMutation) ScopeType() (r string, exists bool) {
+	v := m.scope_type
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldScopeType returns the old "scope_type" field's value of the ProxyRoutingProfile entity.
+// If the ProxyRoutingProfile object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProxyRoutingProfileMutation) OldScopeType(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldScopeType is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldScopeType requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldScopeType: %w", err)
+	}
+	return oldValue.ScopeType, nil
+}
+
+// ResetScopeType resets all changes to the "scope_type" field.
+func (m *ProxyRoutingProfileMutation) ResetScopeType() {
+	m.scope_type = nil
+}
+
+// SetScopeID sets the "scope_id" field.
+func (m *ProxyRoutingProfileMutation) SetScopeID(s string) {
+	m.scope_id = &s
+}
+
+// ScopeID returns the value of the "scope_id" field in the mutation.
+func (m *ProxyRoutingProfileMutation) ScopeID() (r string, exists bool) {
+	v := m.scope_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldScopeID returns the old "scope_id" field's value of the ProxyRoutingProfile entity.
+// If the ProxyRoutingProfile object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProxyRoutingProfileMutation) OldScopeID(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldScopeID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldScopeID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldScopeID: %w", err)
+	}
+	return oldValue.ScopeID, nil
+}
+
+// ResetScopeID resets all changes to the "scope_id" field.
+func (m *ProxyRoutingProfileMutation) ResetScopeID() {
+	m.scope_id = nil
+}
+
+// SetPriority sets the "priority" field.
+func (m *ProxyRoutingProfileMutation) SetPriority(i int) {
+	m.priority = &i
+	m.addpriority = nil
+}
+
+// Priority returns the value of the "priority" field in the mutation.
+func (m *ProxyRoutingProfileMutation) Priority() (r int, exists bool) {
+	v := m.priority
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPriority returns the old "priority" field's value of the ProxyRoutingProfile entity.
+// If the ProxyRoutingProfile object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProxyRoutingProfileMutation) OldPriority(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPriority is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPriority requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPriority: %w", err)
+	}
+	return oldValue.Priority, nil
+}
+
+// AddPriority adds i to the "priority" field.
+func (m *ProxyRoutingProfileMutation) AddPriority(i int) {
+	if m.addpriority != nil {
+		*m.addpriority += i
+	} else {
+		m.addpriority = &i
+	}
+}
+
+// AddedPriority returns the value that was added to the "priority" field in this mutation.
+func (m *ProxyRoutingProfileMutation) AddedPriority() (r int, exists bool) {
+	v := m.addpriority
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetPriority resets all changes to the "priority" field.
+func (m *ProxyRoutingProfileMutation) ResetPriority() {
+	m.priority = nil
+	m.addpriority = nil
+}
+
+// SetMode sets the "mode" field.
+func (m *ProxyRoutingProfileMutation) SetMode(s string) {
+	m.mode = &s
+}
+
+// Mode returns the value of the "mode" field in the mutation.
+func (m *ProxyRoutingProfileMutation) Mode() (r string, exists bool) {
+	v := m.mode
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMode returns the old "mode" field's value of the ProxyRoutingProfile entity.
+// If the ProxyRoutingProfile object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProxyRoutingProfileMutation) OldMode(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldMode is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldMode requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMode: %w", err)
+	}
+	return oldValue.Mode, nil
+}
+
+// ResetMode resets all changes to the "mode" field.
+func (m *ProxyRoutingProfileMutation) ResetMode() {
+	m.mode = nil
+}
+
+// SetEnabled sets the "enabled" field.
+func (m *ProxyRoutingProfileMutation) SetEnabled(b bool) {
+	m.enabled = &b
+}
+
+// Enabled returns the value of the "enabled" field in the mutation.
+func (m *ProxyRoutingProfileMutation) Enabled() (r bool, exists bool) {
+	v := m.enabled
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEnabled returns the old "enabled" field's value of the ProxyRoutingProfile entity.
+// If the ProxyRoutingProfile object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProxyRoutingProfileMutation) OldEnabled(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEnabled is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEnabled requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEnabled: %w", err)
+	}
+	return oldValue.Enabled, nil
+}
+
+// ResetEnabled resets all changes to the "enabled" field.
+func (m *ProxyRoutingProfileMutation) ResetEnabled() {
+	m.enabled = nil
+}
+
+// SetProfileJSON sets the "profile_json" field.
+func (m *ProxyRoutingProfileMutation) SetProfileJSON(s string) {
+	m.profile_json = &s
+}
+
+// ProfileJSON returns the value of the "profile_json" field in the mutation.
+func (m *ProxyRoutingProfileMutation) ProfileJSON() (r string, exists bool) {
+	v := m.profile_json
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldProfileJSON returns the old "profile_json" field's value of the ProxyRoutingProfile entity.
+// If the ProxyRoutingProfile object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProxyRoutingProfileMutation) OldProfileJSON(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldProfileJSON is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldProfileJSON requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldProfileJSON: %w", err)
+	}
+	return oldValue.ProfileJSON, nil
+}
+
+// ResetProfileJSON resets all changes to the "profile_json" field.
+func (m *ProxyRoutingProfileMutation) ResetProfileJSON() {
+	m.profile_json = nil
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *ProxyRoutingProfileMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *ProxyRoutingProfileMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the ProxyRoutingProfile entity.
+// If the ProxyRoutingProfile object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProxyRoutingProfileMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *ProxyRoutingProfileMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *ProxyRoutingProfileMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *ProxyRoutingProfileMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the ProxyRoutingProfile entity.
+// If the ProxyRoutingProfile object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProxyRoutingProfileMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *ProxyRoutingProfileMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// Where appends a list predicates to the ProxyRoutingProfileMutation builder.
+func (m *ProxyRoutingProfileMutation) Where(ps ...predicate.ProxyRoutingProfile) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the ProxyRoutingProfileMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *ProxyRoutingProfileMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.ProxyRoutingProfile, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *ProxyRoutingProfileMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *ProxyRoutingProfileMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (ProxyRoutingProfile).
+func (m *ProxyRoutingProfileMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *ProxyRoutingProfileMutation) Fields() []string {
+	fields := make([]string, 0, 11)
+	if m.code != nil {
+		fields = append(fields, proxyroutingprofile.FieldCode)
+	}
+	if m.name != nil {
+		fields = append(fields, proxyroutingprofile.FieldName)
+	}
+	if m.description != nil {
+		fields = append(fields, proxyroutingprofile.FieldDescription)
+	}
+	if m.scope_type != nil {
+		fields = append(fields, proxyroutingprofile.FieldScopeType)
+	}
+	if m.scope_id != nil {
+		fields = append(fields, proxyroutingprofile.FieldScopeID)
+	}
+	if m.priority != nil {
+		fields = append(fields, proxyroutingprofile.FieldPriority)
+	}
+	if m.mode != nil {
+		fields = append(fields, proxyroutingprofile.FieldMode)
+	}
+	if m.enabled != nil {
+		fields = append(fields, proxyroutingprofile.FieldEnabled)
+	}
+	if m.profile_json != nil {
+		fields = append(fields, proxyroutingprofile.FieldProfileJSON)
+	}
+	if m.created_at != nil {
+		fields = append(fields, proxyroutingprofile.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, proxyroutingprofile.FieldUpdatedAt)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *ProxyRoutingProfileMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case proxyroutingprofile.FieldCode:
+		return m.Code()
+	case proxyroutingprofile.FieldName:
+		return m.Name()
+	case proxyroutingprofile.FieldDescription:
+		return m.Description()
+	case proxyroutingprofile.FieldScopeType:
+		return m.ScopeType()
+	case proxyroutingprofile.FieldScopeID:
+		return m.ScopeID()
+	case proxyroutingprofile.FieldPriority:
+		return m.Priority()
+	case proxyroutingprofile.FieldMode:
+		return m.Mode()
+	case proxyroutingprofile.FieldEnabled:
+		return m.Enabled()
+	case proxyroutingprofile.FieldProfileJSON:
+		return m.ProfileJSON()
+	case proxyroutingprofile.FieldCreatedAt:
+		return m.CreatedAt()
+	case proxyroutingprofile.FieldUpdatedAt:
+		return m.UpdatedAt()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *ProxyRoutingProfileMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case proxyroutingprofile.FieldCode:
+		return m.OldCode(ctx)
+	case proxyroutingprofile.FieldName:
+		return m.OldName(ctx)
+	case proxyroutingprofile.FieldDescription:
+		return m.OldDescription(ctx)
+	case proxyroutingprofile.FieldScopeType:
+		return m.OldScopeType(ctx)
+	case proxyroutingprofile.FieldScopeID:
+		return m.OldScopeID(ctx)
+	case proxyroutingprofile.FieldPriority:
+		return m.OldPriority(ctx)
+	case proxyroutingprofile.FieldMode:
+		return m.OldMode(ctx)
+	case proxyroutingprofile.FieldEnabled:
+		return m.OldEnabled(ctx)
+	case proxyroutingprofile.FieldProfileJSON:
+		return m.OldProfileJSON(ctx)
+	case proxyroutingprofile.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case proxyroutingprofile.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	}
+	return nil, fmt.Errorf("unknown ProxyRoutingProfile field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ProxyRoutingProfileMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case proxyroutingprofile.FieldCode:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCode(v)
+		return nil
+	case proxyroutingprofile.FieldName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetName(v)
+		return nil
+	case proxyroutingprofile.FieldDescription:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDescription(v)
+		return nil
+	case proxyroutingprofile.FieldScopeType:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetScopeType(v)
+		return nil
+	case proxyroutingprofile.FieldScopeID:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetScopeID(v)
+		return nil
+	case proxyroutingprofile.FieldPriority:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPriority(v)
+		return nil
+	case proxyroutingprofile.FieldMode:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMode(v)
+		return nil
+	case proxyroutingprofile.FieldEnabled:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEnabled(v)
+		return nil
+	case proxyroutingprofile.FieldProfileJSON:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetProfileJSON(v)
+		return nil
+	case proxyroutingprofile.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case proxyroutingprofile.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	}
+	return fmt.Errorf("unknown ProxyRoutingProfile field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *ProxyRoutingProfileMutation) AddedFields() []string {
+	var fields []string
+	if m.addpriority != nil {
+		fields = append(fields, proxyroutingprofile.FieldPriority)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *ProxyRoutingProfileMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case proxyroutingprofile.FieldPriority:
+		return m.AddedPriority()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ProxyRoutingProfileMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case proxyroutingprofile.FieldPriority:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddPriority(v)
+		return nil
+	}
+	return fmt.Errorf("unknown ProxyRoutingProfile numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *ProxyRoutingProfileMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(proxyroutingprofile.FieldDescription) {
+		fields = append(fields, proxyroutingprofile.FieldDescription)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *ProxyRoutingProfileMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *ProxyRoutingProfileMutation) ClearField(name string) error {
+	switch name {
+	case proxyroutingprofile.FieldDescription:
+		m.ClearDescription()
+		return nil
+	}
+	return fmt.Errorf("unknown ProxyRoutingProfile nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *ProxyRoutingProfileMutation) ResetField(name string) error {
+	switch name {
+	case proxyroutingprofile.FieldCode:
+		m.ResetCode()
+		return nil
+	case proxyroutingprofile.FieldName:
+		m.ResetName()
+		return nil
+	case proxyroutingprofile.FieldDescription:
+		m.ResetDescription()
+		return nil
+	case proxyroutingprofile.FieldScopeType:
+		m.ResetScopeType()
+		return nil
+	case proxyroutingprofile.FieldScopeID:
+		m.ResetScopeID()
+		return nil
+	case proxyroutingprofile.FieldPriority:
+		m.ResetPriority()
+		return nil
+	case proxyroutingprofile.FieldMode:
+		m.ResetMode()
+		return nil
+	case proxyroutingprofile.FieldEnabled:
+		m.ResetEnabled()
+		return nil
+	case proxyroutingprofile.FieldProfileJSON:
+		m.ResetProfileJSON()
+		return nil
+	case proxyroutingprofile.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case proxyroutingprofile.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	}
+	return fmt.Errorf("unknown ProxyRoutingProfile field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *ProxyRoutingProfileMutation) AddedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *ProxyRoutingProfileMutation) AddedIDs(name string) []ent.Value {
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *ProxyRoutingProfileMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *ProxyRoutingProfileMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *ProxyRoutingProfileMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *ProxyRoutingProfileMutation) EdgeCleared(name string) bool {
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *ProxyRoutingProfileMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown ProxyRoutingProfile unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *ProxyRoutingProfileMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown ProxyRoutingProfile edge %s", name)
+}
+
+// ProxyRoutingRuleMutation represents an operation that mutates the ProxyRoutingRule nodes in the graph.
+type ProxyRoutingRuleMutation struct {
+	config
+	op            Op
+	typ           string
+	id            *int64
+	profile_id    *int64
+	addprofile_id *int64
+	name          *string
+	priority      *int
+	addpriority   *int
+	enabled       *bool
+	service_code  *string
+	matcher_json  *string
+	action_json   *string
+	created_at    *time.Time
+	updated_at    *time.Time
+	clearedFields map[string]struct{}
+	done          bool
+	oldValue      func(context.Context) (*ProxyRoutingRule, error)
+	predicates    []predicate.ProxyRoutingRule
+}
+
+var _ ent.Mutation = (*ProxyRoutingRuleMutation)(nil)
+
+// proxyroutingruleOption allows management of the mutation configuration using functional options.
+type proxyroutingruleOption func(*ProxyRoutingRuleMutation)
+
+// newProxyRoutingRuleMutation creates new mutation for the ProxyRoutingRule entity.
+func newProxyRoutingRuleMutation(c config, op Op, opts ...proxyroutingruleOption) *ProxyRoutingRuleMutation {
+	m := &ProxyRoutingRuleMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeProxyRoutingRule,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withProxyRoutingRuleID sets the ID field of the mutation.
+func withProxyRoutingRuleID(id int64) proxyroutingruleOption {
+	return func(m *ProxyRoutingRuleMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *ProxyRoutingRule
+		)
+		m.oldValue = func(ctx context.Context) (*ProxyRoutingRule, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().ProxyRoutingRule.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withProxyRoutingRule sets the old ProxyRoutingRule of the mutation.
+func withProxyRoutingRule(node *ProxyRoutingRule) proxyroutingruleOption {
+	return func(m *ProxyRoutingRuleMutation) {
+		m.oldValue = func(context.Context) (*ProxyRoutingRule, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m ProxyRoutingRuleMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m ProxyRoutingRuleMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of ProxyRoutingRule entities.
+func (m *ProxyRoutingRuleMutation) SetID(id int64) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *ProxyRoutingRuleMutation) ID() (id int64, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *ProxyRoutingRuleMutation) IDs(ctx context.Context) ([]int64, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int64{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().ProxyRoutingRule.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetProfileID sets the "profile_id" field.
+func (m *ProxyRoutingRuleMutation) SetProfileID(i int64) {
+	m.profile_id = &i
+	m.addprofile_id = nil
+}
+
+// ProfileID returns the value of the "profile_id" field in the mutation.
+func (m *ProxyRoutingRuleMutation) ProfileID() (r int64, exists bool) {
+	v := m.profile_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldProfileID returns the old "profile_id" field's value of the ProxyRoutingRule entity.
+// If the ProxyRoutingRule object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProxyRoutingRuleMutation) OldProfileID(ctx context.Context) (v int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldProfileID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldProfileID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldProfileID: %w", err)
+	}
+	return oldValue.ProfileID, nil
+}
+
+// AddProfileID adds i to the "profile_id" field.
+func (m *ProxyRoutingRuleMutation) AddProfileID(i int64) {
+	if m.addprofile_id != nil {
+		*m.addprofile_id += i
+	} else {
+		m.addprofile_id = &i
+	}
+}
+
+// AddedProfileID returns the value that was added to the "profile_id" field in this mutation.
+func (m *ProxyRoutingRuleMutation) AddedProfileID() (r int64, exists bool) {
+	v := m.addprofile_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetProfileID resets all changes to the "profile_id" field.
+func (m *ProxyRoutingRuleMutation) ResetProfileID() {
+	m.profile_id = nil
+	m.addprofile_id = nil
+}
+
+// SetName sets the "name" field.
+func (m *ProxyRoutingRuleMutation) SetName(s string) {
+	m.name = &s
+}
+
+// Name returns the value of the "name" field in the mutation.
+func (m *ProxyRoutingRuleMutation) Name() (r string, exists bool) {
+	v := m.name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldName returns the old "name" field's value of the ProxyRoutingRule entity.
+// If the ProxyRoutingRule object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProxyRoutingRuleMutation) OldName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
+	}
+	return oldValue.Name, nil
+}
+
+// ResetName resets all changes to the "name" field.
+func (m *ProxyRoutingRuleMutation) ResetName() {
+	m.name = nil
+}
+
+// SetPriority sets the "priority" field.
+func (m *ProxyRoutingRuleMutation) SetPriority(i int) {
+	m.priority = &i
+	m.addpriority = nil
+}
+
+// Priority returns the value of the "priority" field in the mutation.
+func (m *ProxyRoutingRuleMutation) Priority() (r int, exists bool) {
+	v := m.priority
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPriority returns the old "priority" field's value of the ProxyRoutingRule entity.
+// If the ProxyRoutingRule object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProxyRoutingRuleMutation) OldPriority(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPriority is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPriority requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPriority: %w", err)
+	}
+	return oldValue.Priority, nil
+}
+
+// AddPriority adds i to the "priority" field.
+func (m *ProxyRoutingRuleMutation) AddPriority(i int) {
+	if m.addpriority != nil {
+		*m.addpriority += i
+	} else {
+		m.addpriority = &i
+	}
+}
+
+// AddedPriority returns the value that was added to the "priority" field in this mutation.
+func (m *ProxyRoutingRuleMutation) AddedPriority() (r int, exists bool) {
+	v := m.addpriority
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetPriority resets all changes to the "priority" field.
+func (m *ProxyRoutingRuleMutation) ResetPriority() {
+	m.priority = nil
+	m.addpriority = nil
+}
+
+// SetEnabled sets the "enabled" field.
+func (m *ProxyRoutingRuleMutation) SetEnabled(b bool) {
+	m.enabled = &b
+}
+
+// Enabled returns the value of the "enabled" field in the mutation.
+func (m *ProxyRoutingRuleMutation) Enabled() (r bool, exists bool) {
+	v := m.enabled
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEnabled returns the old "enabled" field's value of the ProxyRoutingRule entity.
+// If the ProxyRoutingRule object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProxyRoutingRuleMutation) OldEnabled(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEnabled is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEnabled requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEnabled: %w", err)
+	}
+	return oldValue.Enabled, nil
+}
+
+// ResetEnabled resets all changes to the "enabled" field.
+func (m *ProxyRoutingRuleMutation) ResetEnabled() {
+	m.enabled = nil
+}
+
+// SetServiceCode sets the "service_code" field.
+func (m *ProxyRoutingRuleMutation) SetServiceCode(s string) {
+	m.service_code = &s
+}
+
+// ServiceCode returns the value of the "service_code" field in the mutation.
+func (m *ProxyRoutingRuleMutation) ServiceCode() (r string, exists bool) {
+	v := m.service_code
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldServiceCode returns the old "service_code" field's value of the ProxyRoutingRule entity.
+// If the ProxyRoutingRule object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProxyRoutingRuleMutation) OldServiceCode(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldServiceCode is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldServiceCode requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldServiceCode: %w", err)
+	}
+	return oldValue.ServiceCode, nil
+}
+
+// ResetServiceCode resets all changes to the "service_code" field.
+func (m *ProxyRoutingRuleMutation) ResetServiceCode() {
+	m.service_code = nil
+}
+
+// SetMatcherJSON sets the "matcher_json" field.
+func (m *ProxyRoutingRuleMutation) SetMatcherJSON(s string) {
+	m.matcher_json = &s
+}
+
+// MatcherJSON returns the value of the "matcher_json" field in the mutation.
+func (m *ProxyRoutingRuleMutation) MatcherJSON() (r string, exists bool) {
+	v := m.matcher_json
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMatcherJSON returns the old "matcher_json" field's value of the ProxyRoutingRule entity.
+// If the ProxyRoutingRule object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProxyRoutingRuleMutation) OldMatcherJSON(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldMatcherJSON is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldMatcherJSON requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMatcherJSON: %w", err)
+	}
+	return oldValue.MatcherJSON, nil
+}
+
+// ResetMatcherJSON resets all changes to the "matcher_json" field.
+func (m *ProxyRoutingRuleMutation) ResetMatcherJSON() {
+	m.matcher_json = nil
+}
+
+// SetActionJSON sets the "action_json" field.
+func (m *ProxyRoutingRuleMutation) SetActionJSON(s string) {
+	m.action_json = &s
+}
+
+// ActionJSON returns the value of the "action_json" field in the mutation.
+func (m *ProxyRoutingRuleMutation) ActionJSON() (r string, exists bool) {
+	v := m.action_json
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldActionJSON returns the old "action_json" field's value of the ProxyRoutingRule entity.
+// If the ProxyRoutingRule object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProxyRoutingRuleMutation) OldActionJSON(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldActionJSON is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldActionJSON requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldActionJSON: %w", err)
+	}
+	return oldValue.ActionJSON, nil
+}
+
+// ResetActionJSON resets all changes to the "action_json" field.
+func (m *ProxyRoutingRuleMutation) ResetActionJSON() {
+	m.action_json = nil
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *ProxyRoutingRuleMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *ProxyRoutingRuleMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the ProxyRoutingRule entity.
+// If the ProxyRoutingRule object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProxyRoutingRuleMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *ProxyRoutingRuleMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *ProxyRoutingRuleMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *ProxyRoutingRuleMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the ProxyRoutingRule entity.
+// If the ProxyRoutingRule object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProxyRoutingRuleMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *ProxyRoutingRuleMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// Where appends a list predicates to the ProxyRoutingRuleMutation builder.
+func (m *ProxyRoutingRuleMutation) Where(ps ...predicate.ProxyRoutingRule) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the ProxyRoutingRuleMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *ProxyRoutingRuleMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.ProxyRoutingRule, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *ProxyRoutingRuleMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *ProxyRoutingRuleMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (ProxyRoutingRule).
+func (m *ProxyRoutingRuleMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *ProxyRoutingRuleMutation) Fields() []string {
+	fields := make([]string, 0, 9)
+	if m.profile_id != nil {
+		fields = append(fields, proxyroutingrule.FieldProfileID)
+	}
+	if m.name != nil {
+		fields = append(fields, proxyroutingrule.FieldName)
+	}
+	if m.priority != nil {
+		fields = append(fields, proxyroutingrule.FieldPriority)
+	}
+	if m.enabled != nil {
+		fields = append(fields, proxyroutingrule.FieldEnabled)
+	}
+	if m.service_code != nil {
+		fields = append(fields, proxyroutingrule.FieldServiceCode)
+	}
+	if m.matcher_json != nil {
+		fields = append(fields, proxyroutingrule.FieldMatcherJSON)
+	}
+	if m.action_json != nil {
+		fields = append(fields, proxyroutingrule.FieldActionJSON)
+	}
+	if m.created_at != nil {
+		fields = append(fields, proxyroutingrule.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, proxyroutingrule.FieldUpdatedAt)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *ProxyRoutingRuleMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case proxyroutingrule.FieldProfileID:
+		return m.ProfileID()
+	case proxyroutingrule.FieldName:
+		return m.Name()
+	case proxyroutingrule.FieldPriority:
+		return m.Priority()
+	case proxyroutingrule.FieldEnabled:
+		return m.Enabled()
+	case proxyroutingrule.FieldServiceCode:
+		return m.ServiceCode()
+	case proxyroutingrule.FieldMatcherJSON:
+		return m.MatcherJSON()
+	case proxyroutingrule.FieldActionJSON:
+		return m.ActionJSON()
+	case proxyroutingrule.FieldCreatedAt:
+		return m.CreatedAt()
+	case proxyroutingrule.FieldUpdatedAt:
+		return m.UpdatedAt()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *ProxyRoutingRuleMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case proxyroutingrule.FieldProfileID:
+		return m.OldProfileID(ctx)
+	case proxyroutingrule.FieldName:
+		return m.OldName(ctx)
+	case proxyroutingrule.FieldPriority:
+		return m.OldPriority(ctx)
+	case proxyroutingrule.FieldEnabled:
+		return m.OldEnabled(ctx)
+	case proxyroutingrule.FieldServiceCode:
+		return m.OldServiceCode(ctx)
+	case proxyroutingrule.FieldMatcherJSON:
+		return m.OldMatcherJSON(ctx)
+	case proxyroutingrule.FieldActionJSON:
+		return m.OldActionJSON(ctx)
+	case proxyroutingrule.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case proxyroutingrule.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	}
+	return nil, fmt.Errorf("unknown ProxyRoutingRule field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ProxyRoutingRuleMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case proxyroutingrule.FieldProfileID:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetProfileID(v)
+		return nil
+	case proxyroutingrule.FieldName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetName(v)
+		return nil
+	case proxyroutingrule.FieldPriority:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPriority(v)
+		return nil
+	case proxyroutingrule.FieldEnabled:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEnabled(v)
+		return nil
+	case proxyroutingrule.FieldServiceCode:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetServiceCode(v)
+		return nil
+	case proxyroutingrule.FieldMatcherJSON:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMatcherJSON(v)
+		return nil
+	case proxyroutingrule.FieldActionJSON:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetActionJSON(v)
+		return nil
+	case proxyroutingrule.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case proxyroutingrule.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	}
+	return fmt.Errorf("unknown ProxyRoutingRule field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *ProxyRoutingRuleMutation) AddedFields() []string {
+	var fields []string
+	if m.addprofile_id != nil {
+		fields = append(fields, proxyroutingrule.FieldProfileID)
+	}
+	if m.addpriority != nil {
+		fields = append(fields, proxyroutingrule.FieldPriority)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *ProxyRoutingRuleMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case proxyroutingrule.FieldProfileID:
+		return m.AddedProfileID()
+	case proxyroutingrule.FieldPriority:
+		return m.AddedPriority()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ProxyRoutingRuleMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case proxyroutingrule.FieldProfileID:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddProfileID(v)
+		return nil
+	case proxyroutingrule.FieldPriority:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddPriority(v)
+		return nil
+	}
+	return fmt.Errorf("unknown ProxyRoutingRule numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *ProxyRoutingRuleMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *ProxyRoutingRuleMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *ProxyRoutingRuleMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown ProxyRoutingRule nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *ProxyRoutingRuleMutation) ResetField(name string) error {
+	switch name {
+	case proxyroutingrule.FieldProfileID:
+		m.ResetProfileID()
+		return nil
+	case proxyroutingrule.FieldName:
+		m.ResetName()
+		return nil
+	case proxyroutingrule.FieldPriority:
+		m.ResetPriority()
+		return nil
+	case proxyroutingrule.FieldEnabled:
+		m.ResetEnabled()
+		return nil
+	case proxyroutingrule.FieldServiceCode:
+		m.ResetServiceCode()
+		return nil
+	case proxyroutingrule.FieldMatcherJSON:
+		m.ResetMatcherJSON()
+		return nil
+	case proxyroutingrule.FieldActionJSON:
+		m.ResetActionJSON()
+		return nil
+	case proxyroutingrule.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case proxyroutingrule.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	}
+	return fmt.Errorf("unknown ProxyRoutingRule field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *ProxyRoutingRuleMutation) AddedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *ProxyRoutingRuleMutation) AddedIDs(name string) []ent.Value {
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *ProxyRoutingRuleMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *ProxyRoutingRuleMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *ProxyRoutingRuleMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *ProxyRoutingRuleMutation) EdgeCleared(name string) bool {
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *ProxyRoutingRuleMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown ProxyRoutingRule unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *ProxyRoutingRuleMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown ProxyRoutingRule edge %s", name)
+}
+
+// ProxyRoutingUnlockServiceMutation represents an operation that mutates the ProxyRoutingUnlockService nodes in the graph.
+type ProxyRoutingUnlockServiceMutation struct {
+	config
+	op            Op
+	typ           string
+	id            *int64
+	code          *string
+	name          *string
+	category      *string
+	enabled       *bool
+	service_json  *string
+	created_at    *time.Time
+	updated_at    *time.Time
+	clearedFields map[string]struct{}
+	done          bool
+	oldValue      func(context.Context) (*ProxyRoutingUnlockService, error)
+	predicates    []predicate.ProxyRoutingUnlockService
+}
+
+var _ ent.Mutation = (*ProxyRoutingUnlockServiceMutation)(nil)
+
+// proxyroutingunlockserviceOption allows management of the mutation configuration using functional options.
+type proxyroutingunlockserviceOption func(*ProxyRoutingUnlockServiceMutation)
+
+// newProxyRoutingUnlockServiceMutation creates new mutation for the ProxyRoutingUnlockService entity.
+func newProxyRoutingUnlockServiceMutation(c config, op Op, opts ...proxyroutingunlockserviceOption) *ProxyRoutingUnlockServiceMutation {
+	m := &ProxyRoutingUnlockServiceMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeProxyRoutingUnlockService,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withProxyRoutingUnlockServiceID sets the ID field of the mutation.
+func withProxyRoutingUnlockServiceID(id int64) proxyroutingunlockserviceOption {
+	return func(m *ProxyRoutingUnlockServiceMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *ProxyRoutingUnlockService
+		)
+		m.oldValue = func(ctx context.Context) (*ProxyRoutingUnlockService, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().ProxyRoutingUnlockService.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withProxyRoutingUnlockService sets the old ProxyRoutingUnlockService of the mutation.
+func withProxyRoutingUnlockService(node *ProxyRoutingUnlockService) proxyroutingunlockserviceOption {
+	return func(m *ProxyRoutingUnlockServiceMutation) {
+		m.oldValue = func(context.Context) (*ProxyRoutingUnlockService, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m ProxyRoutingUnlockServiceMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m ProxyRoutingUnlockServiceMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of ProxyRoutingUnlockService entities.
+func (m *ProxyRoutingUnlockServiceMutation) SetID(id int64) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *ProxyRoutingUnlockServiceMutation) ID() (id int64, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *ProxyRoutingUnlockServiceMutation) IDs(ctx context.Context) ([]int64, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int64{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().ProxyRoutingUnlockService.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCode sets the "code" field.
+func (m *ProxyRoutingUnlockServiceMutation) SetCode(s string) {
+	m.code = &s
+}
+
+// Code returns the value of the "code" field in the mutation.
+func (m *ProxyRoutingUnlockServiceMutation) Code() (r string, exists bool) {
+	v := m.code
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCode returns the old "code" field's value of the ProxyRoutingUnlockService entity.
+// If the ProxyRoutingUnlockService object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProxyRoutingUnlockServiceMutation) OldCode(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCode is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCode requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCode: %w", err)
+	}
+	return oldValue.Code, nil
+}
+
+// ResetCode resets all changes to the "code" field.
+func (m *ProxyRoutingUnlockServiceMutation) ResetCode() {
+	m.code = nil
+}
+
+// SetName sets the "name" field.
+func (m *ProxyRoutingUnlockServiceMutation) SetName(s string) {
+	m.name = &s
+}
+
+// Name returns the value of the "name" field in the mutation.
+func (m *ProxyRoutingUnlockServiceMutation) Name() (r string, exists bool) {
+	v := m.name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldName returns the old "name" field's value of the ProxyRoutingUnlockService entity.
+// If the ProxyRoutingUnlockService object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProxyRoutingUnlockServiceMutation) OldName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
+	}
+	return oldValue.Name, nil
+}
+
+// ResetName resets all changes to the "name" field.
+func (m *ProxyRoutingUnlockServiceMutation) ResetName() {
+	m.name = nil
+}
+
+// SetCategory sets the "category" field.
+func (m *ProxyRoutingUnlockServiceMutation) SetCategory(s string) {
+	m.category = &s
+}
+
+// Category returns the value of the "category" field in the mutation.
+func (m *ProxyRoutingUnlockServiceMutation) Category() (r string, exists bool) {
+	v := m.category
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCategory returns the old "category" field's value of the ProxyRoutingUnlockService entity.
+// If the ProxyRoutingUnlockService object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProxyRoutingUnlockServiceMutation) OldCategory(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCategory is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCategory requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCategory: %w", err)
+	}
+	return oldValue.Category, nil
+}
+
+// ResetCategory resets all changes to the "category" field.
+func (m *ProxyRoutingUnlockServiceMutation) ResetCategory() {
+	m.category = nil
+}
+
+// SetEnabled sets the "enabled" field.
+func (m *ProxyRoutingUnlockServiceMutation) SetEnabled(b bool) {
+	m.enabled = &b
+}
+
+// Enabled returns the value of the "enabled" field in the mutation.
+func (m *ProxyRoutingUnlockServiceMutation) Enabled() (r bool, exists bool) {
+	v := m.enabled
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEnabled returns the old "enabled" field's value of the ProxyRoutingUnlockService entity.
+// If the ProxyRoutingUnlockService object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProxyRoutingUnlockServiceMutation) OldEnabled(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEnabled is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEnabled requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEnabled: %w", err)
+	}
+	return oldValue.Enabled, nil
+}
+
+// ResetEnabled resets all changes to the "enabled" field.
+func (m *ProxyRoutingUnlockServiceMutation) ResetEnabled() {
+	m.enabled = nil
+}
+
+// SetServiceJSON sets the "service_json" field.
+func (m *ProxyRoutingUnlockServiceMutation) SetServiceJSON(s string) {
+	m.service_json = &s
+}
+
+// ServiceJSON returns the value of the "service_json" field in the mutation.
+func (m *ProxyRoutingUnlockServiceMutation) ServiceJSON() (r string, exists bool) {
+	v := m.service_json
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldServiceJSON returns the old "service_json" field's value of the ProxyRoutingUnlockService entity.
+// If the ProxyRoutingUnlockService object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProxyRoutingUnlockServiceMutation) OldServiceJSON(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldServiceJSON is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldServiceJSON requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldServiceJSON: %w", err)
+	}
+	return oldValue.ServiceJSON, nil
+}
+
+// ResetServiceJSON resets all changes to the "service_json" field.
+func (m *ProxyRoutingUnlockServiceMutation) ResetServiceJSON() {
+	m.service_json = nil
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *ProxyRoutingUnlockServiceMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *ProxyRoutingUnlockServiceMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the ProxyRoutingUnlockService entity.
+// If the ProxyRoutingUnlockService object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProxyRoutingUnlockServiceMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *ProxyRoutingUnlockServiceMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *ProxyRoutingUnlockServiceMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *ProxyRoutingUnlockServiceMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the ProxyRoutingUnlockService entity.
+// If the ProxyRoutingUnlockService object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProxyRoutingUnlockServiceMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *ProxyRoutingUnlockServiceMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// Where appends a list predicates to the ProxyRoutingUnlockServiceMutation builder.
+func (m *ProxyRoutingUnlockServiceMutation) Where(ps ...predicate.ProxyRoutingUnlockService) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the ProxyRoutingUnlockServiceMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *ProxyRoutingUnlockServiceMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.ProxyRoutingUnlockService, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *ProxyRoutingUnlockServiceMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *ProxyRoutingUnlockServiceMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (ProxyRoutingUnlockService).
+func (m *ProxyRoutingUnlockServiceMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *ProxyRoutingUnlockServiceMutation) Fields() []string {
+	fields := make([]string, 0, 7)
+	if m.code != nil {
+		fields = append(fields, proxyroutingunlockservice.FieldCode)
+	}
+	if m.name != nil {
+		fields = append(fields, proxyroutingunlockservice.FieldName)
+	}
+	if m.category != nil {
+		fields = append(fields, proxyroutingunlockservice.FieldCategory)
+	}
+	if m.enabled != nil {
+		fields = append(fields, proxyroutingunlockservice.FieldEnabled)
+	}
+	if m.service_json != nil {
+		fields = append(fields, proxyroutingunlockservice.FieldServiceJSON)
+	}
+	if m.created_at != nil {
+		fields = append(fields, proxyroutingunlockservice.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, proxyroutingunlockservice.FieldUpdatedAt)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *ProxyRoutingUnlockServiceMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case proxyroutingunlockservice.FieldCode:
+		return m.Code()
+	case proxyroutingunlockservice.FieldName:
+		return m.Name()
+	case proxyroutingunlockservice.FieldCategory:
+		return m.Category()
+	case proxyroutingunlockservice.FieldEnabled:
+		return m.Enabled()
+	case proxyroutingunlockservice.FieldServiceJSON:
+		return m.ServiceJSON()
+	case proxyroutingunlockservice.FieldCreatedAt:
+		return m.CreatedAt()
+	case proxyroutingunlockservice.FieldUpdatedAt:
+		return m.UpdatedAt()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *ProxyRoutingUnlockServiceMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case proxyroutingunlockservice.FieldCode:
+		return m.OldCode(ctx)
+	case proxyroutingunlockservice.FieldName:
+		return m.OldName(ctx)
+	case proxyroutingunlockservice.FieldCategory:
+		return m.OldCategory(ctx)
+	case proxyroutingunlockservice.FieldEnabled:
+		return m.OldEnabled(ctx)
+	case proxyroutingunlockservice.FieldServiceJSON:
+		return m.OldServiceJSON(ctx)
+	case proxyroutingunlockservice.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case proxyroutingunlockservice.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	}
+	return nil, fmt.Errorf("unknown ProxyRoutingUnlockService field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ProxyRoutingUnlockServiceMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case proxyroutingunlockservice.FieldCode:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCode(v)
+		return nil
+	case proxyroutingunlockservice.FieldName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetName(v)
+		return nil
+	case proxyroutingunlockservice.FieldCategory:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCategory(v)
+		return nil
+	case proxyroutingunlockservice.FieldEnabled:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEnabled(v)
+		return nil
+	case proxyroutingunlockservice.FieldServiceJSON:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetServiceJSON(v)
+		return nil
+	case proxyroutingunlockservice.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case proxyroutingunlockservice.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	}
+	return fmt.Errorf("unknown ProxyRoutingUnlockService field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *ProxyRoutingUnlockServiceMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *ProxyRoutingUnlockServiceMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ProxyRoutingUnlockServiceMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown ProxyRoutingUnlockService numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *ProxyRoutingUnlockServiceMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *ProxyRoutingUnlockServiceMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *ProxyRoutingUnlockServiceMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown ProxyRoutingUnlockService nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *ProxyRoutingUnlockServiceMutation) ResetField(name string) error {
+	switch name {
+	case proxyroutingunlockservice.FieldCode:
+		m.ResetCode()
+		return nil
+	case proxyroutingunlockservice.FieldName:
+		m.ResetName()
+		return nil
+	case proxyroutingunlockservice.FieldCategory:
+		m.ResetCategory()
+		return nil
+	case proxyroutingunlockservice.FieldEnabled:
+		m.ResetEnabled()
+		return nil
+	case proxyroutingunlockservice.FieldServiceJSON:
+		m.ResetServiceJSON()
+		return nil
+	case proxyroutingunlockservice.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case proxyroutingunlockservice.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	}
+	return fmt.Errorf("unknown ProxyRoutingUnlockService field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *ProxyRoutingUnlockServiceMutation) AddedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *ProxyRoutingUnlockServiceMutation) AddedIDs(name string) []ent.Value {
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *ProxyRoutingUnlockServiceMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *ProxyRoutingUnlockServiceMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *ProxyRoutingUnlockServiceMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *ProxyRoutingUnlockServiceMutation) EdgeCleared(name string) bool {
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *ProxyRoutingUnlockServiceMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown ProxyRoutingUnlockService unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *ProxyRoutingUnlockServiceMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown ProxyRoutingUnlockService edge %s", name)
 }
 
 // ProxySchemaMigrationsMutation represents an operation that mutates the ProxySchemaMigrations nodes in the graph.

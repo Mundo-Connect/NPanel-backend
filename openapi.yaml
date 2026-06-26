@@ -1977,6 +1977,408 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/api.admin.redemption.v1.GetRedemptionRecordListReply'
+    /v1/admin/routing/dns_resolver:
+        put:
+            tags:
+                - RoutingService
+            operationId: RoutingService_UpdateDnsResolver
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.admin.routing.v1.UpdateDnsResolverRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.admin.routing.v1.DnsResolverReply'
+        post:
+            tags:
+                - RoutingService
+            operationId: RoutingService_CreateDnsResolver
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.admin.routing.v1.CreateDnsResolverRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.admin.routing.v1.DnsResolverReply'
+        delete:
+            tags:
+                - RoutingService
+            operationId: RoutingService_DeleteDnsResolver
+            parameters:
+                - name: id
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.admin.routing.v1.DeleteRouteItemReply'
+    /v1/admin/routing/dns_resolvers:
+        get:
+            tags:
+                - RoutingService
+            operationId: RoutingService_ListDnsResolvers
+            parameters:
+                - name: page
+                  in: query
+                  schema:
+                    type: string
+                - name: size
+                  in: query
+                  schema:
+                    type: string
+                - name: search
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.admin.routing.v1.ListDnsResolversReply'
+    /v1/admin/routing/outbound:
+        put:
+            tags:
+                - RoutingService
+            operationId: RoutingService_UpdateRouteOutbound
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.admin.routing.v1.UpdateRouteOutboundRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.admin.routing.v1.RouteOutboundReply'
+        post:
+            tags:
+                - RoutingService
+            operationId: RoutingService_CreateRouteOutbound
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.admin.routing.v1.CreateRouteOutboundRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.admin.routing.v1.RouteOutboundReply'
+        delete:
+            tags:
+                - RoutingService
+            operationId: RoutingService_DeleteRouteOutbound
+            parameters:
+                - name: id
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.admin.routing.v1.DeleteRouteItemReply'
+    /v1/admin/routing/outbounds:
+        get:
+            tags:
+                - RoutingService
+            operationId: RoutingService_ListRouteOutbounds
+            parameters:
+                - name: page
+                  in: query
+                  schema:
+                    type: string
+                - name: size
+                  in: query
+                  schema:
+                    type: string
+                - name: search
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.admin.routing.v1.ListRouteOutboundsReply'
+    /v1/admin/routing/preview:
+        post:
+            tags:
+                - RoutingService
+            operationId: RoutingService_PreviewRouteConfig
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.admin.routing.v1.PreviewRouteConfigRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.admin.routing.v1.PreviewRouteConfigReply'
+    /v1/admin/routing/profile:
+        put:
+            tags:
+                - RoutingService
+            operationId: RoutingService_UpdateRouteProfile
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.admin.routing.v1.UpdateRouteProfileRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.admin.routing.v1.RouteProfileReply'
+        post:
+            tags:
+                - RoutingService
+            operationId: RoutingService_CreateRouteProfile
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.admin.routing.v1.CreateRouteProfileRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.admin.routing.v1.RouteProfileReply'
+        delete:
+            tags:
+                - RoutingService
+            operationId: RoutingService_DeleteRouteProfile
+            parameters:
+                - name: id
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.admin.routing.v1.DeleteRouteItemReply'
+    /v1/admin/routing/profiles:
+        get:
+            tags:
+                - RoutingService
+            operationId: RoutingService_ListRouteProfiles
+            parameters:
+                - name: page
+                  in: query
+                  schema:
+                    type: string
+                - name: size
+                  in: query
+                  schema:
+                    type: string
+                - name: search
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.admin.routing.v1.ListRouteProfilesReply'
+    /v1/admin/routing/rule:
+        put:
+            tags:
+                - RoutingService
+            operationId: RoutingService_UpdateRouteRule
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.admin.routing.v1.UpdateRouteRuleRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.admin.routing.v1.RouteRuleReply'
+        post:
+            tags:
+                - RoutingService
+            operationId: RoutingService_CreateRouteRule
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.admin.routing.v1.CreateRouteRuleRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.admin.routing.v1.RouteRuleReply'
+        delete:
+            tags:
+                - RoutingService
+            operationId: RoutingService_DeleteRouteRule
+            parameters:
+                - name: id
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.admin.routing.v1.DeleteRouteItemReply'
+    /v1/admin/routing/rules:
+        get:
+            tags:
+                - RoutingService
+            operationId: RoutingService_ListRouteRules
+            parameters:
+                - name: page
+                  in: query
+                  schema:
+                    type: string
+                - name: size
+                  in: query
+                  schema:
+                    type: string
+                - name: profileId
+                  in: query
+                  schema:
+                    type: string
+                - name: search
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.admin.routing.v1.ListRouteRulesReply'
+    /v1/admin/routing/unlock_service:
+        put:
+            tags:
+                - RoutingService
+            operationId: RoutingService_UpdateUnlockService
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.admin.routing.v1.UpdateUnlockServiceRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.admin.routing.v1.UnlockServiceReply'
+        post:
+            tags:
+                - RoutingService
+            operationId: RoutingService_CreateUnlockService
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.admin.routing.v1.CreateUnlockServiceRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.admin.routing.v1.UnlockServiceReply'
+        delete:
+            tags:
+                - RoutingService
+            operationId: RoutingService_DeleteUnlockService
+            parameters:
+                - name: id
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.admin.routing.v1.DeleteRouteItemReply'
+    /v1/admin/routing/unlock_services:
+        get:
+            tags:
+                - RoutingService
+            operationId: RoutingService_ListUnlockServices
+            parameters:
+                - name: page
+                  in: query
+                  schema:
+                    type: string
+                - name: size
+                  in: query
+                  schema:
+                    type: string
+                - name: search
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.admin.routing.v1.ListUnlockServicesReply'
     /v1/admin/server/create:
         post:
             tags:
@@ -8536,6 +8938,421 @@ components:
                 status:
                     type: integer
                     format: int32
+        api.admin.routing.v1.CreateDnsResolverRequest:
+            type: object
+            properties:
+                resolver:
+                    $ref: '#/components/schemas/api.admin.routing.v1.DnsResolver'
+        api.admin.routing.v1.CreateRouteOutboundRequest:
+            type: object
+            properties:
+                outbound:
+                    $ref: '#/components/schemas/api.admin.routing.v1.RouteOutbound'
+        api.admin.routing.v1.CreateRouteProfileRequest:
+            type: object
+            properties:
+                profile:
+                    $ref: '#/components/schemas/api.admin.routing.v1.RouteProfile'
+        api.admin.routing.v1.CreateRouteRuleRequest:
+            type: object
+            properties:
+                rule:
+                    $ref: '#/components/schemas/api.admin.routing.v1.RouteRule'
+        api.admin.routing.v1.CreateUnlockServiceRequest:
+            type: object
+            properties:
+                service:
+                    $ref: '#/components/schemas/api.admin.routing.v1.UnlockService'
+        api.admin.routing.v1.DeleteRouteItemData:
+            type: object
+            properties:
+                success:
+                    type: boolean
+        api.admin.routing.v1.DeleteRouteItemReply:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/api.admin.routing.v1.DeleteRouteItemData'
+        api.admin.routing.v1.DnsResolver:
+            type: object
+            properties:
+                id:
+                    type: string
+                tag:
+                    type: string
+                name:
+                    type: string
+                proto:
+                    type: string
+                address:
+                    type: string
+                port:
+                    type: integer
+                    format: int32
+                enabled:
+                    type: boolean
+                resolverJson:
+                    type: string
+                createdAt:
+                    type: string
+                updatedAt:
+                    type: string
+        api.admin.routing.v1.DnsResolverData:
+            type: object
+            properties:
+                resolver:
+                    $ref: '#/components/schemas/api.admin.routing.v1.DnsResolver'
+        api.admin.routing.v1.DnsResolverListData:
+            type: object
+            properties:
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.admin.routing.v1.DnsResolver'
+                total:
+                    type: integer
+                    format: int32
+        api.admin.routing.v1.DnsResolverReply:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/api.admin.routing.v1.DnsResolverData'
+        api.admin.routing.v1.ListDnsResolversReply:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/api.admin.routing.v1.DnsResolverListData'
+        api.admin.routing.v1.ListRouteOutboundsReply:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/api.admin.routing.v1.RouteOutboundListData'
+        api.admin.routing.v1.ListRouteProfilesReply:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/api.admin.routing.v1.RouteProfileListData'
+        api.admin.routing.v1.ListRouteRulesReply:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/api.admin.routing.v1.RouteRuleListData'
+        api.admin.routing.v1.ListUnlockServicesReply:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/api.admin.routing.v1.UnlockServiceListData'
+        api.admin.routing.v1.PreviewRouteConfigReply:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/api.admin.routing.v1.PreviewRouteResult'
+        api.admin.routing.v1.PreviewRouteConfigRequest:
+            type: object
+            properties:
+                domain:
+                    type: string
+                ip:
+                    type: string
+                port:
+                    type: integer
+                    format: int32
+                userId:
+                    type: string
+                nodeId:
+                    type: string
+                supportedFeatures:
+                    type: array
+                    items:
+                        type: string
+        api.admin.routing.v1.PreviewRouteResult:
+            type: object
+            properties:
+                routingHash:
+                    type: string
+                profileCode:
+                    type: string
+                profileName:
+                    type: string
+                matched:
+                    type: boolean
+                ruleId:
+                    type: string
+                ruleName:
+                    type: string
+                actionType:
+                    type: string
+                dnsResolverTag:
+                    type: string
+                outboundTag:
+                    type: string
+                fallbackPolicy:
+                    type: string
+                unsupportedFeatures:
+                    type: array
+                    items:
+                        type: string
+                effectiveMode:
+                    type: string
+                executionEnabled:
+                    type: boolean
+        api.admin.routing.v1.RouteOutbound:
+            type: object
+            properties:
+                id:
+                    type: string
+                tag:
+                    type: string
+                name:
+                    type: string
+                type:
+                    type: string
+                region:
+                    type: string
+                enabled:
+                    type: boolean
+                outboundJson:
+                    type: string
+                createdAt:
+                    type: string
+                updatedAt:
+                    type: string
+        api.admin.routing.v1.RouteOutboundData:
+            type: object
+            properties:
+                outbound:
+                    $ref: '#/components/schemas/api.admin.routing.v1.RouteOutbound'
+        api.admin.routing.v1.RouteOutboundListData:
+            type: object
+            properties:
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.admin.routing.v1.RouteOutbound'
+                total:
+                    type: integer
+                    format: int32
+        api.admin.routing.v1.RouteOutboundReply:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/api.admin.routing.v1.RouteOutboundData'
+        api.admin.routing.v1.RouteProfile:
+            type: object
+            properties:
+                id:
+                    type: string
+                code:
+                    type: string
+                name:
+                    type: string
+                description:
+                    type: string
+                scopeType:
+                    type: string
+                scopeId:
+                    type: string
+                priority:
+                    type: integer
+                    format: int32
+                mode:
+                    type: string
+                enabled:
+                    type: boolean
+                profileJson:
+                    type: string
+                createdAt:
+                    type: string
+                updatedAt:
+                    type: string
+        api.admin.routing.v1.RouteProfileData:
+            type: object
+            properties:
+                profile:
+                    $ref: '#/components/schemas/api.admin.routing.v1.RouteProfile'
+        api.admin.routing.v1.RouteProfileListData:
+            type: object
+            properties:
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.admin.routing.v1.RouteProfile'
+                total:
+                    type: integer
+                    format: int32
+        api.admin.routing.v1.RouteProfileReply:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/api.admin.routing.v1.RouteProfileData'
+        api.admin.routing.v1.RouteRule:
+            type: object
+            properties:
+                id:
+                    type: string
+                profileId:
+                    type: string
+                name:
+                    type: string
+                priority:
+                    type: integer
+                    format: int32
+                enabled:
+                    type: boolean
+                serviceCode:
+                    type: string
+                matcherJson:
+                    type: string
+                actionJson:
+                    type: string
+                createdAt:
+                    type: string
+                updatedAt:
+                    type: string
+        api.admin.routing.v1.RouteRuleData:
+            type: object
+            properties:
+                rule:
+                    $ref: '#/components/schemas/api.admin.routing.v1.RouteRule'
+        api.admin.routing.v1.RouteRuleListData:
+            type: object
+            properties:
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.admin.routing.v1.RouteRule'
+                total:
+                    type: integer
+                    format: int32
+        api.admin.routing.v1.RouteRuleReply:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/api.admin.routing.v1.RouteRuleData'
+        api.admin.routing.v1.UnlockService:
+            type: object
+            properties:
+                id:
+                    type: string
+                code:
+                    type: string
+                name:
+                    type: string
+                category:
+                    type: string
+                enabled:
+                    type: boolean
+                serviceJson:
+                    type: string
+                createdAt:
+                    type: string
+                updatedAt:
+                    type: string
+        api.admin.routing.v1.UnlockServiceData:
+            type: object
+            properties:
+                service:
+                    $ref: '#/components/schemas/api.admin.routing.v1.UnlockService'
+        api.admin.routing.v1.UnlockServiceListData:
+            type: object
+            properties:
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.admin.routing.v1.UnlockService'
+                total:
+                    type: integer
+                    format: int32
+        api.admin.routing.v1.UnlockServiceReply:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/api.admin.routing.v1.UnlockServiceData'
+        api.admin.routing.v1.UpdateDnsResolverRequest:
+            type: object
+            properties:
+                resolver:
+                    $ref: '#/components/schemas/api.admin.routing.v1.DnsResolver'
+        api.admin.routing.v1.UpdateRouteOutboundRequest:
+            type: object
+            properties:
+                outbound:
+                    $ref: '#/components/schemas/api.admin.routing.v1.RouteOutbound'
+        api.admin.routing.v1.UpdateRouteProfileRequest:
+            type: object
+            properties:
+                profile:
+                    $ref: '#/components/schemas/api.admin.routing.v1.RouteProfile'
+        api.admin.routing.v1.UpdateRouteRuleRequest:
+            type: object
+            properties:
+                rule:
+                    $ref: '#/components/schemas/api.admin.routing.v1.RouteRule'
+        api.admin.routing.v1.UpdateUnlockServiceRequest:
+            type: object
+            properties:
+                service:
+                    $ref: '#/components/schemas/api.admin.routing.v1.UnlockService'
         api.admin.server.v1.CreateNodeData:
             type: object
             properties:
@@ -14343,6 +15160,10 @@ components:
                     type: string
                 updatedAt:
                     type: string
+                priceOptions:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.public.user.v1.SubscribePriceOption'
             description: Subscribe 订阅套餐信息
         api.public.user.v1.SubscribeDiscount:
             type: object
@@ -14352,6 +15173,39 @@ components:
                 discount:
                     type: number
                     format: double
+        api.public.user.v1.SubscribePriceOption:
+            type: object
+            properties:
+                id:
+                    type: string
+                subscribeId:
+                    type: string
+                name:
+                    type: string
+                durationUnit:
+                    type: string
+                durationValue:
+                    type: string
+                price:
+                    type: string
+                originalPrice:
+                    type: string
+                inventory:
+                    type: integer
+                    format: int32
+                show:
+                    type: boolean
+                sell:
+                    type: boolean
+                isDefault:
+                    type: boolean
+                sort:
+                    type: integer
+                    format: int32
+                createdAt:
+                    type: string
+                updatedAt:
+                    type: string
         api.public.user.v1.TrafficLimit:
             type: object
             properties:
@@ -15266,6 +16120,7 @@ tags:
     - name: Redemption
     - name: RedemptionService
       description: RedemptionService 兑换码服务
+    - name: RoutingService
     - name: Server
       description: |-
         Server service - 节点服务器接口
