@@ -74,7 +74,10 @@ func (uc *RedemptionUseCase) RedeemCode(ctx context.Context, userID int64, code 
 	err = db.TX(ctx, func(tx *ent.Tx) error {
 		// 查询兑换码
 		redemptionCode, err := tx.ProxyRedemptionCode.Query().
-			Where(proxyredemptioncode.CodeEQ(code)).
+			Where(
+				proxyredemptioncode.CodeEQ(code),
+				proxyredemptioncode.DeletedAtIsNil(),
+			).
 			Only(ctx)
 		if err != nil {
 			if ent.IsNotFound(err) {
@@ -228,7 +231,10 @@ func (uc *RedemptionUseCase) RedeemCode(ctx context.Context, userID int64, code 
 		}
 
 		redemptionUpdate := tx.ProxyRedemptionCode.Update().
-			Where(proxyredemptioncode.IDEQ(redemptionCode.ID))
+			Where(
+				proxyredemptioncode.IDEQ(redemptionCode.ID),
+				proxyredemptioncode.DeletedAtIsNil(),
+			)
 		if redemptionCode.TotalCount > 0 {
 			redemptionUpdate.Where(proxyredemptioncode.UsedCountLT(redemptionCode.TotalCount))
 		}
