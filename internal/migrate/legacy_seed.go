@@ -42,6 +42,7 @@ var legacySQLMigrations = []legacySQLMigration{
 	{version: 2142, path: "legacy_sql/02142_subscribe_price_option.up.sql"},
 	{version: 2143, path: "legacy_sql/02143_subscribe_defaults_and_language_normalization.up.sql"},
 	{version: 2144, path: "legacy_sql/02144_routing_tables.up.sql"},
+	{version: 2145, path: "legacy_sql/02145_routing_health_report.up.sql"},
 }
 
 func (m *Migrator) initLegacyDefaultData(ctx context.Context) error {
@@ -138,7 +139,7 @@ func (m *Migrator) EnsureLegacyCompatibilitySchema(ctx context.Context) error {
 	defer db.Close()
 
 	for _, migration := range legacySQLMigrations {
-		if migration.version != 2141 && migration.version != 2142 && migration.version != 2143 && migration.version != 2144 {
+		if migration.version != 2141 && migration.version != 2142 && migration.version != 2143 && migration.version != 2144 && migration.version != 2145 {
 			continue
 		}
 		if err := m.executeLegacySQLMigrationWithVersion(ctx, db, migration, false); err != nil {

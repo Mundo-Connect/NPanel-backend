@@ -96,6 +96,28 @@ type RoutingHealthItem struct {
 	DNSResolverTag      string
 }
 
+type RoutingHealthReport struct {
+	ID                  int64
+	ReporterType        string
+	ReporterID          string
+	ProfileCode         string
+	RoutingHash         string
+	SubjectType         string
+	SubjectKey          string
+	Region              string
+	Status              string
+	Source              string
+	RTTMS               int
+	ConsecutiveFailures int
+	LastError           string
+	OutboundTag         string
+	DNSResolverTag      string
+	CheckedAt           time.Time
+	ReportJSON          string
+	CreatedAt           time.Time
+	UpdatedAt           time.Time
+}
+
 type RoutingEnforceGuard struct {
 	Key    string
 	Label  string
@@ -170,6 +192,8 @@ type RoutingRepo interface {
 	DeleteUnlockService(context.Context, int64) error
 
 	ResolveScopeBySubscribeToken(context.Context, string) (ScopeContext, error)
+	SaveHealthReports(context.Context, []*RoutingHealthReport) error
+	ListHealthReports(context.Context, int, int, string, string, string) ([]*RoutingHealthReport, int32, error)
 }
 
 type RoutingUsecase struct {
@@ -366,6 +390,19 @@ func (uc *RoutingUsecase) DeleteUnlockService(ctx context.Context, id int64) err
 	return uc.repo.DeleteUnlockService(ctx, id)
 }
 
+func (uc *RoutingUsecase) RecordHealthReport(ctx context.Context, req publicrouting.HealthReportRequest) error {
+	reports, err := healthReportsFromRequest(req, time.Now())
+	if err != nil {
+		return err
+	}
+	return uc.repo.SaveHealthReports(ctx, reports)
+}
+
+func (uc *RoutingUsecase) ListHealthReports(ctx context.Context, page, size int, subjectType, subjectKey, reporterType string) ([]*RoutingHealthReport, int32, error) {
+	page, size = normalizePage(page, size)
+	return uc.repo.ListHealthReports(ctx, page, size, subjectType, subjectKey, reporterType)
+}
+
 func (uc *RoutingUsecase) Preview(ctx context.Context, req PreviewRequest) (PreviewResult, error) {
 	envelope, err := uc.BuildConfig(ctx, time.Now(), previewConfigOptions(req))
 	if err != nil {
@@ -468,12 +505,22 @@ func (uc *RoutingUsecase) BuildConfig(ctx context.Context, now time.Time, opts .
 		return fixture, err
 	}
 
-	envelope.HealthSnapshot = buildAdminHealthSnapshot(envelope)
+	envelope.HealthSnapshot = uc.buildHealthSnapshot(ctx, envelope, now)
 	if err := validateCompiledEnvelope(envelope); err != nil {
 		return fixture, err
 	}
 	envelope.RoutingHash = publicrouting.StableHash(envelope)
 	return envelope, nil
+}
+
+func (uc *RoutingUsecase) buildHealthSnapshot(ctx context.Context, envelope publicrouting.Envelope, now time.Time) publicrouting.HealthSnapshot {
+	snapshot := buildAdminHealthSnapshot(envelope)
+	reports, _, err := uc.repo.ListHealthReports(ctx, 1, 1000, "", "", "")
+	if err != nil {
+		return snapshot
+	}
+	mergeHealthReports(&snapshot, reports, now)
+	return snapshot
 }
 
 func (uc *RoutingUsecase) ResolveCurrentProfile(ctx context.Context, opts publicrouting.ConfigOptions) (publicrouting.Envelope, error) {
@@ -665,6 +712,72 @@ func validateUnlockService(item *UnlockService) error {
 		return responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
 	return nil
+}
+
+func healthReportsFromRequest(req publicrouting.HealthReportRequest, now time.Time) ([]*RoutingHealthReport, error) {
+	req.ReporterType = firstNonEmpty(strings.TrimSpace(req.ReporterType), "client")
+	req.ReporterID = strings.TrimSpace(req.ReporterID)
+	req.ProfileCode = strings.TrimSpace(req.ProfileCode)
+	req.RoutingHash = strings.TrimSpace(req.RoutingHash)
+	if len(req.Items) == 0 {
+		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+	}
+
+	reports := make([]*RoutingHealthReport, 0, len(req.Items))
+	for _, item := range req.Items {
+		kind := normalizeHealthSubjectType(item.Kind)
+		key := strings.TrimSpace(item.Key)
+		status := normalizeHealthStatus(item.Status)
+		if kind == "" || key == "" {
+			return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+		}
+		checkedAt := parseRFC3339(item.CheckedAt)
+		if checkedAt.IsZero() {
+			checkedAt = now
+		}
+		reportJSON := normalizeJSONWithDefault(item.ReportJSON, "{}")
+		reports = append(reports, &RoutingHealthReport{
+			ReporterType:        req.ReporterType,
+			ReporterID:          req.ReporterID,
+			ProfileCode:         req.ProfileCode,
+			RoutingHash:         req.RoutingHash,
+			SubjectType:         kind,
+			SubjectKey:          key,
+			Region:              strings.TrimSpace(item.Region),
+			Status:              status,
+			Source:              "health_report",
+			RTTMS:               item.RTTMS,
+			ConsecutiveFailures: item.ConsecutiveFailures,
+			LastError:           strings.TrimSpace(item.LastError),
+			OutboundTag:         strings.TrimSpace(item.OutboundTag),
+			DNSResolverTag:      strings.TrimSpace(item.DNSResolverTag),
+			CheckedAt:           checkedAt,
+			ReportJSON:          reportJSON,
+		})
+	}
+	return reports, nil
+}
+
+func normalizeHealthSubjectType(kind string) string {
+	switch strings.ToLower(strings.TrimSpace(kind)) {
+	case "outbound", "dns_resolver", "service":
+		return strings.ToLower(strings.TrimSpace(kind))
+	case "dns":
+		return "dns_resolver"
+	default:
+		return ""
+	}
+}
+
+func normalizeHealthStatus(status string) string {
+	switch strings.ToLower(strings.TrimSpace(status)) {
+	case "healthy", "ok", "failed", "degraded", "stale", "disabled", "unknown":
+		return strings.ToLower(strings.TrimSpace(status))
+	case "":
+		return "unknown"
+	default:
+		return "degraded"
+	}
 }
 
 func normalizeJSON(raw string) string {
@@ -864,6 +977,7 @@ func routingEnforceGuards(envelope publicrouting.Envelope, compileError string) 
 	healthOK := routingHealthOK(envelope.HealthSnapshot)
 	capabilityOK := len(envelope.CapabilityRequirements.RequiredFeatures) > 0
 	rollbackOK := true
+	executionWired := modeEnforce && grayScope && healthOK && capabilityOK
 
 	return []RoutingEnforceGuard{
 		guard("compile_ok", "Config compiles", compileOK, "ok", compileError),
@@ -873,8 +987,15 @@ func routingEnforceGuards(envelope publicrouting.Envelope, compileError string) 
 		guard("health_ok", "Health snapshot healthy", healthOK, healthSummary(envelope.HealthSnapshot), "unknown or failing health blocks enforce"),
 		guard("capability_contract", "Capability contract present", capabilityOK, "ok", "required_features must be declared"),
 		guard("rollback_ready", "Rollback path ready", rollbackOK, "ok", "switch profile mode back to observe"),
-		guard("execution_wired", "Client execution wired", false, "dry-run only", "P4 keeps real execution disabled"),
+		guard("execution_wired", "Client execution wired", executionWired, executionStatus(executionWired), "small-scope enforce needs mode, gray scope, health and capability"),
 	}
+}
+
+func executionStatus(enabled bool) string {
+	if enabled {
+		return "small-scope ready"
+	}
+	return "guarded"
 }
 
 func guard(key, label string, passed bool, status, failReason string) RoutingEnforceGuard {
@@ -932,6 +1053,95 @@ func buildAdminHealthSnapshot(envelope publicrouting.Envelope) publicrouting.Hea
 		DNSResolvers: adminDNSHealth(envelope.DNSResolvers, envelope.GeneratedAt),
 		Services:     adminServiceHealth(envelope.UnlockServices, envelope.GeneratedAt),
 	}
+}
+
+func mergeHealthReports(snapshot *publicrouting.HealthSnapshot, reports []*RoutingHealthReport, now time.Time) {
+	if snapshot == nil || len(reports) == 0 {
+		return
+	}
+	latest := latestHealthReports(reports)
+	for i := range snapshot.Outbounds {
+		key := healthReportKey("outbound", snapshot.Outbounds[i].Tag)
+		if report, ok := latest[key]; ok {
+			snapshot.Outbounds[i] = healthStatusFromReport(report, now)
+		}
+	}
+	for i := range snapshot.DNSResolvers {
+		key := healthReportKey("dns_resolver", snapshot.DNSResolvers[i].Tag)
+		if report, ok := latest[key]; ok {
+			snapshot.DNSResolvers[i] = healthStatusFromReport(report, now)
+		}
+	}
+	for i := range snapshot.Services {
+		key := healthReportKey("service", snapshot.Services[i].Code)
+		if report, ok := latest[key]; ok {
+			snapshot.Services[i] = healthStatusFromReport(report, now)
+		}
+	}
+}
+
+func latestHealthReports(reports []*RoutingHealthReport) map[string]*RoutingHealthReport {
+	result := map[string]*RoutingHealthReport{}
+	for _, report := range reports {
+		if report == nil {
+			continue
+		}
+		key := healthReportKey(report.SubjectType, report.SubjectKey)
+		if key == "" {
+			continue
+		}
+		if existing := result[key]; existing == nil || report.CheckedAt.After(existing.CheckedAt) {
+			result[key] = report
+		}
+	}
+	return result
+}
+
+func healthReportKey(kind, key string) string {
+	kind = normalizeHealthSubjectType(kind)
+	key = strings.TrimSpace(key)
+	if kind == "" || key == "" {
+		return ""
+	}
+	return kind + ":" + key
+}
+
+func healthStatusFromReport(report *RoutingHealthReport, now time.Time) publicrouting.HealthStatus {
+	status := normalizeHealthStatus(report.Status)
+	lastError := report.LastError
+	if report.CheckedAt.IsZero() || now.Sub(report.CheckedAt) > 10*time.Minute {
+		status = "stale"
+		if lastError == "" {
+			lastError = "health report is stale"
+		}
+	}
+	return publicrouting.HealthStatus{
+		Tag:                 subjectTag(report),
+		Code:                subjectCode(report),
+		Region:              report.Region,
+		Status:              status,
+		Source:              report.Source,
+		RTTMS:               report.RTTMS,
+		CheckedAt:           report.CheckedAt.UTC().Format(time.RFC3339),
+		ConsecutiveFailures: report.ConsecutiveFailures,
+		LastError:           lastError,
+		OutboundTag:         report.OutboundTag,
+		DNSResolverTag:      report.DNSResolverTag,
+	}
+}
+
+func subjectTag(report *RoutingHealthReport) string {
+	if report.SubjectType == "outbound" || report.SubjectType == "dns_resolver" {
+		return report.SubjectKey
+	}
+	return ""
+}
+
+func subjectCode(report *RoutingHealthReport) string {
+	if report.SubjectType == "service" {
+		return report.SubjectKey
+	}
+	return ""
 }
 
 func adminOutboundHealth(items []publicrouting.RouteOutbound, now string) []publicrouting.HealthStatus {

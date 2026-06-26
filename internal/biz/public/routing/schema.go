@@ -192,3 +192,25 @@ type ConfigOptions struct {
 	SupportedFeatures []string
 	UserAgent         string
 }
+
+type HealthReportRequest struct {
+	ReporterType string             `json:"reporter_type,omitempty"`
+	ReporterID   string             `json:"reporter_id,omitempty"`
+	ProfileCode  string             `json:"profile_code,omitempty"`
+	RoutingHash  string             `json:"routing_hash,omitempty"`
+	Items        []HealthReportItem `json:"items"`
+}
+
+type HealthReportItem struct {
+	Kind                string `json:"kind"`
+	Key                 string `json:"key"`
+	Region              string `json:"region,omitempty"`
+	Status              string `json:"status"`
+	RTTMS               int    `json:"rtt_ms,omitempty"`
+	ConsecutiveFailures int    `json:"consecutive_failures,omitempty"`
+	LastError           string `json:"last_error,omitempty"`
+	OutboundTag         string `json:"outbound_tag,omitempty"`
+	DNSResolverTag      string `json:"dns_resolver_tag,omitempty"`
+	CheckedAt           string `json:"checked_at,omitempty"`
+	ReportJSON          string `json:"report_json,omitempty"`
+}

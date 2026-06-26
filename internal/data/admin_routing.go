@@ -8,6 +8,7 @@ import (
 
 	"github.com/npanel-dev/NPanel-backend/ent"
 	"github.com/npanel-dev/NPanel-backend/ent/proxyroutingdnsresolver"
+	"github.com/npanel-dev/NPanel-backend/ent/proxyroutinghealthreport"
 	"github.com/npanel-dev/NPanel-backend/ent/proxyroutingoutbound"
 	"github.com/npanel-dev/NPanel-backend/ent/proxyroutingprofile"
 	"github.com/npanel-dev/NPanel-backend/ent/proxyroutingrule"
@@ -418,6 +419,64 @@ func (r *adminRoutingRepo) ResolveScopeBySubscribeToken(ctx context.Context, tok
 	}, nil
 }
 
+func (r *adminRoutingRepo) SaveHealthReports(ctx context.Context, reports []*routingbiz.RoutingHealthReport) error {
+	for _, report := range reports {
+		if report == nil {
+			continue
+		}
+		if _, err := r.data.db.ProxyRoutingHealthReport.Create().
+			SetReporterType(report.ReporterType).
+			SetReporterID(report.ReporterID).
+			SetProfileCode(report.ProfileCode).
+			SetRoutingHash(report.RoutingHash).
+			SetSubjectType(report.SubjectType).
+			SetSubjectKey(report.SubjectKey).
+			SetRegion(report.Region).
+			SetStatus(report.Status).
+			SetSource(report.Source).
+			SetRttMs(report.RTTMS).
+			SetConsecutiveFailures(report.ConsecutiveFailures).
+			SetLastError(report.LastError).
+			SetOutboundTag(report.OutboundTag).
+			SetDNSResolverTag(report.DNSResolverTag).
+			SetCheckedAt(report.CheckedAt).
+			SetReportJSON(report.ReportJSON).
+			Save(ctx); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (r *adminRoutingRepo) ListHealthReports(ctx context.Context, page, size int, subjectType, subjectKey, reporterType string) ([]*routingbiz.RoutingHealthReport, int32, error) {
+	query := r.data.db.ProxyRoutingHealthReport.Query()
+	if subjectType != "" {
+		query = query.Where(proxyroutinghealthreport.SubjectTypeEQ(subjectType))
+	}
+	if subjectKey != "" {
+		query = query.Where(proxyroutinghealthreport.SubjectKeyContains(subjectKey))
+	}
+	if reporterType != "" {
+		query = query.Where(proxyroutinghealthreport.ReporterTypeEQ(reporterType))
+	}
+	total, err := query.Count(ctx)
+	if err != nil {
+		return nil, 0, err
+	}
+	pos, err := query.Order(proxyroutinghealthreport.ByCheckedAt(sql.OrderDesc()), proxyroutinghealthreport.ByID(sql.OrderDesc())).
+		Offset((page - 1) * size).
+		Limit(size).
+		All(ctx)
+	if err != nil {
+		return nil, 0, err
+	}
+	items := make([]*routingbiz.RoutingHealthReport, 0, len(pos))
+	for _, po := range pos {
+		items = append(items, healthReportToModel(po))
+	}
+	return items, int32(total), nil
+}
+
 func profileToModel(po *ent.ProxyRoutingProfile) *routingbiz.RouteProfile {
 	return &routingbiz.RouteProfile{
 		ID:          po.ID,
@@ -432,6 +491,30 @@ func profileToModel(po *ent.ProxyRoutingProfile) *routingbiz.RouteProfile {
 		ProfileJSON: po.ProfileJSON,
 		CreatedAt:   po.CreatedAt,
 		UpdatedAt:   po.UpdatedAt,
+	}
+}
+
+func healthReportToModel(po *ent.ProxyRoutingHealthReport) *routingbiz.RoutingHealthReport {
+	return &routingbiz.RoutingHealthReport{
+		ID:                  po.ID,
+		ReporterType:        po.ReporterType,
+		ReporterID:          po.ReporterID,
+		ProfileCode:         po.ProfileCode,
+		RoutingHash:         po.RoutingHash,
+		SubjectType:         po.SubjectType,
+		SubjectKey:          po.SubjectKey,
+		Region:              po.Region,
+		Status:              po.Status,
+		Source:              po.Source,
+		RTTMS:               po.RttMs,
+		ConsecutiveFailures: po.ConsecutiveFailures,
+		LastError:           po.LastError,
+		OutboundTag:         po.OutboundTag,
+		DNSResolverTag:      po.DNSResolverTag,
+		CheckedAt:           po.CheckedAt,
+		ReportJSON:          po.ReportJSON,
+		CreatedAt:           po.CreatedAt,
+		UpdatedAt:           po.UpdatedAt,
 	}
 }
 

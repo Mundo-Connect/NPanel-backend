@@ -19,28 +19,29 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	RoutingService_ListRouteProfiles_FullMethodName   = "/api.admin.routing.v1.RoutingService/ListRouteProfiles"
-	RoutingService_CreateRouteProfile_FullMethodName  = "/api.admin.routing.v1.RoutingService/CreateRouteProfile"
-	RoutingService_UpdateRouteProfile_FullMethodName  = "/api.admin.routing.v1.RoutingService/UpdateRouteProfile"
-	RoutingService_DeleteRouteProfile_FullMethodName  = "/api.admin.routing.v1.RoutingService/DeleteRouteProfile"
-	RoutingService_ListRouteRules_FullMethodName      = "/api.admin.routing.v1.RoutingService/ListRouteRules"
-	RoutingService_CreateRouteRule_FullMethodName     = "/api.admin.routing.v1.RoutingService/CreateRouteRule"
-	RoutingService_UpdateRouteRule_FullMethodName     = "/api.admin.routing.v1.RoutingService/UpdateRouteRule"
-	RoutingService_DeleteRouteRule_FullMethodName     = "/api.admin.routing.v1.RoutingService/DeleteRouteRule"
-	RoutingService_ListDnsResolvers_FullMethodName    = "/api.admin.routing.v1.RoutingService/ListDnsResolvers"
-	RoutingService_CreateDnsResolver_FullMethodName   = "/api.admin.routing.v1.RoutingService/CreateDnsResolver"
-	RoutingService_UpdateDnsResolver_FullMethodName   = "/api.admin.routing.v1.RoutingService/UpdateDnsResolver"
-	RoutingService_DeleteDnsResolver_FullMethodName   = "/api.admin.routing.v1.RoutingService/DeleteDnsResolver"
-	RoutingService_ListRouteOutbounds_FullMethodName  = "/api.admin.routing.v1.RoutingService/ListRouteOutbounds"
-	RoutingService_CreateRouteOutbound_FullMethodName = "/api.admin.routing.v1.RoutingService/CreateRouteOutbound"
-	RoutingService_UpdateRouteOutbound_FullMethodName = "/api.admin.routing.v1.RoutingService/UpdateRouteOutbound"
-	RoutingService_DeleteRouteOutbound_FullMethodName = "/api.admin.routing.v1.RoutingService/DeleteRouteOutbound"
-	RoutingService_ListUnlockServices_FullMethodName  = "/api.admin.routing.v1.RoutingService/ListUnlockServices"
-	RoutingService_CreateUnlockService_FullMethodName = "/api.admin.routing.v1.RoutingService/CreateUnlockService"
-	RoutingService_UpdateUnlockService_FullMethodName = "/api.admin.routing.v1.RoutingService/UpdateUnlockService"
-	RoutingService_DeleteUnlockService_FullMethodName = "/api.admin.routing.v1.RoutingService/DeleteUnlockService"
-	RoutingService_PreviewRouteConfig_FullMethodName  = "/api.admin.routing.v1.RoutingService/PreviewRouteConfig"
-	RoutingService_GetRoutingOverview_FullMethodName  = "/api.admin.routing.v1.RoutingService/GetRoutingOverview"
+	RoutingService_ListRouteProfiles_FullMethodName        = "/api.admin.routing.v1.RoutingService/ListRouteProfiles"
+	RoutingService_CreateRouteProfile_FullMethodName       = "/api.admin.routing.v1.RoutingService/CreateRouteProfile"
+	RoutingService_UpdateRouteProfile_FullMethodName       = "/api.admin.routing.v1.RoutingService/UpdateRouteProfile"
+	RoutingService_DeleteRouteProfile_FullMethodName       = "/api.admin.routing.v1.RoutingService/DeleteRouteProfile"
+	RoutingService_ListRouteRules_FullMethodName           = "/api.admin.routing.v1.RoutingService/ListRouteRules"
+	RoutingService_CreateRouteRule_FullMethodName          = "/api.admin.routing.v1.RoutingService/CreateRouteRule"
+	RoutingService_UpdateRouteRule_FullMethodName          = "/api.admin.routing.v1.RoutingService/UpdateRouteRule"
+	RoutingService_DeleteRouteRule_FullMethodName          = "/api.admin.routing.v1.RoutingService/DeleteRouteRule"
+	RoutingService_ListDnsResolvers_FullMethodName         = "/api.admin.routing.v1.RoutingService/ListDnsResolvers"
+	RoutingService_CreateDnsResolver_FullMethodName        = "/api.admin.routing.v1.RoutingService/CreateDnsResolver"
+	RoutingService_UpdateDnsResolver_FullMethodName        = "/api.admin.routing.v1.RoutingService/UpdateDnsResolver"
+	RoutingService_DeleteDnsResolver_FullMethodName        = "/api.admin.routing.v1.RoutingService/DeleteDnsResolver"
+	RoutingService_ListRouteOutbounds_FullMethodName       = "/api.admin.routing.v1.RoutingService/ListRouteOutbounds"
+	RoutingService_CreateRouteOutbound_FullMethodName      = "/api.admin.routing.v1.RoutingService/CreateRouteOutbound"
+	RoutingService_UpdateRouteOutbound_FullMethodName      = "/api.admin.routing.v1.RoutingService/UpdateRouteOutbound"
+	RoutingService_DeleteRouteOutbound_FullMethodName      = "/api.admin.routing.v1.RoutingService/DeleteRouteOutbound"
+	RoutingService_ListUnlockServices_FullMethodName       = "/api.admin.routing.v1.RoutingService/ListUnlockServices"
+	RoutingService_CreateUnlockService_FullMethodName      = "/api.admin.routing.v1.RoutingService/CreateUnlockService"
+	RoutingService_UpdateUnlockService_FullMethodName      = "/api.admin.routing.v1.RoutingService/UpdateUnlockService"
+	RoutingService_DeleteUnlockService_FullMethodName      = "/api.admin.routing.v1.RoutingService/DeleteUnlockService"
+	RoutingService_PreviewRouteConfig_FullMethodName       = "/api.admin.routing.v1.RoutingService/PreviewRouteConfig"
+	RoutingService_GetRoutingOverview_FullMethodName       = "/api.admin.routing.v1.RoutingService/GetRoutingOverview"
+	RoutingService_ListRoutingHealthReports_FullMethodName = "/api.admin.routing.v1.RoutingService/ListRoutingHealthReports"
 )
 
 // RoutingServiceClient is the client API for RoutingService service.
@@ -69,6 +70,7 @@ type RoutingServiceClient interface {
 	DeleteUnlockService(ctx context.Context, in *DeleteUnlockServiceRequest, opts ...grpc.CallOption) (*DeleteRouteItemReply, error)
 	PreviewRouteConfig(ctx context.Context, in *PreviewRouteConfigRequest, opts ...grpc.CallOption) (*PreviewRouteConfigReply, error)
 	GetRoutingOverview(ctx context.Context, in *GetRoutingOverviewRequest, opts ...grpc.CallOption) (*GetRoutingOverviewReply, error)
+	ListRoutingHealthReports(ctx context.Context, in *ListRoutingHealthReportsRequest, opts ...grpc.CallOption) (*ListRoutingHealthReportsReply, error)
 }
 
 type routingServiceClient struct {
@@ -299,6 +301,16 @@ func (c *routingServiceClient) GetRoutingOverview(ctx context.Context, in *GetRo
 	return out, nil
 }
 
+func (c *routingServiceClient) ListRoutingHealthReports(ctx context.Context, in *ListRoutingHealthReportsRequest, opts ...grpc.CallOption) (*ListRoutingHealthReportsReply, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListRoutingHealthReportsReply)
+	err := c.cc.Invoke(ctx, RoutingService_ListRoutingHealthReports_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // RoutingServiceServer is the server API for RoutingService service.
 // All implementations must embed UnimplementedRoutingServiceServer
 // for forward compatibility.
@@ -325,6 +337,7 @@ type RoutingServiceServer interface {
 	DeleteUnlockService(context.Context, *DeleteUnlockServiceRequest) (*DeleteRouteItemReply, error)
 	PreviewRouteConfig(context.Context, *PreviewRouteConfigRequest) (*PreviewRouteConfigReply, error)
 	GetRoutingOverview(context.Context, *GetRoutingOverviewRequest) (*GetRoutingOverviewReply, error)
+	ListRoutingHealthReports(context.Context, *ListRoutingHealthReportsRequest) (*ListRoutingHealthReportsReply, error)
 	mustEmbedUnimplementedRoutingServiceServer()
 }
 
@@ -400,6 +413,9 @@ func (UnimplementedRoutingServiceServer) PreviewRouteConfig(context.Context, *Pr
 }
 func (UnimplementedRoutingServiceServer) GetRoutingOverview(context.Context, *GetRoutingOverviewRequest) (*GetRoutingOverviewReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetRoutingOverview not implemented")
+}
+func (UnimplementedRoutingServiceServer) ListRoutingHealthReports(context.Context, *ListRoutingHealthReportsRequest) (*ListRoutingHealthReportsReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListRoutingHealthReports not implemented")
 }
 func (UnimplementedRoutingServiceServer) mustEmbedUnimplementedRoutingServiceServer() {}
 func (UnimplementedRoutingServiceServer) testEmbeddedByValue()                        {}
@@ -818,6 +834,24 @@ func _RoutingService_GetRoutingOverview_Handler(srv interface{}, ctx context.Con
 	return interceptor(ctx, in, info, handler)
 }
 
+func _RoutingService_ListRoutingHealthReports_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListRoutingHealthReportsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RoutingServiceServer).ListRoutingHealthReports(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: RoutingService_ListRoutingHealthReports_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RoutingServiceServer).ListRoutingHealthReports(ctx, req.(*ListRoutingHealthReportsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // RoutingService_ServiceDesc is the grpc.ServiceDesc for RoutingService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -912,6 +946,10 @@ var RoutingService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetRoutingOverview",
 			Handler:    _RoutingService_GetRoutingOverview_Handler,
+		},
+		{
+			MethodName: "ListRoutingHealthReports",
+			Handler:    _RoutingService_ListRoutingHealthReports_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

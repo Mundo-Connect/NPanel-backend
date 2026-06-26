@@ -29,6 +29,10 @@ func (s *RoutingService) BuildPublicConfig(ctx context.Context, now time.Time, o
 	return s.uc.BuildConfig(ctx, now, opts)
 }
 
+func (s *RoutingService) RecordHealthReport(ctx context.Context, req publicrouting.HealthReportRequest) error {
+	return s.uc.RecordHealthReport(ctx, req)
+}
+
 func (s *RoutingService) ListRouteProfiles(ctx context.Context, req *v1.ListRouteProfilesRequest) (*v1.ListRouteProfilesReply, error) {
 	items, total, err := s.uc.ListProfiles(ctx, int(req.Page), int(req.Size), req.Search, nil)
 	if err != nil {
@@ -259,6 +263,22 @@ func (s *RoutingService) GetRoutingOverview(ctx context.Context, req *v1.GetRout
 	}, nil
 }
 
+func (s *RoutingService) ListRoutingHealthReports(ctx context.Context, req *v1.ListRoutingHealthReportsRequest) (*v1.ListRoutingHealthReportsReply, error) {
+	items, total, err := s.uc.ListHealthReports(ctx, int(req.Page), int(req.Size), req.SubjectType, req.SubjectKey, req.ReporterType)
+	if err != nil {
+		return nil, err
+	}
+	list := make([]*v1.RoutingHealthReport, 0, len(items))
+	for _, item := range items {
+		list = append(list, healthReportToProto(item))
+	}
+	return &v1.ListRoutingHealthReportsReply{
+		Code:    successCode,
+		Message: "success",
+		Data:    &v1.RoutingHealthReportListData{List: list, Total: total},
+	}, nil
+}
+
 func routeProfileFromProto(item *v1.RouteProfile) *routingbiz.RouteProfile {
 	if item == nil {
 		return &routingbiz.RouteProfile{}
@@ -274,6 +294,33 @@ func routeProfileFromProto(item *v1.RouteProfile) *routingbiz.RouteProfile {
 		Mode:        item.Mode,
 		Enabled:     item.Enabled,
 		ProfileJSON: item.ProfileJson,
+	}
+}
+
+func healthReportToProto(item *routingbiz.RoutingHealthReport) *v1.RoutingHealthReport {
+	if item == nil {
+		return nil
+	}
+	return &v1.RoutingHealthReport{
+		Id:                  item.ID,
+		ReporterType:        item.ReporterType,
+		ReporterId:          item.ReporterID,
+		ProfileCode:         item.ProfileCode,
+		RoutingHash:         item.RoutingHash,
+		SubjectType:         item.SubjectType,
+		SubjectKey:          item.SubjectKey,
+		Region:              item.Region,
+		Status:              item.Status,
+		Source:              item.Source,
+		RttMs:               int32(item.RTTMS),
+		ConsecutiveFailures: int32(item.ConsecutiveFailures),
+		LastError:           item.LastError,
+		OutboundTag:         item.OutboundTag,
+		DnsResolverTag:      item.DNSResolverTag,
+		CheckedAt:           item.CheckedAt.Unix(),
+		ReportJson:          item.ReportJSON,
+		CreatedAt:           item.CreatedAt.Unix(),
+		UpdatedAt:           item.UpdatedAt.Unix(),
 	}
 }
 

@@ -165,6 +165,18 @@ func (f ProxyRoutingDNSResolverFunc) Mutate(ctx context.Context, m ent.Mutation)
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ProxyRoutingDNSResolverMutation", m)
 }
 
+// The ProxyRoutingHealthReportFunc type is an adapter to allow the use of ordinary
+// function as ProxyRoutingHealthReport mutator.
+type ProxyRoutingHealthReportFunc func(context.Context, *ent.ProxyRoutingHealthReportMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ProxyRoutingHealthReportFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ProxyRoutingHealthReportMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ProxyRoutingHealthReportMutation", m)
+}
+
 // The ProxyRoutingOutboundFunc type is an adapter to allow the use of ordinary
 // function as ProxyRoutingOutbound mutator.
 type ProxyRoutingOutboundFunc func(context.Context, *ent.ProxyRoutingOutboundMutation) (ent.Value, error)

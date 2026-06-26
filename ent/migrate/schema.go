@@ -315,6 +315,34 @@ var (
 		Columns:    RoutingDNSResolverColumns,
 		PrimaryKey: []*schema.Column{RoutingDNSResolverColumns[0]},
 	}
+	// RoutingHealthReportColumns holds the columns for the "routing_health_report" table.
+	RoutingHealthReportColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "Routing health report ID"},
+		{Name: "reporter_type", Type: field.TypeString, Size: 32, Comment: "client/node/backend", Default: "client"},
+		{Name: "reporter_id", Type: field.TypeString, Size: 128, Comment: "Reporter identifier", Default: ""},
+		{Name: "profile_code", Type: field.TypeString, Size: 128, Comment: "Routing profile code", Default: ""},
+		{Name: "routing_hash", Type: field.TypeString, Size: 128, Comment: "Routing hash", Default: ""},
+		{Name: "subject_type", Type: field.TypeString, Size: 32, Comment: "outbound/dns_resolver/service"},
+		{Name: "subject_key", Type: field.TypeString, Size: 128, Comment: "Outbound tag, DNS resolver tag or service code"},
+		{Name: "region", Type: field.TypeString, Size: 32, Comment: "Region code", Default: ""},
+		{Name: "status", Type: field.TypeString, Size: 32, Comment: "healthy/ok/failed/degraded/stale/disabled/unknown", Default: "unknown"},
+		{Name: "source", Type: field.TypeString, Size: 64, Comment: "Health source", Default: "health_report"},
+		{Name: "rtt_ms", Type: field.TypeInt, Comment: "RTT in milliseconds", Default: 0},
+		{Name: "consecutive_failures", Type: field.TypeInt, Comment: "Consecutive failures", Default: 0},
+		{Name: "last_error", Type: field.TypeString, Nullable: true, Size: 2147483647, Comment: "Last health error"},
+		{Name: "outbound_tag", Type: field.TypeString, Size: 128, Comment: "Related outbound tag", Default: ""},
+		{Name: "dns_resolver_tag", Type: field.TypeString, Size: 128, Comment: "Related DNS resolver tag", Default: ""},
+		{Name: "checked_at", Type: field.TypeTime, Comment: "Checked at"},
+		{Name: "report_json", Type: field.TypeString, Size: 2147483647, Comment: "Raw health report JSON", Default: "{}"},
+		{Name: "created_at", Type: field.TypeTime, Comment: "Created at"},
+		{Name: "updated_at", Type: field.TypeTime, Comment: "Updated at"},
+	}
+	// RoutingHealthReportTable holds the schema information for the "routing_health_report" table.
+	RoutingHealthReportTable = &schema.Table{
+		Name:       "routing_health_report",
+		Columns:    RoutingHealthReportColumns,
+		PrimaryKey: []*schema.Column{RoutingHealthReportColumns[0]},
+	}
 	// RoutingOutboundColumns holds the columns for the "routing_outbound" table.
 	RoutingOutboundColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "Route Outbound ID"},
@@ -828,6 +856,7 @@ var (
 		RedemptionCodeTable,
 		RedemptionRecordTable,
 		RoutingDNSResolverTable,
+		RoutingHealthReportTable,
 		RoutingOutboundTable,
 		RoutingProfileTable,
 		RoutingRuleTable,
@@ -896,6 +925,9 @@ func init() {
 	}
 	RoutingDNSResolverTable.Annotation = &entsql.Annotation{
 		Table: "routing_dns_resolver",
+	}
+	RoutingHealthReportTable.Annotation = &entsql.Annotation{
+		Table: "routing_health_report",
 	}
 	RoutingOutboundTable.Annotation = &entsql.Annotation{
 		Table: "routing_outbound",

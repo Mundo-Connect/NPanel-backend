@@ -18,6 +18,7 @@ import (
 	"github.com/npanel-dev/NPanel-backend/ent/proxyredemptioncode"
 	"github.com/npanel-dev/NPanel-backend/ent/proxyredemptionrecord"
 	"github.com/npanel-dev/NPanel-backend/ent/proxyroutingdnsresolver"
+	"github.com/npanel-dev/NPanel-backend/ent/proxyroutinghealthreport"
 	"github.com/npanel-dev/NPanel-backend/ent/proxyroutingoutbound"
 	"github.com/npanel-dev/NPanel-backend/ent/proxyroutingprofile"
 	"github.com/npanel-dev/NPanel-backend/ent/proxyroutingrule"
@@ -852,6 +853,124 @@ func init() {
 	proxyroutingdnsresolver.DefaultUpdatedAt = proxyroutingdnsresolverDescUpdatedAt.Default.(func() time.Time)
 	// proxyroutingdnsresolver.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	proxyroutingdnsresolver.UpdateDefaultUpdatedAt = proxyroutingdnsresolverDescUpdatedAt.UpdateDefault.(func() time.Time)
+	proxyroutinghealthreportFields := schema.ProxyRoutingHealthReport{}.Fields()
+	_ = proxyroutinghealthreportFields
+	// proxyroutinghealthreportDescReporterType is the schema descriptor for reporter_type field.
+	proxyroutinghealthreportDescReporterType := proxyroutinghealthreportFields[1].Descriptor()
+	// proxyroutinghealthreport.DefaultReporterType holds the default value on creation for the reporter_type field.
+	proxyroutinghealthreport.DefaultReporterType = proxyroutinghealthreportDescReporterType.Default.(string)
+	// proxyroutinghealthreport.ReporterTypeValidator is a validator for the "reporter_type" field. It is called by the builders before save.
+	proxyroutinghealthreport.ReporterTypeValidator = proxyroutinghealthreportDescReporterType.Validators[0].(func(string) error)
+	// proxyroutinghealthreportDescReporterID is the schema descriptor for reporter_id field.
+	proxyroutinghealthreportDescReporterID := proxyroutinghealthreportFields[2].Descriptor()
+	// proxyroutinghealthreport.DefaultReporterID holds the default value on creation for the reporter_id field.
+	proxyroutinghealthreport.DefaultReporterID = proxyroutinghealthreportDescReporterID.Default.(string)
+	// proxyroutinghealthreport.ReporterIDValidator is a validator for the "reporter_id" field. It is called by the builders before save.
+	proxyroutinghealthreport.ReporterIDValidator = proxyroutinghealthreportDescReporterID.Validators[0].(func(string) error)
+	// proxyroutinghealthreportDescProfileCode is the schema descriptor for profile_code field.
+	proxyroutinghealthreportDescProfileCode := proxyroutinghealthreportFields[3].Descriptor()
+	// proxyroutinghealthreport.DefaultProfileCode holds the default value on creation for the profile_code field.
+	proxyroutinghealthreport.DefaultProfileCode = proxyroutinghealthreportDescProfileCode.Default.(string)
+	// proxyroutinghealthreport.ProfileCodeValidator is a validator for the "profile_code" field. It is called by the builders before save.
+	proxyroutinghealthreport.ProfileCodeValidator = proxyroutinghealthreportDescProfileCode.Validators[0].(func(string) error)
+	// proxyroutinghealthreportDescRoutingHash is the schema descriptor for routing_hash field.
+	proxyroutinghealthreportDescRoutingHash := proxyroutinghealthreportFields[4].Descriptor()
+	// proxyroutinghealthreport.DefaultRoutingHash holds the default value on creation for the routing_hash field.
+	proxyroutinghealthreport.DefaultRoutingHash = proxyroutinghealthreportDescRoutingHash.Default.(string)
+	// proxyroutinghealthreport.RoutingHashValidator is a validator for the "routing_hash" field. It is called by the builders before save.
+	proxyroutinghealthreport.RoutingHashValidator = proxyroutinghealthreportDescRoutingHash.Validators[0].(func(string) error)
+	// proxyroutinghealthreportDescSubjectType is the schema descriptor for subject_type field.
+	proxyroutinghealthreportDescSubjectType := proxyroutinghealthreportFields[5].Descriptor()
+	// proxyroutinghealthreport.SubjectTypeValidator is a validator for the "subject_type" field. It is called by the builders before save.
+	proxyroutinghealthreport.SubjectTypeValidator = func() func(string) error {
+		validators := proxyroutinghealthreportDescSubjectType.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(subject_type string) error {
+			for _, fn := range fns {
+				if err := fn(subject_type); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// proxyroutinghealthreportDescSubjectKey is the schema descriptor for subject_key field.
+	proxyroutinghealthreportDescSubjectKey := proxyroutinghealthreportFields[6].Descriptor()
+	// proxyroutinghealthreport.SubjectKeyValidator is a validator for the "subject_key" field. It is called by the builders before save.
+	proxyroutinghealthreport.SubjectKeyValidator = func() func(string) error {
+		validators := proxyroutinghealthreportDescSubjectKey.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(subject_key string) error {
+			for _, fn := range fns {
+				if err := fn(subject_key); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// proxyroutinghealthreportDescRegion is the schema descriptor for region field.
+	proxyroutinghealthreportDescRegion := proxyroutinghealthreportFields[7].Descriptor()
+	// proxyroutinghealthreport.DefaultRegion holds the default value on creation for the region field.
+	proxyroutinghealthreport.DefaultRegion = proxyroutinghealthreportDescRegion.Default.(string)
+	// proxyroutinghealthreport.RegionValidator is a validator for the "region" field. It is called by the builders before save.
+	proxyroutinghealthreport.RegionValidator = proxyroutinghealthreportDescRegion.Validators[0].(func(string) error)
+	// proxyroutinghealthreportDescStatus is the schema descriptor for status field.
+	proxyroutinghealthreportDescStatus := proxyroutinghealthreportFields[8].Descriptor()
+	// proxyroutinghealthreport.DefaultStatus holds the default value on creation for the status field.
+	proxyroutinghealthreport.DefaultStatus = proxyroutinghealthreportDescStatus.Default.(string)
+	// proxyroutinghealthreport.StatusValidator is a validator for the "status" field. It is called by the builders before save.
+	proxyroutinghealthreport.StatusValidator = proxyroutinghealthreportDescStatus.Validators[0].(func(string) error)
+	// proxyroutinghealthreportDescSource is the schema descriptor for source field.
+	proxyroutinghealthreportDescSource := proxyroutinghealthreportFields[9].Descriptor()
+	// proxyroutinghealthreport.DefaultSource holds the default value on creation for the source field.
+	proxyroutinghealthreport.DefaultSource = proxyroutinghealthreportDescSource.Default.(string)
+	// proxyroutinghealthreport.SourceValidator is a validator for the "source" field. It is called by the builders before save.
+	proxyroutinghealthreport.SourceValidator = proxyroutinghealthreportDescSource.Validators[0].(func(string) error)
+	// proxyroutinghealthreportDescRttMs is the schema descriptor for rtt_ms field.
+	proxyroutinghealthreportDescRttMs := proxyroutinghealthreportFields[10].Descriptor()
+	// proxyroutinghealthreport.DefaultRttMs holds the default value on creation for the rtt_ms field.
+	proxyroutinghealthreport.DefaultRttMs = proxyroutinghealthreportDescRttMs.Default.(int)
+	// proxyroutinghealthreportDescConsecutiveFailures is the schema descriptor for consecutive_failures field.
+	proxyroutinghealthreportDescConsecutiveFailures := proxyroutinghealthreportFields[11].Descriptor()
+	// proxyroutinghealthreport.DefaultConsecutiveFailures holds the default value on creation for the consecutive_failures field.
+	proxyroutinghealthreport.DefaultConsecutiveFailures = proxyroutinghealthreportDescConsecutiveFailures.Default.(int)
+	// proxyroutinghealthreportDescOutboundTag is the schema descriptor for outbound_tag field.
+	proxyroutinghealthreportDescOutboundTag := proxyroutinghealthreportFields[13].Descriptor()
+	// proxyroutinghealthreport.DefaultOutboundTag holds the default value on creation for the outbound_tag field.
+	proxyroutinghealthreport.DefaultOutboundTag = proxyroutinghealthreportDescOutboundTag.Default.(string)
+	// proxyroutinghealthreport.OutboundTagValidator is a validator for the "outbound_tag" field. It is called by the builders before save.
+	proxyroutinghealthreport.OutboundTagValidator = proxyroutinghealthreportDescOutboundTag.Validators[0].(func(string) error)
+	// proxyroutinghealthreportDescDNSResolverTag is the schema descriptor for dns_resolver_tag field.
+	proxyroutinghealthreportDescDNSResolverTag := proxyroutinghealthreportFields[14].Descriptor()
+	// proxyroutinghealthreport.DefaultDNSResolverTag holds the default value on creation for the dns_resolver_tag field.
+	proxyroutinghealthreport.DefaultDNSResolverTag = proxyroutinghealthreportDescDNSResolverTag.Default.(string)
+	// proxyroutinghealthreport.DNSResolverTagValidator is a validator for the "dns_resolver_tag" field. It is called by the builders before save.
+	proxyroutinghealthreport.DNSResolverTagValidator = proxyroutinghealthreportDescDNSResolverTag.Validators[0].(func(string) error)
+	// proxyroutinghealthreportDescCheckedAt is the schema descriptor for checked_at field.
+	proxyroutinghealthreportDescCheckedAt := proxyroutinghealthreportFields[15].Descriptor()
+	// proxyroutinghealthreport.DefaultCheckedAt holds the default value on creation for the checked_at field.
+	proxyroutinghealthreport.DefaultCheckedAt = proxyroutinghealthreportDescCheckedAt.Default.(func() time.Time)
+	// proxyroutinghealthreportDescReportJSON is the schema descriptor for report_json field.
+	proxyroutinghealthreportDescReportJSON := proxyroutinghealthreportFields[16].Descriptor()
+	// proxyroutinghealthreport.DefaultReportJSON holds the default value on creation for the report_json field.
+	proxyroutinghealthreport.DefaultReportJSON = proxyroutinghealthreportDescReportJSON.Default.(string)
+	// proxyroutinghealthreportDescCreatedAt is the schema descriptor for created_at field.
+	proxyroutinghealthreportDescCreatedAt := proxyroutinghealthreportFields[17].Descriptor()
+	// proxyroutinghealthreport.DefaultCreatedAt holds the default value on creation for the created_at field.
+	proxyroutinghealthreport.DefaultCreatedAt = proxyroutinghealthreportDescCreatedAt.Default.(func() time.Time)
+	// proxyroutinghealthreportDescUpdatedAt is the schema descriptor for updated_at field.
+	proxyroutinghealthreportDescUpdatedAt := proxyroutinghealthreportFields[18].Descriptor()
+	// proxyroutinghealthreport.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	proxyroutinghealthreport.DefaultUpdatedAt = proxyroutinghealthreportDescUpdatedAt.Default.(func() time.Time)
+	// proxyroutinghealthreport.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	proxyroutinghealthreport.UpdateDefaultUpdatedAt = proxyroutinghealthreportDescUpdatedAt.UpdateDefault.(func() time.Time)
 	proxyroutingoutboundFields := schema.ProxyRoutingOutbound{}.Fields()
 	_ = proxyroutingoutboundFields
 	// proxyroutingoutboundDescTag is the schema descriptor for tag field.

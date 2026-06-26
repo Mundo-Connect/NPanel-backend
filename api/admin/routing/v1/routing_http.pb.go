@@ -34,6 +34,7 @@ const OperationRoutingServiceListDnsResolvers = "/api.admin.routing.v1.RoutingSe
 const OperationRoutingServiceListRouteOutbounds = "/api.admin.routing.v1.RoutingService/ListRouteOutbounds"
 const OperationRoutingServiceListRouteProfiles = "/api.admin.routing.v1.RoutingService/ListRouteProfiles"
 const OperationRoutingServiceListRouteRules = "/api.admin.routing.v1.RoutingService/ListRouteRules"
+const OperationRoutingServiceListRoutingHealthReports = "/api.admin.routing.v1.RoutingService/ListRoutingHealthReports"
 const OperationRoutingServiceListUnlockServices = "/api.admin.routing.v1.RoutingService/ListUnlockServices"
 const OperationRoutingServicePreviewRouteConfig = "/api.admin.routing.v1.RoutingService/PreviewRouteConfig"
 const OperationRoutingServiceUpdateDnsResolver = "/api.admin.routing.v1.RoutingService/UpdateDnsResolver"
@@ -58,6 +59,7 @@ type RoutingServiceHTTPServer interface {
 	ListRouteOutbounds(context.Context, *ListRouteOutboundsRequest) (*ListRouteOutboundsReply, error)
 	ListRouteProfiles(context.Context, *ListRouteProfilesRequest) (*ListRouteProfilesReply, error)
 	ListRouteRules(context.Context, *ListRouteRulesRequest) (*ListRouteRulesReply, error)
+	ListRoutingHealthReports(context.Context, *ListRoutingHealthReportsRequest) (*ListRoutingHealthReportsReply, error)
 	ListUnlockServices(context.Context, *ListUnlockServicesRequest) (*ListUnlockServicesReply, error)
 	PreviewRouteConfig(context.Context, *PreviewRouteConfigRequest) (*PreviewRouteConfigReply, error)
 	UpdateDnsResolver(context.Context, *UpdateDnsResolverRequest) (*DnsResolverReply, error)
@@ -91,6 +93,7 @@ func RegisterRoutingServiceHTTPServer(s *http.Server, srv RoutingServiceHTTPServ
 	r.DELETE("/v1/admin/routing/unlock_service", _RoutingService_DeleteUnlockService0_HTTP_Handler(srv))
 	r.POST("/v1/admin/routing/preview", _RoutingService_PreviewRouteConfig0_HTTP_Handler(srv))
 	r.GET("/v1/admin/routing/overview", _RoutingService_GetRoutingOverview0_HTTP_Handler(srv))
+	r.GET("/v1/admin/routing/health_reports", _RoutingService_ListRoutingHealthReports0_HTTP_Handler(srv))
 }
 
 func _RoutingService_ListRouteProfiles0_HTTP_Handler(srv RoutingServiceHTTPServer) func(ctx http.Context) error {
@@ -544,6 +547,25 @@ func _RoutingService_GetRoutingOverview0_HTTP_Handler(srv RoutingServiceHTTPServ
 	}
 }
 
+func _RoutingService_ListRoutingHealthReports0_HTTP_Handler(srv RoutingServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ListRoutingHealthReportsRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationRoutingServiceListRoutingHealthReports)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ListRoutingHealthReports(ctx, req.(*ListRoutingHealthReportsRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ListRoutingHealthReportsReply)
+		return ctx.Result(200, reply)
+	}
+}
+
 type RoutingServiceHTTPClient interface {
 	CreateDnsResolver(ctx context.Context, req *CreateDnsResolverRequest, opts ...http.CallOption) (rsp *DnsResolverReply, err error)
 	CreateRouteOutbound(ctx context.Context, req *CreateRouteOutboundRequest, opts ...http.CallOption) (rsp *RouteOutboundReply, err error)
@@ -560,6 +582,7 @@ type RoutingServiceHTTPClient interface {
 	ListRouteOutbounds(ctx context.Context, req *ListRouteOutboundsRequest, opts ...http.CallOption) (rsp *ListRouteOutboundsReply, err error)
 	ListRouteProfiles(ctx context.Context, req *ListRouteProfilesRequest, opts ...http.CallOption) (rsp *ListRouteProfilesReply, err error)
 	ListRouteRules(ctx context.Context, req *ListRouteRulesRequest, opts ...http.CallOption) (rsp *ListRouteRulesReply, err error)
+	ListRoutingHealthReports(ctx context.Context, req *ListRoutingHealthReportsRequest, opts ...http.CallOption) (rsp *ListRoutingHealthReportsReply, err error)
 	ListUnlockServices(ctx context.Context, req *ListUnlockServicesRequest, opts ...http.CallOption) (rsp *ListUnlockServicesReply, err error)
 	PreviewRouteConfig(ctx context.Context, req *PreviewRouteConfigRequest, opts ...http.CallOption) (rsp *PreviewRouteConfigReply, err error)
 	UpdateDnsResolver(ctx context.Context, req *UpdateDnsResolverRequest, opts ...http.CallOption) (rsp *DnsResolverReply, err error)
@@ -764,6 +787,19 @@ func (c *RoutingServiceHTTPClientImpl) ListRouteRules(ctx context.Context, in *L
 	pattern := "/v1/admin/routing/rules"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationRoutingServiceListRouteRules))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *RoutingServiceHTTPClientImpl) ListRoutingHealthReports(ctx context.Context, in *ListRoutingHealthReportsRequest, opts ...http.CallOption) (*ListRoutingHealthReportsReply, error) {
+	var out ListRoutingHealthReportsReply
+	pattern := "/v1/admin/routing/health_reports"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationRoutingServiceListRoutingHealthReports))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {

@@ -2053,6 +2053,39 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/api.admin.routing.v1.ListDnsResolversReply'
+    /v1/admin/routing/health_reports:
+        get:
+            tags:
+                - RoutingService
+            operationId: RoutingService_ListRoutingHealthReports
+            parameters:
+                - name: page
+                  in: query
+                  schema:
+                    type: string
+                - name: size
+                  in: query
+                  schema:
+                    type: string
+                - name: subjectType
+                  in: query
+                  schema:
+                    type: string
+                - name: subjectKey
+                  in: query
+                  schema:
+                    type: string
+                - name: reporterType
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.admin.routing.v1.ListRoutingHealthReportsReply'
     /v1/admin/routing/outbound:
         put:
             tags:
@@ -9089,6 +9122,16 @@ components:
                     type: string
                 data:
                     $ref: '#/components/schemas/api.admin.routing.v1.RouteRuleListData'
+        api.admin.routing.v1.ListRoutingHealthReportsReply:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/api.admin.routing.v1.RoutingHealthReportListData'
         api.admin.routing.v1.ListUnlockServicesReply:
             type: object
             properties:
@@ -9373,6 +9416,59 @@ components:
                     type: string
                 dnsResolverTag:
                     type: string
+        api.admin.routing.v1.RoutingHealthReport:
+            type: object
+            properties:
+                id:
+                    type: string
+                reporterType:
+                    type: string
+                reporterId:
+                    type: string
+                profileCode:
+                    type: string
+                routingHash:
+                    type: string
+                subjectType:
+                    type: string
+                subjectKey:
+                    type: string
+                region:
+                    type: string
+                status:
+                    type: string
+                source:
+                    type: string
+                rttMs:
+                    type: integer
+                    format: int32
+                consecutiveFailures:
+                    type: integer
+                    format: int32
+                lastError:
+                    type: string
+                outboundTag:
+                    type: string
+                dnsResolverTag:
+                    type: string
+                checkedAt:
+                    type: string
+                reportJson:
+                    type: string
+                createdAt:
+                    type: string
+                updatedAt:
+                    type: string
+        api.admin.routing.v1.RoutingHealthReportListData:
+            type: object
+            properties:
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.admin.routing.v1.RoutingHealthReport'
+                total:
+                    type: integer
+                    format: int32
         api.admin.routing.v1.RoutingOverview:
             type: object
             properties:

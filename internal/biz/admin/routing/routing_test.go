@@ -10,9 +10,10 @@ import (
 )
 
 type fakeRoutingRepo struct {
-	profiles   []*RouteProfile
-	rules      []*RouteRule
-	tokenScope ScopeContext
+	profiles      []*RouteProfile
+	rules         []*RouteRule
+	healthReports []*RoutingHealthReport
+	tokenScope    ScopeContext
 }
 
 func (r fakeRoutingRepo) SaveProfile(context.Context, *RouteProfile) (*RouteProfile, error) {
@@ -82,6 +83,12 @@ func (r fakeRoutingRepo) ListUnlockServices(context.Context, int, int, string, *
 func (r fakeRoutingRepo) DeleteUnlockService(context.Context, int64) error { panic("not used") }
 func (r fakeRoutingRepo) ResolveScopeBySubscribeToken(context.Context, string) (ScopeContext, error) {
 	return r.tokenScope, nil
+}
+func (r fakeRoutingRepo) SaveHealthReports(context.Context, []*RoutingHealthReport) error {
+	return nil
+}
+func (r fakeRoutingRepo) ListHealthReports(context.Context, int, int, string, string, string) ([]*RoutingHealthReport, int32, error) {
+	return r.healthReports, int32(len(r.healthReports)), nil
 }
 
 func TestBuildConfigFallsBackToFixtureWhenStoreIsEmpty(t *testing.T) {
@@ -199,6 +206,63 @@ func TestBuildConfigResolveScopeFromSubscribeToken(t *testing.T) {
 	}
 	if cfg.Profile.Code != "subscription_instance_profile" {
 		t.Fatalf("Profile.Code = %q, want subscription_instance_profile", cfg.Profile.Code)
+	}
+}
+
+func TestBuildConfigMergesFreshHealthReports(t *testing.T) {
+	now := time.Date(2026, 6, 27, 10, 0, 0, 0, time.UTC)
+	uc := NewRoutingUsecase(fakeRoutingRepo{
+		profiles: []*RouteProfile{
+			{
+				ID:          1,
+				Code:        "db_profile",
+				Name:        "DB Profile",
+				ScopeType:   "user",
+				ScopeID:     "10001",
+				Mode:        "enforce",
+				Enabled:     true,
+				ProfileJSON: `{"default_action":{"type":"proxy"},"default_dns_resolver_tag":"dns:system","default_fallback_policy":"fallback_default"}`,
+			},
+		},
+		healthReports: []*RoutingHealthReport{
+			{
+				SubjectType: "outbound",
+				SubjectKey:  "unlock:openai:us",
+				Status:      "healthy",
+				Source:      "client_health_report",
+				RTTMS:       42,
+				CheckedAt:   now.Add(-time.Minute),
+			},
+			{
+				SubjectType: "dns_resolver",
+				SubjectKey:  "dns:cloudflare-doh",
+				Status:      "healthy",
+				Source:      "client_health_report",
+				CheckedAt:   now.Add(-time.Minute),
+			},
+			{
+				SubjectType: "service",
+				SubjectKey:  "openai",
+				Status:      "healthy",
+				Source:      "client_health_report",
+				CheckedAt:   now.Add(-time.Minute),
+			},
+		},
+	}, log.DefaultLogger)
+
+	cfg, err := uc.BuildConfig(context.Background(), now, publicrouting.ConfigOptions{UserID: 10001})
+	if err != nil {
+		t.Fatalf("BuildConfig() error = %v", err)
+	}
+	result := publicrouting.PreviewRouteConfig(cfg, publicrouting.PreviewRequest{
+		Domain:            "example.com",
+		SupportedFeatures: []string{"route_outbound", "route_dns_resolver", "doh"},
+	})
+	if !result.ExecutionEnabled {
+		t.Fatal("ExecutionEnabled = false, want true for enforce gray scope with healthy reports")
+	}
+	if cfg.HealthSnapshot.Outbounds[0].Status != "healthy" {
+		t.Fatalf("outbound status = %q, want healthy", cfg.HealthSnapshot.Outbounds[0].Status)
 	}
 }
 

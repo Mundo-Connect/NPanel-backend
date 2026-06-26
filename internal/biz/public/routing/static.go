@@ -193,7 +193,7 @@ func PreviewRouteConfig(envelope Envelope, req PreviewRequest) PreviewResult {
 		FallbackPolicy:   envelope.Profile.DefaultFallbackPolicy,
 		Unsupported:      unsupported,
 		EffectiveMode:    envelope.Mode,
-		ExecutionEnabled: false,
+		ExecutionEnabled: envelope.Mode == "enforce" && envelope.Profile.Scope.Type != "" && envelope.Profile.Scope.Type != "global" && len(unsupported) == 0 && healthSnapshotOK(envelope.HealthSnapshot),
 	}
 	if result.Action.Type == "proxy" {
 		result.OutboundTag = "proxy:default"
@@ -214,6 +214,19 @@ func PreviewRouteConfig(envelope Envelope, req PreviewRequest) PreviewResult {
 	}
 
 	return result
+}
+
+func healthSnapshotOK(snapshot HealthSnapshot) bool {
+	total := len(snapshot.Outbounds) + len(snapshot.DNSResolvers) + len(snapshot.Services)
+	if total == 0 {
+		return false
+	}
+	for _, item := range append(append([]HealthStatus{}, snapshot.Outbounds...), append(snapshot.DNSResolvers, snapshot.Services...)...) {
+		if item.Status != "healthy" && item.Status != "ok" && item.Status != "disabled" {
+			return false
+		}
+	}
+	return true
 }
 
 func MissingRequiredFeatures(required, supported []string) []string {
