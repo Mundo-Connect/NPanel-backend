@@ -13,6 +13,7 @@ import (
 	"github.com/npanel-dev/NPanel-backend/ent/proxyservergroup"
 	"github.com/npanel-dev/NPanel-backend/ent/proxysubscribe"
 	"github.com/npanel-dev/NPanel-backend/ent/proxysubscribecategory"
+	"github.com/npanel-dev/NPanel-backend/ent/proxysubscribepriceoption"
 	"github.com/npanel-dev/NPanel-backend/ent/proxysystem"
 	"github.com/npanel-dev/NPanel-backend/ent/proxyusersubscribe"
 	subscribeBiz "github.com/npanel-dev/NPanel-backend/internal/biz/public/subscribe"
@@ -75,6 +76,7 @@ func (r *publicSubscribeRepo) QuerySubscribeList(ctx context.Context, language s
 	total := int32(len(subscribes))
 	result := make([]*subscribeBiz.Subscribe, 0, len(subscribes))
 	categoryNames := r.publicSubscribeCategoryNames(ctx, subscribes)
+	priceOptions := r.publicSubscribePriceOptions(ctx, subscribes)
 
 	for _, s := range subscribes {
 		// 处理Description（指针类型）
@@ -159,6 +161,7 @@ func (r *publicSubscribeRepo) QuerySubscribeList(ctx context.Context, language s
 			ResetCycle:        resetCycle,
 			RenewalReset:      s.RenewalReset,
 			ShowOriginalPrice: s.ShowOriginalPrice,
+			PriceOptions:      priceOptions[int64(s.ID)],
 			CreatedAt:         s.CreatedAt.UnixMilli(),
 			UpdatedAt:         s.UpdatedAt.UnixMilli(),
 		}
@@ -268,6 +271,49 @@ func (r *publicSubscribeRepo) publicSubscribeCategoryNames(ctx context.Context, 
 	result := make(map[int64]string, len(categories))
 	for _, category := range categories {
 		result[category.ID] = category.Name
+	}
+	return result
+}
+
+func (r *publicSubscribeRepo) publicSubscribePriceOptions(ctx context.Context, subscribes []*ent.ProxySubscribe) map[int64][]subscribeBiz.SubscribePriceOption {
+	ids := make([]int64, 0, len(subscribes))
+	for _, sub := range subscribes {
+		if sub != nil {
+			ids = append(ids, int64(sub.ID))
+		}
+	}
+	result := make(map[int64][]subscribeBiz.SubscribePriceOption)
+	if len(ids) == 0 {
+		return result
+	}
+	items, err := r.data.db.ProxySubscribePriceOption.Query().
+		Where(
+			proxysubscribepriceoption.SubscribeIDIn(ids...),
+			proxysubscribepriceoption.ShowEQ(true),
+			proxysubscribepriceoption.SellEQ(true),
+		).
+		Order(ent.Desc(proxysubscribepriceoption.FieldSort), ent.Asc(proxysubscribepriceoption.FieldID)).
+		All(ctx)
+	if err != nil {
+		return result
+	}
+	for _, item := range items {
+		result[item.SubscribeID] = append(result[item.SubscribeID], subscribeBiz.SubscribePriceOption{
+			ID:            item.ID,
+			SubscribeID:   item.SubscribeID,
+			Name:          item.Name,
+			DurationUnit:  item.DurationUnit,
+			DurationValue: item.DurationValue,
+			Price:         item.Price,
+			OriginalPrice: item.OriginalPrice,
+			Inventory:     int64(item.Inventory),
+			Show:          item.Show,
+			Sell:          item.Sell,
+			IsDefault:     item.IsDefault,
+			Sort:          int64(item.Sort),
+			CreatedAt:     item.CreatedAt.UnixMilli(),
+			UpdatedAt:     item.UpdatedAt.UnixMilli(),
+		})
 	}
 	return result
 }

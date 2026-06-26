@@ -55,6 +55,7 @@ type SubscribeRepo interface {
 	UpdateSubscribe(ctx context.Context, sub *model.Subscribe) error
 	DeleteSubscribe(ctx context.Context, id int) error
 	GetSubscribeList(ctx context.Context, req *model.SubscribeListParams) ([]*ent.ProxySubscribe, int32, error)
+	GetSubscribePriceOptionsBySubscribeIDs(ctx context.Context, ids []int64) (map[int64][]*ent.ProxySubscribePriceOption, error)
 	CheckSubscribeInUse(ctx context.Context, subscribeID int) (bool, error)
 	BatchDeleteSubscribe(ctx context.Context, ids []int) error
 	GetSubscribeMinSort(ctx context.Context, ids []int) (int64, error)
@@ -101,6 +102,10 @@ func (uc *SubscribeUseCase) CreateSubscribe(ctx context.Context, req *v1.CreateS
 	if err := uc.ensureSubscribeCategoryExists(ctx, req.CategoryId); err != nil {
 		return err
 	}
+	priceOptions, err := convertPriceOptionsToModel(req.GetPriceOptions())
+	if err != nil {
+		return err
+	}
 
 	sub := &model.Subscribe{
 		Name:              req.Name,
@@ -129,6 +134,7 @@ func (uc *SubscribeUseCase) CreateSubscribe(ctx context.Context, req *v1.CreateS
 		ResetCycle:        int64(req.ResetCycle),
 		RenewalReset:      getBoolValue(req.RenewalReset, false),
 		ShowOriginalPrice: req.ShowOriginalPrice,
+		PriceOptions:      priceOptions,
 	}
 
 	if err := uc.repo.CreateSubscribe(ctx, sub); err != nil {
@@ -170,6 +176,10 @@ func (uc *SubscribeUseCase) UpdateSubscribe(ctx context.Context, req *v1.UpdateS
 	if err := uc.ensureSubscribeCategoryExists(ctx, req.CategoryId); err != nil {
 		return err
 	}
+	priceOptions, err := convertPriceOptionsToModel(req.GetPriceOptions())
+	if err != nil {
+		return err
+	}
 
 	sub := &model.Subscribe{
 		ID:                int64(id),
@@ -199,6 +209,7 @@ func (uc *SubscribeUseCase) UpdateSubscribe(ctx context.Context, req *v1.UpdateS
 		ResetCycle:        int64(req.ResetCycle),
 		RenewalReset:      getBoolValue(req.RenewalReset, false),
 		ShowOriginalPrice: req.ShowOriginalPrice,
+		PriceOptions:      priceOptions,
 	}
 
 	if err := uc.repo.UpdateSubscribe(ctx, sub); err != nil {
@@ -269,6 +280,12 @@ func (uc *SubscribeUseCase) GetSubscribeDetails(ctx context.Context, id int) (*v
 	}
 
 	item := convertSubscribeToProto(sub)
+	priceOptions, err := uc.repo.GetSubscribePriceOptionsBySubscribeIDs(ctx, []int64{int64(sub.ID)})
+	if err != nil {
+		uc.log.WithContext(ctx).Errorw("msg", "GetSubscribeDetails price options error", "error", err, "id", id)
+		return nil, responsecode.NewKratosError(responsecode.ErrInternalError)
+	}
+	item.PriceOptions = convertPriceOptionsToProto(priceOptions[int64(sub.ID)])
 	if sub.CategoryID > 0 {
 		if category, err := uc.repo.GetSubscribeCategoryByID(ctx, sub.CategoryID); err == nil {
 			item.CategoryName = category.Name
@@ -312,11 +329,17 @@ func (uc *SubscribeUseCase) GetSubscribeList(ctx context.Context, req *v1.GetSub
 
 	// Convert to proto
 	categoryNames := uc.subscribeCategoryNames(ctx, list)
+	priceOptions, err := uc.repo.GetSubscribePriceOptionsBySubscribeIDs(ctx, subscribeIDs)
+	if err != nil {
+		uc.log.WithContext(ctx).Errorw("msg", "GetSubscribeList price options error", "error", err)
+		return nil, responsecode.NewKratosError(responsecode.ErrInternalError)
+	}
 	items := make([]*v1.SubscribeItem, 0, len(list))
 	for _, sub := range list {
 		item := convertSubscribeToProtoItem(sub)
 		item.CategoryName = categoryNames[sub.CategoryID]
 		item.Sold = soldCounts[int64(sub.ID)]
+		item.PriceOptions = convertPriceOptionsToProto(priceOptions[int64(sub.ID)])
 		items = append(items, item)
 	}
 
@@ -890,6 +913,103 @@ func (uc *SubscribeUseCase) subscribeCategoryNames(ctx context.Context, subscrib
 			continue
 		}
 		result[id] = category.Name
+	}
+	return result
+}
+
+var validPriceOptionDurationUnits = map[string]struct{}{
+	"Minute":  {},
+	"Hour":    {},
+	"Day":     {},
+	"Week":    {},
+	"Month":   {},
+	"Year":    {},
+	"NoLimit": {},
+}
+
+func convertPriceOptionsToModel(items []*v1.SubscribePriceOption) ([]model.SubscribePriceOption, error) {
+	if len(items) == 0 {
+		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+	}
+	result := make([]model.SubscribePriceOption, 0, len(items))
+	hasDefault := false
+	for i, item := range items {
+		if item == nil {
+			return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+		}
+		unit := strings.TrimSpace(item.DurationUnit)
+		if _, ok := validPriceOptionDurationUnits[unit]; !ok {
+			return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+		}
+		durationValue := item.DurationValue
+		if unit == "NoLimit" {
+			durationValue = 0
+		} else if durationValue <= 0 {
+			return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+		}
+		if item.Price < 0 || item.OriginalPrice < 0 || item.Inventory < -1 {
+			return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+		}
+		option := model.SubscribePriceOption{
+			ID:            item.Id,
+			Name:          strings.TrimSpace(item.Name),
+			DurationUnit:  unit,
+			DurationValue: durationValue,
+			Price:         item.Price,
+			OriginalPrice: item.OriginalPrice,
+			Inventory:     int64(item.Inventory),
+			Show:          item.Show,
+			Sell:          item.Sell,
+			IsDefault:     item.IsDefault,
+			Sort:          int64(item.Sort),
+		}
+		if option.Name == "" {
+			if unit == "NoLimit" {
+				option.Name = "NoLimit"
+			} else {
+				option.Name = fmt.Sprintf("%d %s", durationValue, unit)
+			}
+		}
+		if option.IsDefault {
+			if hasDefault {
+				option.IsDefault = false
+			} else {
+				hasDefault = true
+			}
+		}
+		if option.Sort == 0 {
+			option.Sort = int64(len(items) - i)
+		}
+		result = append(result, option)
+	}
+	if !hasDefault {
+		result[0].IsDefault = true
+	}
+	return result, nil
+}
+
+func convertPriceOptionsToProto(items []*ent.ProxySubscribePriceOption) []*v1.SubscribePriceOption {
+	if len(items) == 0 {
+		return []*v1.SubscribePriceOption{}
+	}
+	result := make([]*v1.SubscribePriceOption, 0, len(items))
+	for _, item := range items {
+		result = append(result, &v1.SubscribePriceOption{
+			Id:            item.ID,
+			SubscribeId:   item.SubscribeID,
+			Name:          item.Name,
+			DurationUnit:  item.DurationUnit,
+			DurationValue: item.DurationValue,
+			Price:         item.Price,
+			OriginalPrice: item.OriginalPrice,
+			Inventory:     item.Inventory,
+			Show:          item.Show,
+			Sell:          item.Sell,
+			IsDefault:     item.IsDefault,
+			Sort:          item.Sort,
+			CreatedAt:     item.CreatedAt.Unix(),
+			UpdatedAt:     item.UpdatedAt.Unix(),
+		})
 	}
 	return result
 }

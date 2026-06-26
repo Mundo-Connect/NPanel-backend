@@ -39,6 +39,7 @@ var legacySQLMigrations = []legacySQLMigration{
 	{version: 2139, path: "legacy_sql/02139_device_admission_control.up.sql"},
 	{version: 2140, path: "legacy_sql/02140_update_simnet_subscribe_application_format.up.sql"},
 	{version: 2141, path: "legacy_sql/02141_subscribe_category.up.sql"},
+	{version: 2142, path: "legacy_sql/02142_subscribe_price_option.up.sql"},
 }
 
 func (m *Migrator) initLegacyDefaultData(ctx context.Context) error {
@@ -135,7 +136,7 @@ func (m *Migrator) EnsureLegacyCompatibilitySchema(ctx context.Context) error {
 	defer db.Close()
 
 	for _, migration := range legacySQLMigrations {
-		if migration.version != 2141 {
+		if migration.version != 2141 && migration.version != 2142 {
 			continue
 		}
 		if err := m.executeLegacySQLMigrationWithVersion(ctx, db, migration, false); err != nil {
