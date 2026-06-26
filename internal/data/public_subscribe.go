@@ -18,6 +18,7 @@ import (
 	"github.com/npanel-dev/NPanel-backend/ent/proxyusersubscribe"
 	subscribeBiz "github.com/npanel-dev/NPanel-backend/internal/biz/public/subscribe"
 	servermodel "github.com/npanel-dev/NPanel-backend/internal/model/server"
+	productlanguage "github.com/npanel-dev/NPanel-backend/internal/pkg/language"
 	"github.com/npanel-dev/NPanel-backend/internal/responsecode"
 	"github.com/npanel-dev/NPanel-backend/pkg/tool"
 )
@@ -44,6 +45,7 @@ func NewPublicSubscribeRepo(data *Data, logger log.Logger) subscribeBiz.Subscrib
 
 // QuerySubscribeList 查询订阅列表
 func (r *publicSubscribeRepo) QuerySubscribeList(ctx context.Context, language string, categoryID int64) ([]*subscribeBiz.Subscribe, int32, error) {
+	language = productlanguage.NormalizeProductLanguage(language)
 	// 查询条件: sell=true
 	query := r.data.db.ProxySubscribe.Query().
 		Where(
@@ -181,6 +183,7 @@ func (r *publicSubscribeRepo) QuerySubscribeList(ctx context.Context, language s
 }
 
 func (r *publicSubscribeRepo) QuerySubscribeCatalog(ctx context.Context, language string) (*subscribeBiz.SubscribeCatalog, error) {
+	language = productlanguage.NormalizeProductLanguage(language)
 	subscribes, total, err := r.QuerySubscribeList(ctx, language, 0)
 	if err != nil {
 		return nil, err

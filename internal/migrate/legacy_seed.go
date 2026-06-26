@@ -40,6 +40,7 @@ var legacySQLMigrations = []legacySQLMigration{
 	{version: 2140, path: "legacy_sql/02140_update_simnet_subscribe_application_format.up.sql"},
 	{version: 2141, path: "legacy_sql/02141_subscribe_category.up.sql"},
 	{version: 2142, path: "legacy_sql/02142_subscribe_price_option.up.sql"},
+	{version: 2143, path: "legacy_sql/02143_subscribe_defaults_and_language_normalization.up.sql"},
 }
 
 func (m *Migrator) initLegacyDefaultData(ctx context.Context) error {
@@ -136,7 +137,7 @@ func (m *Migrator) EnsureLegacyCompatibilitySchema(ctx context.Context) error {
 	defer db.Close()
 
 	for _, migration := range legacySQLMigrations {
-		if migration.version != 2141 && migration.version != 2142 {
+		if migration.version != 2141 && migration.version != 2142 && migration.version != 2143 {
 			continue
 		}
 		if err := m.executeLegacySQLMigrationWithVersion(ctx, db, migration, false); err != nil {
@@ -259,9 +260,11 @@ func shouldIgnoreLegacySQLError(path, stmt string, err error) bool {
 		return strings.HasPrefix(path, "legacy_sql/02133_") ||
 			path == "legacy_sql/02135_add_node_group_type.up.sql" ||
 			path == "legacy_sql/02136_add_node_type_is_hidden.up.sql" ||
-			path == "legacy_sql/02137_payment_sort.up.sql"
+			path == "legacy_sql/02137_payment_sort.up.sql" ||
+			path == "legacy_sql/02143_subscribe_defaults_and_language_normalization.up.sql"
 	case 1061:
-		return path == "legacy_sql/02133_add_expired_node_group.up.sql"
+		return path == "legacy_sql/02133_add_expired_node_group.up.sql" ||
+			path == "legacy_sql/02143_subscribe_defaults_and_language_normalization.up.sql"
 	case 1091:
 		return path == "legacy_sql/02137_payment_sort.up.sql"
 	}

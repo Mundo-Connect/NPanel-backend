@@ -21,6 +21,7 @@ import (
 	"github.com/npanel-dev/NPanel-backend/ent/proxyuser"
 	"github.com/npanel-dev/NPanel-backend/ent/proxyuserauthmethod"
 	portalBiz "github.com/npanel-dev/NPanel-backend/internal/biz/public/portal"
+	productlanguage "github.com/npanel-dev/NPanel-backend/internal/pkg/language"
 	"github.com/npanel-dev/NPanel-backend/internal/pkg/middleware"
 	queueTypes "github.com/npanel-dev/NPanel-backend/internal/queue/types"
 	"github.com/npanel-dev/NPanel-backend/internal/responsecode"
@@ -76,6 +77,7 @@ func (r *publicPortalRepo) CheckUserExists(ctx context.Context, authType, identi
 // ⚠️ 包含租户过滤和语言过滤
 // language: 如果不为空，过滤指定语言；如果为空，返回默认语言（language=”）
 func (r *publicPortalRepo) GetSubscribeList(ctx context.Context, language string, categoryID int64) ([]*portalBiz.SubscribeInfo, error) {
+	language = productlanguage.NormalizeProductLanguage(language)
 	r.logger.Infof("[GetSubscribeList] language: %s", language)
 
 	// 构建查询条件
@@ -195,6 +197,7 @@ func (r *publicPortalRepo) GetSubscribeList(ctx context.Context, language string
 }
 
 func (r *publicPortalRepo) GetSubscribeCatalog(ctx context.Context, language string) (*portalBiz.SubscribeCatalog, error) {
+	language = productlanguage.NormalizeProductLanguage(language)
 	subscribes, err := r.GetSubscribeList(ctx, language, 0)
 	if err != nil {
 		return nil, err
