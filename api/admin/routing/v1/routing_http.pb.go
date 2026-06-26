@@ -29,6 +29,7 @@ const OperationRoutingServiceDeleteRouteOutbound = "/api.admin.routing.v1.Routin
 const OperationRoutingServiceDeleteRouteProfile = "/api.admin.routing.v1.RoutingService/DeleteRouteProfile"
 const OperationRoutingServiceDeleteRouteRule = "/api.admin.routing.v1.RoutingService/DeleteRouteRule"
 const OperationRoutingServiceDeleteUnlockService = "/api.admin.routing.v1.RoutingService/DeleteUnlockService"
+const OperationRoutingServiceGetRoutingOverview = "/api.admin.routing.v1.RoutingService/GetRoutingOverview"
 const OperationRoutingServiceListDnsResolvers = "/api.admin.routing.v1.RoutingService/ListDnsResolvers"
 const OperationRoutingServiceListRouteOutbounds = "/api.admin.routing.v1.RoutingService/ListRouteOutbounds"
 const OperationRoutingServiceListRouteProfiles = "/api.admin.routing.v1.RoutingService/ListRouteProfiles"
@@ -52,6 +53,7 @@ type RoutingServiceHTTPServer interface {
 	DeleteRouteProfile(context.Context, *DeleteRouteProfileRequest) (*DeleteRouteItemReply, error)
 	DeleteRouteRule(context.Context, *DeleteRouteRuleRequest) (*DeleteRouteItemReply, error)
 	DeleteUnlockService(context.Context, *DeleteUnlockServiceRequest) (*DeleteRouteItemReply, error)
+	GetRoutingOverview(context.Context, *GetRoutingOverviewRequest) (*GetRoutingOverviewReply, error)
 	ListDnsResolvers(context.Context, *ListDnsResolversRequest) (*ListDnsResolversReply, error)
 	ListRouteOutbounds(context.Context, *ListRouteOutboundsRequest) (*ListRouteOutboundsReply, error)
 	ListRouteProfiles(context.Context, *ListRouteProfilesRequest) (*ListRouteProfilesReply, error)
@@ -88,6 +90,7 @@ func RegisterRoutingServiceHTTPServer(s *http.Server, srv RoutingServiceHTTPServ
 	r.PUT("/v1/admin/routing/unlock_service", _RoutingService_UpdateUnlockService0_HTTP_Handler(srv))
 	r.DELETE("/v1/admin/routing/unlock_service", _RoutingService_DeleteUnlockService0_HTTP_Handler(srv))
 	r.POST("/v1/admin/routing/preview", _RoutingService_PreviewRouteConfig0_HTTP_Handler(srv))
+	r.GET("/v1/admin/routing/overview", _RoutingService_GetRoutingOverview0_HTTP_Handler(srv))
 }
 
 func _RoutingService_ListRouteProfiles0_HTTP_Handler(srv RoutingServiceHTTPServer) func(ctx http.Context) error {
@@ -522,6 +525,25 @@ func _RoutingService_PreviewRouteConfig0_HTTP_Handler(srv RoutingServiceHTTPServ
 	}
 }
 
+func _RoutingService_GetRoutingOverview0_HTTP_Handler(srv RoutingServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GetRoutingOverviewRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationRoutingServiceGetRoutingOverview)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetRoutingOverview(ctx, req.(*GetRoutingOverviewRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*GetRoutingOverviewReply)
+		return ctx.Result(200, reply)
+	}
+}
+
 type RoutingServiceHTTPClient interface {
 	CreateDnsResolver(ctx context.Context, req *CreateDnsResolverRequest, opts ...http.CallOption) (rsp *DnsResolverReply, err error)
 	CreateRouteOutbound(ctx context.Context, req *CreateRouteOutboundRequest, opts ...http.CallOption) (rsp *RouteOutboundReply, err error)
@@ -533,6 +555,7 @@ type RoutingServiceHTTPClient interface {
 	DeleteRouteProfile(ctx context.Context, req *DeleteRouteProfileRequest, opts ...http.CallOption) (rsp *DeleteRouteItemReply, err error)
 	DeleteRouteRule(ctx context.Context, req *DeleteRouteRuleRequest, opts ...http.CallOption) (rsp *DeleteRouteItemReply, err error)
 	DeleteUnlockService(ctx context.Context, req *DeleteUnlockServiceRequest, opts ...http.CallOption) (rsp *DeleteRouteItemReply, err error)
+	GetRoutingOverview(ctx context.Context, req *GetRoutingOverviewRequest, opts ...http.CallOption) (rsp *GetRoutingOverviewReply, err error)
 	ListDnsResolvers(ctx context.Context, req *ListDnsResolversRequest, opts ...http.CallOption) (rsp *ListDnsResolversReply, err error)
 	ListRouteOutbounds(ctx context.Context, req *ListRouteOutboundsRequest, opts ...http.CallOption) (rsp *ListRouteOutboundsReply, err error)
 	ListRouteProfiles(ctx context.Context, req *ListRouteProfilesRequest, opts ...http.CallOption) (rsp *ListRouteProfilesReply, err error)
@@ -678,6 +701,19 @@ func (c *RoutingServiceHTTPClientImpl) DeleteUnlockService(ctx context.Context, 
 	opts = append(opts, http.Operation(OperationRoutingServiceDeleteUnlockService))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "DELETE", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *RoutingServiceHTTPClientImpl) GetRoutingOverview(ctx context.Context, in *GetRoutingOverviewRequest, opts ...http.CallOption) (*GetRoutingOverviewReply, error) {
+	var out GetRoutingOverviewReply
+	pattern := "/v1/admin/routing/overview"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationRoutingServiceGetRoutingOverview))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {
 		return nil, err
 	}

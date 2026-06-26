@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"sort"
 	"strings"
 	"time"
 
@@ -79,6 +80,54 @@ type UnlockService struct {
 
 type PreviewRequest = publicrouting.PreviewRequest
 type PreviewResult = publicrouting.PreviewResult
+
+type RoutingHealthItem struct {
+	Kind                string
+	Key                 string
+	Name                string
+	Status              string
+	Source              string
+	CheckedAt           time.Time
+	RTTMS               int
+	ConsecutiveFailures int
+	LastError           string
+	OutboundTag         string
+	DNSResolverTag      string
+}
+
+type RoutingEnforceGuard struct {
+	Key    string
+	Label  string
+	Passed bool
+	Status string
+	Reason string
+}
+
+type RoutingAuditEvent struct {
+	ID           string
+	ResourceType string
+	ResourceID   string
+	ResourceName string
+	Action       string
+	Summary      string
+	CreatedAt    time.Time
+}
+
+type RoutingOverview struct {
+	RoutingHash      string
+	GeneratedAt      string
+	ProfileCode      string
+	ProfileName      string
+	Mode             string
+	ProfileEnabled   bool
+	EnforceReady     bool
+	ExecutionEnabled bool
+	RollbackAction   string
+	CompileError     string
+	Health           []RoutingHealthItem
+	Guards           []RoutingEnforceGuard
+	AuditEvents      []RoutingAuditEvent
+}
 
 type RoutingRepo interface {
 	SaveProfile(context.Context, *RouteProfile) (*RouteProfile, error)
@@ -314,6 +363,42 @@ func (uc *RoutingUsecase) Preview(ctx context.Context, req PreviewRequest) (Prev
 	return publicrouting.PreviewRouteConfig(envelope, req), nil
 }
 
+func (uc *RoutingUsecase) Overview(ctx context.Context) (*RoutingOverview, error) {
+	now := time.Now()
+	envelope, err := uc.BuildConfig(ctx, now)
+	overview := routingOverviewFromEnvelope(envelope)
+	if err != nil {
+		overview.CompileError = err.Error()
+	}
+	profiles, _, profileErr := uc.repo.ListProfiles(ctx, 1, 1000, "", nil)
+	if profileErr == nil {
+		overview.AuditEvents = append(overview.AuditEvents, auditEventsForProfiles(profiles)...)
+	}
+	if rules, _, err := uc.repo.ListRules(ctx, 1, 1000, 0, "", nil); err == nil {
+		overview.AuditEvents = append(overview.AuditEvents, auditEventsForRules(rules)...)
+	}
+	if resolvers, _, err := uc.repo.ListDNSResolvers(ctx, 1, 1000, "", nil); err == nil {
+		overview.AuditEvents = append(overview.AuditEvents, auditEventsForDNSResolvers(resolvers)...)
+	}
+	if outbounds, _, err := uc.repo.ListOutbounds(ctx, 1, 1000, "", nil); err == nil {
+		overview.AuditEvents = append(overview.AuditEvents, auditEventsForOutbounds(outbounds)...)
+	}
+	if services, _, err := uc.repo.ListUnlockServices(ctx, 1, 1000, "", nil); err == nil {
+		overview.AuditEvents = append(overview.AuditEvents, auditEventsForUnlockServices(services)...)
+	}
+	sort.SliceStable(overview.AuditEvents, func(i, j int) bool {
+		return overview.AuditEvents[i].CreatedAt.After(overview.AuditEvents[j].CreatedAt)
+	})
+	if len(overview.AuditEvents) > 20 {
+		overview.AuditEvents = overview.AuditEvents[:20]
+	}
+	overview.Guards = routingEnforceGuards(envelope, overview.CompileError)
+	overview.EnforceReady = guardsPassed(overview.Guards)
+	overview.ExecutionEnabled = false
+	overview.RollbackAction = "switch profile mode back to observe"
+	return overview, nil
+}
+
 func (uc *RoutingUsecase) BuildConfig(ctx context.Context, now time.Time, opts ...publicrouting.ConfigOptions) (publicrouting.Envelope, error) {
 	fixture := publicrouting.BuildPreviewConfig(now, firstConfigOptions(opts))
 	profiles, _, err := uc.repo.ListProfiles(ctx, 1, 1000, "", boolPtr(true))
@@ -352,12 +437,7 @@ func (uc *RoutingUsecase) BuildConfig(ctx context.Context, now time.Time, opts .
 		return fixture, err
 	}
 
-	envelope.HealthSnapshot = publicrouting.HealthSnapshot{
-		GeneratedAt:  envelope.GeneratedAt,
-		Outbounds:    unknownOutboundHealth(envelope.Outbounds, envelope.GeneratedAt),
-		DNSResolvers: unknownDNSHealth(envelope.DNSResolvers, envelope.GeneratedAt),
-		Services:     unknownServiceHealth(envelope.UnlockServices, envelope.GeneratedAt),
-	}
+	envelope.HealthSnapshot = buildAdminHealthSnapshot(envelope)
 	if err := validateCompiledEnvelope(envelope); err != nil {
 		return fixture, err
 	}
@@ -596,12 +676,269 @@ func validateAction(action publicrouting.RouteAction, resolvers, outbounds map[s
 	return nil
 }
 
+func routingOverviewFromEnvelope(envelope publicrouting.Envelope) *RoutingOverview {
+	return &RoutingOverview{
+		RoutingHash:    envelope.RoutingHash,
+		GeneratedAt:    envelope.GeneratedAt,
+		ProfileCode:    envelope.Profile.Code,
+		ProfileName:    envelope.Profile.Name,
+		Mode:           envelope.Mode,
+		ProfileEnabled: envelope.Profile.Enabled,
+		Health:         routingHealthItems(envelope),
+	}
+}
+
+func routingHealthItems(envelope publicrouting.Envelope) []RoutingHealthItem {
+	names := map[string]string{}
+	for _, outbound := range envelope.Outbounds {
+		names["outbound:"+outbound.Tag] = outbound.Name
+	}
+	for _, resolver := range envelope.DNSResolvers {
+		names["dns_resolver:"+resolver.Tag] = resolver.Name
+	}
+	for _, service := range envelope.UnlockServices {
+		names["service:"+service.Code] = service.Name
+	}
+
+	var result []RoutingHealthItem
+	for _, item := range envelope.HealthSnapshot.Outbounds {
+		result = append(result, healthItemFromStatus("outbound", item.Tag, names["outbound:"+item.Tag], item))
+	}
+	for _, item := range envelope.HealthSnapshot.DNSResolvers {
+		result = append(result, healthItemFromStatus("dns_resolver", item.Tag, names["dns_resolver:"+item.Tag], item))
+	}
+	for _, item := range envelope.HealthSnapshot.Services {
+		result = append(result, healthItemFromStatus("service", item.Code, names["service:"+item.Code], item))
+	}
+	return result
+}
+
+func healthItemFromStatus(kind, key, name string, item publicrouting.HealthStatus) RoutingHealthItem {
+	return RoutingHealthItem{
+		Kind:                kind,
+		Key:                 key,
+		Name:                name,
+		Status:              item.Status,
+		Source:              item.Source,
+		CheckedAt:           parseRFC3339(item.CheckedAt),
+		RTTMS:               item.RTTMS,
+		ConsecutiveFailures: item.ConsecutiveFailures,
+		LastError:           item.LastError,
+		OutboundTag:         item.OutboundTag,
+		DNSResolverTag:      item.DNSResolverTag,
+	}
+}
+
+func routingEnforceGuards(envelope publicrouting.Envelope, compileError string) []RoutingEnforceGuard {
+	compileOK := compileError == ""
+	profileEnabled := envelope.Profile.Enabled
+	modeEnforce := envelope.Mode == "enforce"
+	grayScope := envelope.Profile.Scope.Type != "" && envelope.Profile.Scope.Type != "global"
+	healthOK := routingHealthOK(envelope.HealthSnapshot)
+	capabilityOK := len(envelope.CapabilityRequirements.RequiredFeatures) > 0
+	rollbackOK := true
+
+	return []RoutingEnforceGuard{
+		guard("compile_ok", "Config compiles", compileOK, "ok", compileError),
+		guard("profile_enabled", "Profile enabled", profileEnabled, "ok", "enable the target profile before enforce"),
+		guard("mode_enforce", "Profile mode enforce", modeEnforce, envelope.Mode, "keep observe until dry-run and health are verified"),
+		guard("gray_scope", "Gray scope selected", grayScope, envelope.Profile.Scope.Type, "use user/subscribe scope before global enforce"),
+		guard("health_ok", "Health snapshot healthy", healthOK, healthSummary(envelope.HealthSnapshot), "unknown or failing health blocks enforce"),
+		guard("capability_contract", "Capability contract present", capabilityOK, "ok", "required_features must be declared"),
+		guard("rollback_ready", "Rollback path ready", rollbackOK, "ok", "switch profile mode back to observe"),
+		guard("execution_wired", "Client execution wired", false, "dry-run only", "P4 keeps real execution disabled"),
+	}
+}
+
+func guard(key, label string, passed bool, status, failReason string) RoutingEnforceGuard {
+	if passed {
+		return RoutingEnforceGuard{Key: key, Label: label, Passed: true, Status: status, Reason: "passed"}
+	}
+	if failReason == "" {
+		failReason = "blocked"
+	}
+	return RoutingEnforceGuard{Key: key, Label: label, Passed: false, Status: status, Reason: failReason}
+}
+
+func guardsPassed(items []RoutingEnforceGuard) bool {
+	for _, item := range items {
+		if !item.Passed {
+			return false
+		}
+	}
+	return true
+}
+
+func routingHealthOK(snapshot publicrouting.HealthSnapshot) bool {
+	for _, item := range append(append([]publicrouting.HealthStatus{}, snapshot.Outbounds...), append(snapshot.DNSResolvers, snapshot.Services...)...) {
+		if item.Status != "healthy" && item.Status != "ok" && item.Status != "disabled" {
+			return false
+		}
+	}
+	return len(snapshot.Outbounds)+len(snapshot.DNSResolvers)+len(snapshot.Services) > 0
+}
+
+func healthSummary(snapshot publicrouting.HealthSnapshot) string {
+	counts := map[string]int{}
+	for _, item := range append(append([]publicrouting.HealthStatus{}, snapshot.Outbounds...), append(snapshot.DNSResolvers, snapshot.Services...)...) {
+		counts[item.Status]++
+	}
+	if len(counts) == 0 {
+		return "empty"
+	}
+	keys := make([]string, 0, len(counts))
+	for key := range counts {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+	parts := make([]string, 0, len(keys))
+	for _, key := range keys {
+		parts = append(parts, fmt.Sprintf("%s:%d", key, counts[key]))
+	}
+	return strings.Join(parts, ", ")
+}
+
+func buildAdminHealthSnapshot(envelope publicrouting.Envelope) publicrouting.HealthSnapshot {
+	return publicrouting.HealthSnapshot{
+		GeneratedAt:  envelope.GeneratedAt,
+		Outbounds:    adminOutboundHealth(envelope.Outbounds, envelope.GeneratedAt),
+		DNSResolvers: adminDNSHealth(envelope.DNSResolvers, envelope.GeneratedAt),
+		Services:     adminServiceHealth(envelope.UnlockServices, envelope.GeneratedAt),
+	}
+}
+
+func adminOutboundHealth(items []publicrouting.RouteOutbound, now string) []publicrouting.HealthStatus {
+	result := make([]publicrouting.HealthStatus, 0, len(items))
+	for _, item := range items {
+		status, lastError := configuredHealthStatus(item.Enabled, item.HealthCheck.Enabled)
+		result = append(result, publicrouting.HealthStatus{
+			Tag:       item.Tag,
+			Region:    item.Region,
+			Status:    status,
+			Source:    "admin_config",
+			CheckedAt: now,
+			LastError: lastError,
+		})
+	}
+	return result
+}
+
+func adminDNSHealth(items []publicrouting.DNSResolver, now string) []publicrouting.HealthStatus {
+	result := make([]publicrouting.HealthStatus, 0, len(items))
+	for _, item := range items {
+		status, lastError := configuredHealthStatus(item.Enabled, item.HealthCheck.Enabled)
+		result = append(result, publicrouting.HealthStatus{
+			Tag:       item.Tag,
+			Status:    status,
+			Source:    "admin_config",
+			CheckedAt: now,
+			LastError: lastError,
+		})
+	}
+	return result
+}
+
+func adminServiceHealth(items []publicrouting.UnlockService, now string) []publicrouting.HealthStatus {
+	result := make([]publicrouting.HealthStatus, 0, len(items))
+	for _, item := range items {
+		status, lastError := configuredHealthStatus(item.Enabled, item.HealthCheckURL != "")
+		result = append(result, publicrouting.HealthStatus{
+			Code:           item.Code,
+			Region:         item.DefaultRegion,
+			Status:         status,
+			Source:         "admin_config",
+			CheckedAt:      now,
+			LastError:      lastError,
+			OutboundTag:    item.DefaultOutboundTag,
+			DNSResolverTag: item.DefaultDNSResolverTag,
+		})
+	}
+	return result
+}
+
+func configuredHealthStatus(enabled, hasCheck bool) (string, string) {
+	if !enabled {
+		return "disabled", ""
+	}
+	if !hasCheck {
+		return "unknown", "health check is not configured"
+	}
+	return "unknown", "waiting for node/client health reports"
+}
+
 func unknownOutboundHealth(items []publicrouting.RouteOutbound, now string) []publicrouting.HealthStatus {
 	result := make([]publicrouting.HealthStatus, 0, len(items))
 	for _, item := range items {
 		result = append(result, publicrouting.HealthStatus{Tag: item.Tag, Status: "unknown", Source: "backend_admin", CheckedAt: now})
 	}
 	return result
+}
+
+func auditEventsForProfiles(items []*RouteProfile) []RoutingAuditEvent {
+	events := make([]RoutingAuditEvent, 0, len(items))
+	for _, item := range items {
+		events = append(events, auditEvent("profile", item.ID, item.Code, "upsert", fmt.Sprintf("mode=%s enabled=%t scope=%s:%s", item.Mode, item.Enabled, item.ScopeType, item.ScopeID), item.UpdatedAt))
+	}
+	return events
+}
+
+func auditEventsForRules(items []*RouteRule) []RoutingAuditEvent {
+	events := make([]RoutingAuditEvent, 0, len(items))
+	for _, item := range items {
+		events = append(events, auditEvent("rule", item.ID, item.Name, "upsert", fmt.Sprintf("profile_id=%d enabled=%t", item.ProfileID, item.Enabled), item.UpdatedAt))
+	}
+	return events
+}
+
+func auditEventsForDNSResolvers(items []*DNSResolver) []RoutingAuditEvent {
+	events := make([]RoutingAuditEvent, 0, len(items))
+	for _, item := range items {
+		events = append(events, auditEvent("dns_resolver", item.ID, item.Tag, "upsert", fmt.Sprintf("proto=%s enabled=%t", item.Proto, item.Enabled), item.UpdatedAt))
+	}
+	return events
+}
+
+func auditEventsForOutbounds(items []*RouteOutbound) []RoutingAuditEvent {
+	events := make([]RoutingAuditEvent, 0, len(items))
+	for _, item := range items {
+		events = append(events, auditEvent("outbound", item.ID, item.Tag, "upsert", fmt.Sprintf("type=%s region=%s enabled=%t", item.Type, item.Region, item.Enabled), item.UpdatedAt))
+	}
+	return events
+}
+
+func auditEventsForUnlockServices(items []*UnlockService) []RoutingAuditEvent {
+	events := make([]RoutingAuditEvent, 0, len(items))
+	for _, item := range items {
+		events = append(events, auditEvent("unlock_service", item.ID, item.Code, "upsert", fmt.Sprintf("category=%s enabled=%t", item.Category, item.Enabled), item.UpdatedAt))
+	}
+	return events
+}
+
+func auditEvent(resourceType string, resourceID int64, name, action, summary string, at time.Time) RoutingAuditEvent {
+	if at.IsZero() {
+		at = time.Now()
+	}
+	id := fmt.Sprintf("%s:%d:%d", resourceType, resourceID, at.Unix())
+	return RoutingAuditEvent{
+		ID:           id,
+		ResourceType: resourceType,
+		ResourceID:   fmt.Sprintf("%d", resourceID),
+		ResourceName: name,
+		Action:       action,
+		Summary:      summary,
+		CreatedAt:    at,
+	}
+}
+
+func parseRFC3339(value string) time.Time {
+	if value == "" {
+		return time.Time{}
+	}
+	parsed, err := time.Parse(time.RFC3339, value)
+	if err != nil {
+		return time.Time{}
+	}
+	return parsed
 }
 
 func unknownDNSHealth(items []publicrouting.DNSResolver, now string) []publicrouting.HealthStatus {

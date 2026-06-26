@@ -242,6 +242,18 @@ func (s *RoutingService) PreviewRouteConfig(ctx context.Context, req *v1.Preview
 	}, nil
 }
 
+func (s *RoutingService) GetRoutingOverview(ctx context.Context, req *v1.GetRoutingOverviewRequest) (*v1.GetRoutingOverviewReply, error) {
+	overview, err := s.uc.Overview(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return &v1.GetRoutingOverviewReply{
+		Code:    successCode,
+		Message: "success",
+		Data:    routingOverviewToProto(overview),
+	}, nil
+}
+
 func routeProfileFromProto(item *v1.RouteProfile) *routingbiz.RouteProfile {
 	if item == nil {
 		return &routingbiz.RouteProfile{}
@@ -412,6 +424,65 @@ func unlockServiceToProto(item *routingbiz.UnlockService) *v1.UnlockService {
 
 func deleteReply() *v1.DeleteRouteItemReply {
 	return &v1.DeleteRouteItemReply{Code: successCode, Message: "success", Data: &v1.DeleteRouteItemData{Success: true}}
+}
+
+func routingOverviewToProto(item *routingbiz.RoutingOverview) *v1.RoutingOverview {
+	if item == nil {
+		return nil
+	}
+	health := make([]*v1.RoutingHealthItem, 0, len(item.Health))
+	for _, healthItem := range item.Health {
+		health = append(health, &v1.RoutingHealthItem{
+			Kind:                healthItem.Kind,
+			Key:                 healthItem.Key,
+			Name:                healthItem.Name,
+			Status:              healthItem.Status,
+			Source:              healthItem.Source,
+			CheckedAt:           healthItem.CheckedAt.Unix(),
+			RttMs:               int32(healthItem.RTTMS),
+			ConsecutiveFailures: int32(healthItem.ConsecutiveFailures),
+			LastError:           healthItem.LastError,
+			OutboundTag:         healthItem.OutboundTag,
+			DnsResolverTag:      healthItem.DNSResolverTag,
+		})
+	}
+	guards := make([]*v1.RoutingEnforceGuard, 0, len(item.Guards))
+	for _, guard := range item.Guards {
+		guards = append(guards, &v1.RoutingEnforceGuard{
+			Key:    guard.Key,
+			Label:  guard.Label,
+			Passed: guard.Passed,
+			Status: guard.Status,
+			Reason: guard.Reason,
+		})
+	}
+	auditEvents := make([]*v1.RoutingAuditEvent, 0, len(item.AuditEvents))
+	for _, event := range item.AuditEvents {
+		auditEvents = append(auditEvents, &v1.RoutingAuditEvent{
+			Id:           event.ID,
+			ResourceType: event.ResourceType,
+			ResourceId:   event.ResourceID,
+			ResourceName: event.ResourceName,
+			Action:       event.Action,
+			Summary:      event.Summary,
+			CreatedAt:    event.CreatedAt.Unix(),
+		})
+	}
+	return &v1.RoutingOverview{
+		RoutingHash:      item.RoutingHash,
+		GeneratedAt:      item.GeneratedAt,
+		ProfileCode:      item.ProfileCode,
+		ProfileName:      item.ProfileName,
+		Mode:             item.Mode,
+		ProfileEnabled:   item.ProfileEnabled,
+		EnforceReady:     item.EnforceReady,
+		ExecutionEnabled: item.ExecutionEnabled,
+		RollbackAction:   item.RollbackAction,
+		CompileError:     item.CompileError,
+		Health:           health,
+		Guards:           guards,
+		AuditEvents:      auditEvents,
+	}
 }
 
 func int64ToString(value int64) string {

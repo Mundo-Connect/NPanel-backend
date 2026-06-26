@@ -108,6 +108,10 @@ service RoutingService {
       body: "*"
     };
   }
+
+  rpc GetRoutingOverview(GetRoutingOverviewRequest) returns (GetRoutingOverviewReply) {
+    option (google.api.http) = { get: "/v1/admin/routing/overview" };
+  }
 }
 
 message RouteProfile {
@@ -251,4 +255,60 @@ message PreviewRouteConfigReply {
   int32 code = 1;
   string message = 2;
   PreviewRouteResult data = 3;
+}
+
+message GetRoutingOverviewRequest {}
+
+message RoutingHealthItem {
+  string kind = 1;
+  string key = 2;
+  string name = 3;
+  string status = 4;
+  string source = 5;
+  int64 checked_at = 6;
+  int32 rtt_ms = 7;
+  int32 consecutive_failures = 8;
+  string last_error = 9;
+  string outbound_tag = 10;
+  string dns_resolver_tag = 11;
+}
+
+message RoutingEnforceGuard {
+  string key = 1;
+  string label = 2;
+  bool passed = 3;
+  string status = 4;
+  string reason = 5;
+}
+
+message RoutingAuditEvent {
+  string id = 1;
+  string resource_type = 2;
+  string resource_id = 3;
+  string resource_name = 4;
+  string action = 5;
+  string summary = 6;
+  int64 created_at = 7;
+}
+
+message RoutingOverview {
+  string routing_hash = 1;
+  string generated_at = 2;
+  string profile_code = 3;
+  string profile_name = 4;
+  string mode = 5;
+  bool profile_enabled = 6;
+  bool enforce_ready = 7;
+  bool execution_enabled = 8;
+  string rollback_action = 9;
+  string compile_error = 10;
+  repeated RoutingHealthItem health = 11;
+  repeated RoutingEnforceGuard guards = 12;
+  repeated RoutingAuditEvent audit_events = 13;
+}
+
+message GetRoutingOverviewReply {
+  int32 code = 1;
+  string message = 2;
+  RoutingOverview data = 3;
 }

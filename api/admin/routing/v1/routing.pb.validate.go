@@ -6298,3 +6298,814 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = PreviewRouteConfigReplyValidationError{}
+
+// Validate checks the field values on GetRoutingOverviewRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GetRoutingOverviewRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetRoutingOverviewRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetRoutingOverviewRequestMultiError, or nil if none found.
+func (m *GetRoutingOverviewRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetRoutingOverviewRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return GetRoutingOverviewRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetRoutingOverviewRequestMultiError is an error wrapping multiple validation
+// errors returned by GetRoutingOverviewRequest.ValidateAll() if the
+// designated constraints aren't met.
+type GetRoutingOverviewRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetRoutingOverviewRequestMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetRoutingOverviewRequestMultiError) AllErrors() []error { return m }
+
+// GetRoutingOverviewRequestValidationError is the validation error returned by
+// GetRoutingOverviewRequest.Validate if the designated constraints aren't met.
+type GetRoutingOverviewRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetRoutingOverviewRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetRoutingOverviewRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetRoutingOverviewRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetRoutingOverviewRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetRoutingOverviewRequestValidationError) ErrorName() string {
+	return "GetRoutingOverviewRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetRoutingOverviewRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetRoutingOverviewRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetRoutingOverviewRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetRoutingOverviewRequestValidationError{}
+
+// Validate checks the field values on RoutingHealthItem with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *RoutingHealthItem) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on RoutingHealthItem with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// RoutingHealthItemMultiError, or nil if none found.
+func (m *RoutingHealthItem) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *RoutingHealthItem) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Kind
+
+	// no validation rules for Key
+
+	// no validation rules for Name
+
+	// no validation rules for Status
+
+	// no validation rules for Source
+
+	// no validation rules for CheckedAt
+
+	// no validation rules for RttMs
+
+	// no validation rules for ConsecutiveFailures
+
+	// no validation rules for LastError
+
+	// no validation rules for OutboundTag
+
+	// no validation rules for DnsResolverTag
+
+	if len(errors) > 0 {
+		return RoutingHealthItemMultiError(errors)
+	}
+
+	return nil
+}
+
+// RoutingHealthItemMultiError is an error wrapping multiple validation errors
+// returned by RoutingHealthItem.ValidateAll() if the designated constraints
+// aren't met.
+type RoutingHealthItemMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m RoutingHealthItemMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m RoutingHealthItemMultiError) AllErrors() []error { return m }
+
+// RoutingHealthItemValidationError is the validation error returned by
+// RoutingHealthItem.Validate if the designated constraints aren't met.
+type RoutingHealthItemValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RoutingHealthItemValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RoutingHealthItemValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RoutingHealthItemValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RoutingHealthItemValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RoutingHealthItemValidationError) ErrorName() string {
+	return "RoutingHealthItemValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e RoutingHealthItemValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRoutingHealthItem.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RoutingHealthItemValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RoutingHealthItemValidationError{}
+
+// Validate checks the field values on RoutingEnforceGuard with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *RoutingEnforceGuard) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on RoutingEnforceGuard with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// RoutingEnforceGuardMultiError, or nil if none found.
+func (m *RoutingEnforceGuard) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *RoutingEnforceGuard) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Key
+
+	// no validation rules for Label
+
+	// no validation rules for Passed
+
+	// no validation rules for Status
+
+	// no validation rules for Reason
+
+	if len(errors) > 0 {
+		return RoutingEnforceGuardMultiError(errors)
+	}
+
+	return nil
+}
+
+// RoutingEnforceGuardMultiError is an error wrapping multiple validation
+// errors returned by RoutingEnforceGuard.ValidateAll() if the designated
+// constraints aren't met.
+type RoutingEnforceGuardMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m RoutingEnforceGuardMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m RoutingEnforceGuardMultiError) AllErrors() []error { return m }
+
+// RoutingEnforceGuardValidationError is the validation error returned by
+// RoutingEnforceGuard.Validate if the designated constraints aren't met.
+type RoutingEnforceGuardValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RoutingEnforceGuardValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RoutingEnforceGuardValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RoutingEnforceGuardValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RoutingEnforceGuardValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RoutingEnforceGuardValidationError) ErrorName() string {
+	return "RoutingEnforceGuardValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e RoutingEnforceGuardValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRoutingEnforceGuard.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RoutingEnforceGuardValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RoutingEnforceGuardValidationError{}
+
+// Validate checks the field values on RoutingAuditEvent with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *RoutingAuditEvent) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on RoutingAuditEvent with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// RoutingAuditEventMultiError, or nil if none found.
+func (m *RoutingAuditEvent) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *RoutingAuditEvent) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Id
+
+	// no validation rules for ResourceType
+
+	// no validation rules for ResourceId
+
+	// no validation rules for ResourceName
+
+	// no validation rules for Action
+
+	// no validation rules for Summary
+
+	// no validation rules for CreatedAt
+
+	if len(errors) > 0 {
+		return RoutingAuditEventMultiError(errors)
+	}
+
+	return nil
+}
+
+// RoutingAuditEventMultiError is an error wrapping multiple validation errors
+// returned by RoutingAuditEvent.ValidateAll() if the designated constraints
+// aren't met.
+type RoutingAuditEventMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m RoutingAuditEventMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m RoutingAuditEventMultiError) AllErrors() []error { return m }
+
+// RoutingAuditEventValidationError is the validation error returned by
+// RoutingAuditEvent.Validate if the designated constraints aren't met.
+type RoutingAuditEventValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RoutingAuditEventValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RoutingAuditEventValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RoutingAuditEventValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RoutingAuditEventValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RoutingAuditEventValidationError) ErrorName() string {
+	return "RoutingAuditEventValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e RoutingAuditEventValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRoutingAuditEvent.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RoutingAuditEventValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RoutingAuditEventValidationError{}
+
+// Validate checks the field values on RoutingOverview with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *RoutingOverview) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on RoutingOverview with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// RoutingOverviewMultiError, or nil if none found.
+func (m *RoutingOverview) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *RoutingOverview) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for RoutingHash
+
+	// no validation rules for GeneratedAt
+
+	// no validation rules for ProfileCode
+
+	// no validation rules for ProfileName
+
+	// no validation rules for Mode
+
+	// no validation rules for ProfileEnabled
+
+	// no validation rules for EnforceReady
+
+	// no validation rules for ExecutionEnabled
+
+	// no validation rules for RollbackAction
+
+	// no validation rules for CompileError
+
+	for idx, item := range m.GetHealth() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, RoutingOverviewValidationError{
+						field:  fmt.Sprintf("Health[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, RoutingOverviewValidationError{
+						field:  fmt.Sprintf("Health[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return RoutingOverviewValidationError{
+					field:  fmt.Sprintf("Health[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	for idx, item := range m.GetGuards() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, RoutingOverviewValidationError{
+						field:  fmt.Sprintf("Guards[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, RoutingOverviewValidationError{
+						field:  fmt.Sprintf("Guards[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return RoutingOverviewValidationError{
+					field:  fmt.Sprintf("Guards[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	for idx, item := range m.GetAuditEvents() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, RoutingOverviewValidationError{
+						field:  fmt.Sprintf("AuditEvents[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, RoutingOverviewValidationError{
+						field:  fmt.Sprintf("AuditEvents[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return RoutingOverviewValidationError{
+					field:  fmt.Sprintf("AuditEvents[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return RoutingOverviewMultiError(errors)
+	}
+
+	return nil
+}
+
+// RoutingOverviewMultiError is an error wrapping multiple validation errors
+// returned by RoutingOverview.ValidateAll() if the designated constraints
+// aren't met.
+type RoutingOverviewMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m RoutingOverviewMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m RoutingOverviewMultiError) AllErrors() []error { return m }
+
+// RoutingOverviewValidationError is the validation error returned by
+// RoutingOverview.Validate if the designated constraints aren't met.
+type RoutingOverviewValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RoutingOverviewValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RoutingOverviewValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RoutingOverviewValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RoutingOverviewValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RoutingOverviewValidationError) ErrorName() string { return "RoutingOverviewValidationError" }
+
+// Error satisfies the builtin error interface
+func (e RoutingOverviewValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRoutingOverview.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RoutingOverviewValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RoutingOverviewValidationError{}
+
+// Validate checks the field values on GetRoutingOverviewReply with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GetRoutingOverviewReply) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetRoutingOverviewReply with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetRoutingOverviewReplyMultiError, or nil if none found.
+func (m *GetRoutingOverviewReply) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetRoutingOverviewReply) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Code
+
+	// no validation rules for Message
+
+	if all {
+		switch v := interface{}(m.GetData()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GetRoutingOverviewReplyValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GetRoutingOverviewReplyValidationError{
+					field:  "Data",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetData()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GetRoutingOverviewReplyValidationError{
+				field:  "Data",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return GetRoutingOverviewReplyMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetRoutingOverviewReplyMultiError is an error wrapping multiple validation
+// errors returned by GetRoutingOverviewReply.ValidateAll() if the designated
+// constraints aren't met.
+type GetRoutingOverviewReplyMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetRoutingOverviewReplyMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetRoutingOverviewReplyMultiError) AllErrors() []error { return m }
+
+// GetRoutingOverviewReplyValidationError is the validation error returned by
+// GetRoutingOverviewReply.Validate if the designated constraints aren't met.
+type GetRoutingOverviewReplyValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetRoutingOverviewReplyValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetRoutingOverviewReplyValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetRoutingOverviewReplyValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetRoutingOverviewReplyValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetRoutingOverviewReplyValidationError) ErrorName() string {
+	return "GetRoutingOverviewReplyValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetRoutingOverviewReplyValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetRoutingOverviewReply.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetRoutingOverviewReplyValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetRoutingOverviewReplyValidationError{}

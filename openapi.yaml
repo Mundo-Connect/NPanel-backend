@@ -2129,6 +2129,18 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/api.admin.routing.v1.ListRouteOutboundsReply'
+    /v1/admin/routing/overview:
+        get:
+            tags:
+                - RoutingService
+            operationId: RoutingService_GetRoutingOverview
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.admin.routing.v1.GetRoutingOverviewReply'
     /v1/admin/routing/preview:
         post:
             tags:
@@ -9027,6 +9039,16 @@ components:
                     type: string
                 data:
                     $ref: '#/components/schemas/api.admin.routing.v1.DnsResolverData'
+        api.admin.routing.v1.GetRoutingOverviewReply:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/api.admin.routing.v1.RoutingOverview'
         api.admin.routing.v1.ListDnsResolversReply:
             type: object
             properties:
@@ -9284,6 +9306,98 @@ components:
                     type: string
                 data:
                     $ref: '#/components/schemas/api.admin.routing.v1.RouteRuleData'
+        api.admin.routing.v1.RoutingAuditEvent:
+            type: object
+            properties:
+                id:
+                    type: string
+                resourceType:
+                    type: string
+                resourceId:
+                    type: string
+                resourceName:
+                    type: string
+                action:
+                    type: string
+                summary:
+                    type: string
+                createdAt:
+                    type: string
+        api.admin.routing.v1.RoutingEnforceGuard:
+            type: object
+            properties:
+                key:
+                    type: string
+                label:
+                    type: string
+                passed:
+                    type: boolean
+                status:
+                    type: string
+                reason:
+                    type: string
+        api.admin.routing.v1.RoutingHealthItem:
+            type: object
+            properties:
+                kind:
+                    type: string
+                key:
+                    type: string
+                name:
+                    type: string
+                status:
+                    type: string
+                source:
+                    type: string
+                checkedAt:
+                    type: string
+                rttMs:
+                    type: integer
+                    format: int32
+                consecutiveFailures:
+                    type: integer
+                    format: int32
+                lastError:
+                    type: string
+                outboundTag:
+                    type: string
+                dnsResolverTag:
+                    type: string
+        api.admin.routing.v1.RoutingOverview:
+            type: object
+            properties:
+                routingHash:
+                    type: string
+                generatedAt:
+                    type: string
+                profileCode:
+                    type: string
+                profileName:
+                    type: string
+                mode:
+                    type: string
+                profileEnabled:
+                    type: boolean
+                enforceReady:
+                    type: boolean
+                executionEnabled:
+                    type: boolean
+                rollbackAction:
+                    type: string
+                compileError:
+                    type: string
+                health:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.admin.routing.v1.RoutingHealthItem'
+                guards:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.admin.routing.v1.RoutingEnforceGuard'
+                auditEvents:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.admin.routing.v1.RoutingAuditEvent'
         api.admin.routing.v1.UnlockService:
             type: object
             properties:
