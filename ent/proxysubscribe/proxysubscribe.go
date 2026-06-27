@@ -19,6 +19,14 @@ const (
 	FieldLanguage = "language"
 	// FieldDescription holds the string denoting the description field in the database.
 	FieldDescription = "description"
+	// FieldShortDescription holds the string denoting the short_description field in the database.
+	FieldShortDescription = "short_description"
+	// FieldFeatures holds the string denoting the features field in the database.
+	FieldFeatures = "features"
+	// FieldDetailFormat holds the string denoting the detail_format field in the database.
+	FieldDetailFormat = "detail_format"
+	// FieldDetailContent holds the string denoting the detail_content field in the database.
+	FieldDetailContent = "detail_content"
 	// FieldUnitPrice holds the string denoting the unit_price field in the database.
 	FieldUnitPrice = "unit_price"
 	// FieldUnitTime holds the string denoting the unit_time field in the database.
@@ -79,6 +87,10 @@ var Columns = []string{
 	FieldName,
 	FieldLanguage,
 	FieldDescription,
+	FieldShortDescription,
+	FieldFeatures,
+	FieldDetailFormat,
+	FieldDetailContent,
 	FieldUnitPrice,
 	FieldUnitTime,
 	FieldDiscount,
@@ -125,6 +137,10 @@ var (
 	DefaultLanguage string
 	// LanguageValidator is a validator for the "language" field. It is called by the builders before save.
 	LanguageValidator func(string) error
+	// DefaultDetailFormat holds the default value on creation for the "detail_format" field.
+	DefaultDetailFormat string
+	// DetailFormatValidator is a validator for the "detail_format" field. It is called by the builders before save.
+	DetailFormatValidator func(string) error
 	// DefaultUnitPrice holds the default value on creation for the "unit_price" field.
 	DefaultUnitPrice int64
 	// DefaultUnitTime holds the default value on creation for the "unit_time" field.
@@ -202,6 +218,26 @@ func ByLanguage(opts ...sql.OrderTermOption) OrderOption {
 // ByDescription orders the results by the description field.
 func ByDescription(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDescription, opts...).ToFunc()
+}
+
+// ByShortDescription orders the results by the short_description field.
+func ByShortDescription(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldShortDescription, opts...).ToFunc()
+}
+
+// ByFeatures orders the results by the features field.
+func ByFeatures(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldFeatures, opts...).ToFunc()
+}
+
+// ByDetailFormat orders the results by the detail_format field.
+func ByDetailFormat(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDetailFormat, opts...).ToFunc()
+}
+
+// ByDetailContent orders the results by the detail_content field.
+func ByDetailContent(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDetailContent, opts...).ToFunc()
 }
 
 // ByUnitPrice orders the results by the unit_price field.

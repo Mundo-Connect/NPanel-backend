@@ -11868,6 +11868,14 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/api.admin.subscribe.v1.SubscribePriceOption'
+                shortDescription:
+                    type: string
+                features:
+                    type: string
+                detailFormat:
+                    type: string
+                detailContent:
+                    type: string
             description: CreateSubscribeRequest 创建订阅套餐请求
         api.admin.subscribe.v1.DeleteSubscribeCategoryData:
             type: object
@@ -12186,6 +12194,14 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/api.admin.subscribe.v1.SubscribePriceOption'
+                shortDescription:
+                    type: string
+                features:
+                    type: string
+                detailFormat:
+                    type: string
+                detailContent:
+                    type: string
             description: SubscribeInfo 订阅套餐信息
         api.admin.subscribe.v1.SubscribeItem:
             type: object
@@ -12273,6 +12289,14 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/api.admin.subscribe.v1.SubscribePriceOption'
+                shortDescription:
+                    type: string
+                features:
+                    type: string
+                detailFormat:
+                    type: string
+                detailContent:
+                    type: string
             description: SubscribeItem 订阅套餐列表项（包含销量）
         api.admin.subscribe.v1.SubscribePriceOption:
             type: object
@@ -12511,6 +12535,14 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/api.admin.subscribe.v1.SubscribePriceOption'
+                shortDescription:
+                    type: string
+                features:
+                    type: string
+                detailFormat:
+                    type: string
+                detailContent:
+                    type: string
             description: UpdateSubscribeRequest 更新订阅套餐请求
         api.admin.system.v1.CurrencyConfig:
             type: object
@@ -16057,6 +16089,14 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/api.public.subscribe.v1.SubscribePriceOption'
+                shortDescription:
+                    type: string
+                features:
+                    type: string
+                detailFormat:
+                    type: string
+                detailContent:
+                    type: string
         api.public.subscribe.v1.SubscribeCategory:
             type: object
             properties:

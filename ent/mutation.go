@@ -22796,6 +22796,10 @@ type ProxySubscribeMutation struct {
 	name                 *string
 	language             *string
 	description          *string
+	short_description    *string
+	features             *string
+	detail_format        *string
+	detail_content       *string
 	unit_price           *int64
 	addunit_price        *int64
 	unit_time            *string
@@ -23063,6 +23067,189 @@ func (m *ProxySubscribeMutation) DescriptionCleared() bool {
 func (m *ProxySubscribeMutation) ResetDescription() {
 	m.description = nil
 	delete(m.clearedFields, proxysubscribe.FieldDescription)
+}
+
+// SetShortDescription sets the "short_description" field.
+func (m *ProxySubscribeMutation) SetShortDescription(s string) {
+	m.short_description = &s
+}
+
+// ShortDescription returns the value of the "short_description" field in the mutation.
+func (m *ProxySubscribeMutation) ShortDescription() (r string, exists bool) {
+	v := m.short_description
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldShortDescription returns the old "short_description" field's value of the ProxySubscribe entity.
+// If the ProxySubscribe object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProxySubscribeMutation) OldShortDescription(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldShortDescription is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldShortDescription requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldShortDescription: %w", err)
+	}
+	return oldValue.ShortDescription, nil
+}
+
+// ClearShortDescription clears the value of the "short_description" field.
+func (m *ProxySubscribeMutation) ClearShortDescription() {
+	m.short_description = nil
+	m.clearedFields[proxysubscribe.FieldShortDescription] = struct{}{}
+}
+
+// ShortDescriptionCleared returns if the "short_description" field was cleared in this mutation.
+func (m *ProxySubscribeMutation) ShortDescriptionCleared() bool {
+	_, ok := m.clearedFields[proxysubscribe.FieldShortDescription]
+	return ok
+}
+
+// ResetShortDescription resets all changes to the "short_description" field.
+func (m *ProxySubscribeMutation) ResetShortDescription() {
+	m.short_description = nil
+	delete(m.clearedFields, proxysubscribe.FieldShortDescription)
+}
+
+// SetFeatures sets the "features" field.
+func (m *ProxySubscribeMutation) SetFeatures(s string) {
+	m.features = &s
+}
+
+// Features returns the value of the "features" field in the mutation.
+func (m *ProxySubscribeMutation) Features() (r string, exists bool) {
+	v := m.features
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldFeatures returns the old "features" field's value of the ProxySubscribe entity.
+// If the ProxySubscribe object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProxySubscribeMutation) OldFeatures(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldFeatures is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldFeatures requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldFeatures: %w", err)
+	}
+	return oldValue.Features, nil
+}
+
+// ClearFeatures clears the value of the "features" field.
+func (m *ProxySubscribeMutation) ClearFeatures() {
+	m.features = nil
+	m.clearedFields[proxysubscribe.FieldFeatures] = struct{}{}
+}
+
+// FeaturesCleared returns if the "features" field was cleared in this mutation.
+func (m *ProxySubscribeMutation) FeaturesCleared() bool {
+	_, ok := m.clearedFields[proxysubscribe.FieldFeatures]
+	return ok
+}
+
+// ResetFeatures resets all changes to the "features" field.
+func (m *ProxySubscribeMutation) ResetFeatures() {
+	m.features = nil
+	delete(m.clearedFields, proxysubscribe.FieldFeatures)
+}
+
+// SetDetailFormat sets the "detail_format" field.
+func (m *ProxySubscribeMutation) SetDetailFormat(s string) {
+	m.detail_format = &s
+}
+
+// DetailFormat returns the value of the "detail_format" field in the mutation.
+func (m *ProxySubscribeMutation) DetailFormat() (r string, exists bool) {
+	v := m.detail_format
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDetailFormat returns the old "detail_format" field's value of the ProxySubscribe entity.
+// If the ProxySubscribe object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProxySubscribeMutation) OldDetailFormat(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDetailFormat is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDetailFormat requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDetailFormat: %w", err)
+	}
+	return oldValue.DetailFormat, nil
+}
+
+// ResetDetailFormat resets all changes to the "detail_format" field.
+func (m *ProxySubscribeMutation) ResetDetailFormat() {
+	m.detail_format = nil
+}
+
+// SetDetailContent sets the "detail_content" field.
+func (m *ProxySubscribeMutation) SetDetailContent(s string) {
+	m.detail_content = &s
+}
+
+// DetailContent returns the value of the "detail_content" field in the mutation.
+func (m *ProxySubscribeMutation) DetailContent() (r string, exists bool) {
+	v := m.detail_content
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDetailContent returns the old "detail_content" field's value of the ProxySubscribe entity.
+// If the ProxySubscribe object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProxySubscribeMutation) OldDetailContent(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDetailContent is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDetailContent requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDetailContent: %w", err)
+	}
+	return oldValue.DetailContent, nil
+}
+
+// ClearDetailContent clears the value of the "detail_content" field.
+func (m *ProxySubscribeMutation) ClearDetailContent() {
+	m.detail_content = nil
+	m.clearedFields[proxysubscribe.FieldDetailContent] = struct{}{}
+}
+
+// DetailContentCleared returns if the "detail_content" field was cleared in this mutation.
+func (m *ProxySubscribeMutation) DetailContentCleared() bool {
+	_, ok := m.clearedFields[proxysubscribe.FieldDetailContent]
+	return ok
+}
+
+// ResetDetailContent resets all changes to the "detail_content" field.
+func (m *ProxySubscribeMutation) ResetDetailContent() {
+	m.detail_content = nil
+	delete(m.clearedFields, proxysubscribe.FieldDetailContent)
 }
 
 // SetUnitPrice sets the "unit_price" field.
@@ -24336,7 +24523,7 @@ func (m *ProxySubscribeMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ProxySubscribeMutation) Fields() []string {
-	fields := make([]string, 0, 28)
+	fields := make([]string, 0, 32)
 	if m.name != nil {
 		fields = append(fields, proxysubscribe.FieldName)
 	}
@@ -24345,6 +24532,18 @@ func (m *ProxySubscribeMutation) Fields() []string {
 	}
 	if m.description != nil {
 		fields = append(fields, proxysubscribe.FieldDescription)
+	}
+	if m.short_description != nil {
+		fields = append(fields, proxysubscribe.FieldShortDescription)
+	}
+	if m.features != nil {
+		fields = append(fields, proxysubscribe.FieldFeatures)
+	}
+	if m.detail_format != nil {
+		fields = append(fields, proxysubscribe.FieldDetailFormat)
+	}
+	if m.detail_content != nil {
+		fields = append(fields, proxysubscribe.FieldDetailContent)
 	}
 	if m.unit_price != nil {
 		fields = append(fields, proxysubscribe.FieldUnitPrice)
@@ -24435,6 +24634,14 @@ func (m *ProxySubscribeMutation) Field(name string) (ent.Value, bool) {
 		return m.Language()
 	case proxysubscribe.FieldDescription:
 		return m.Description()
+	case proxysubscribe.FieldShortDescription:
+		return m.ShortDescription()
+	case proxysubscribe.FieldFeatures:
+		return m.Features()
+	case proxysubscribe.FieldDetailFormat:
+		return m.DetailFormat()
+	case proxysubscribe.FieldDetailContent:
+		return m.DetailContent()
 	case proxysubscribe.FieldUnitPrice:
 		return m.UnitPrice()
 	case proxysubscribe.FieldUnitTime:
@@ -24500,6 +24707,14 @@ func (m *ProxySubscribeMutation) OldField(ctx context.Context, name string) (ent
 		return m.OldLanguage(ctx)
 	case proxysubscribe.FieldDescription:
 		return m.OldDescription(ctx)
+	case proxysubscribe.FieldShortDescription:
+		return m.OldShortDescription(ctx)
+	case proxysubscribe.FieldFeatures:
+		return m.OldFeatures(ctx)
+	case proxysubscribe.FieldDetailFormat:
+		return m.OldDetailFormat(ctx)
+	case proxysubscribe.FieldDetailContent:
+		return m.OldDetailContent(ctx)
 	case proxysubscribe.FieldUnitPrice:
 		return m.OldUnitPrice(ctx)
 	case proxysubscribe.FieldUnitTime:
@@ -24579,6 +24794,34 @@ func (m *ProxySubscribeMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetDescription(v)
+		return nil
+	case proxysubscribe.FieldShortDescription:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetShortDescription(v)
+		return nil
+	case proxysubscribe.FieldFeatures:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetFeatures(v)
+		return nil
+	case proxysubscribe.FieldDetailFormat:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDetailFormat(v)
+		return nil
+	case proxysubscribe.FieldDetailContent:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDetailContent(v)
 		return nil
 	case proxysubscribe.FieldUnitPrice:
 		v, ok := value.(int64)
@@ -24935,6 +25178,15 @@ func (m *ProxySubscribeMutation) ClearedFields() []string {
 	if m.FieldCleared(proxysubscribe.FieldDescription) {
 		fields = append(fields, proxysubscribe.FieldDescription)
 	}
+	if m.FieldCleared(proxysubscribe.FieldShortDescription) {
+		fields = append(fields, proxysubscribe.FieldShortDescription)
+	}
+	if m.FieldCleared(proxysubscribe.FieldFeatures) {
+		fields = append(fields, proxysubscribe.FieldFeatures)
+	}
+	if m.FieldCleared(proxysubscribe.FieldDetailContent) {
+		fields = append(fields, proxysubscribe.FieldDetailContent)
+	}
 	if m.FieldCleared(proxysubscribe.FieldDiscount) {
 		fields = append(fields, proxysubscribe.FieldDiscount)
 	}
@@ -24970,6 +25222,15 @@ func (m *ProxySubscribeMutation) ClearField(name string) error {
 	case proxysubscribe.FieldDescription:
 		m.ClearDescription()
 		return nil
+	case proxysubscribe.FieldShortDescription:
+		m.ClearShortDescription()
+		return nil
+	case proxysubscribe.FieldFeatures:
+		m.ClearFeatures()
+		return nil
+	case proxysubscribe.FieldDetailContent:
+		m.ClearDetailContent()
+		return nil
 	case proxysubscribe.FieldDiscount:
 		m.ClearDiscount()
 		return nil
@@ -25004,6 +25265,18 @@ func (m *ProxySubscribeMutation) ResetField(name string) error {
 		return nil
 	case proxysubscribe.FieldDescription:
 		m.ResetDescription()
+		return nil
+	case proxysubscribe.FieldShortDescription:
+		m.ResetShortDescription()
+		return nil
+	case proxysubscribe.FieldFeatures:
+		m.ResetFeatures()
+		return nil
+	case proxysubscribe.FieldDetailFormat:
+		m.ResetDetailFormat()
+		return nil
+	case proxysubscribe.FieldDetailContent:
+		m.ResetDetailContent()
 		return nil
 	case proxysubscribe.FieldUnitPrice:
 		m.ResetUnitPrice()

@@ -552,6 +552,14 @@ func (m *SubscribeInfo) validate(all bool) error {
 
 	}
 
+	// no validation rules for ShortDescription
+
+	// no validation rules for Features
+
+	// no validation rules for DetailFormat
+
+	// no validation rules for DetailContent
+
 	if len(errors) > 0 {
 		return SubscribeInfoMultiError(errors)
 	}
@@ -806,6 +814,14 @@ func (m *SubscribeItem) validate(all bool) error {
 
 	}
 
+	// no validation rules for ShortDescription
+
+	// no validation rules for Features
+
+	// no validation rules for DetailFormat
+
+	// no validation rules for DetailContent
+
 	if len(errors) > 0 {
 		return SubscribeItemMultiError(errors)
 	}
@@ -1043,6 +1059,14 @@ func (m *CreateSubscribeRequest) validate(all bool) error {
 		}
 
 	}
+
+	// no validation rules for ShortDescription
+
+	// no validation rules for Features
+
+	// no validation rules for DetailFormat
+
+	// no validation rules for DetailContent
 
 	if m.Show != nil {
 		// no validation rules for Show
@@ -1538,6 +1562,14 @@ func (m *UpdateSubscribeRequest) validate(all bool) error {
 		}
 
 	}
+
+	// no validation rules for ShortDescription
+
+	// no validation rules for Features
+
+	// no validation rules for DetailFormat
+
+	// no validation rules for DetailContent
 
 	if m.Show != nil {
 		// no validation rules for Show

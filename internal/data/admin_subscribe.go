@@ -46,6 +46,10 @@ func (r *subscribeRepo) CreateSubscribe(ctx context.Context, sub *model.Subscrib
 		SetName(sub.Name).
 		SetLanguage(sub.Language).
 		SetDescription(sub.Description).
+		SetShortDescription(sub.ShortDescription).
+		SetFeatures(sub.Features).
+		SetDetailFormat(sub.DetailFormat).
+		SetDetailContent(sub.DetailContent).
 		SetUnitPrice(sub.UnitPrice).
 		SetUnitTime(sub.UnitTime).
 		SetDiscount(sub.Discount).
@@ -99,6 +103,10 @@ func (r *subscribeRepo) UpdateSubscribe(ctx context.Context, sub *model.Subscrib
 		SetName(sub.Name).
 		SetLanguage(sub.Language).
 		SetDescription(sub.Description).
+		SetShortDescription(sub.ShortDescription).
+		SetFeatures(sub.Features).
+		SetDetailFormat(sub.DetailFormat).
+		SetDetailContent(sub.DetailContent).
 		SetUnitPrice(sub.UnitPrice).
 		SetUnitTime(sub.UnitTime).
 		SetDiscount(sub.Discount).

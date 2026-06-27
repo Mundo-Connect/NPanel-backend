@@ -1571,98 +1571,104 @@ func init() {
 	proxysubscribe.DefaultLanguage = proxysubscribeDescLanguage.Default.(string)
 	// proxysubscribe.LanguageValidator is a validator for the "language" field. It is called by the builders before save.
 	proxysubscribe.LanguageValidator = proxysubscribeDescLanguage.Validators[0].(func(string) error)
+	// proxysubscribeDescDetailFormat is the schema descriptor for detail_format field.
+	proxysubscribeDescDetailFormat := proxysubscribeFields[6].Descriptor()
+	// proxysubscribe.DefaultDetailFormat holds the default value on creation for the detail_format field.
+	proxysubscribe.DefaultDetailFormat = proxysubscribeDescDetailFormat.Default.(string)
+	// proxysubscribe.DetailFormatValidator is a validator for the "detail_format" field. It is called by the builders before save.
+	proxysubscribe.DetailFormatValidator = proxysubscribeDescDetailFormat.Validators[0].(func(string) error)
 	// proxysubscribeDescUnitPrice is the schema descriptor for unit_price field.
-	proxysubscribeDescUnitPrice := proxysubscribeFields[4].Descriptor()
+	proxysubscribeDescUnitPrice := proxysubscribeFields[8].Descriptor()
 	// proxysubscribe.DefaultUnitPrice holds the default value on creation for the unit_price field.
 	proxysubscribe.DefaultUnitPrice = proxysubscribeDescUnitPrice.Default.(int64)
 	// proxysubscribeDescUnitTime is the schema descriptor for unit_time field.
-	proxysubscribeDescUnitTime := proxysubscribeFields[5].Descriptor()
+	proxysubscribeDescUnitTime := proxysubscribeFields[9].Descriptor()
 	// proxysubscribe.DefaultUnitTime holds the default value on creation for the unit_time field.
 	proxysubscribe.DefaultUnitTime = proxysubscribeDescUnitTime.Default.(string)
 	// proxysubscribe.UnitTimeValidator is a validator for the "unit_time" field. It is called by the builders before save.
 	proxysubscribe.UnitTimeValidator = proxysubscribeDescUnitTime.Validators[0].(func(string) error)
 	// proxysubscribeDescReplacement is the schema descriptor for replacement field.
-	proxysubscribeDescReplacement := proxysubscribeFields[7].Descriptor()
+	proxysubscribeDescReplacement := proxysubscribeFields[11].Descriptor()
 	// proxysubscribe.DefaultReplacement holds the default value on creation for the replacement field.
 	proxysubscribe.DefaultReplacement = proxysubscribeDescReplacement.Default.(int64)
 	// proxysubscribeDescInventory is the schema descriptor for inventory field.
-	proxysubscribeDescInventory := proxysubscribeFields[8].Descriptor()
+	proxysubscribeDescInventory := proxysubscribeFields[12].Descriptor()
 	// proxysubscribe.DefaultInventory holds the default value on creation for the inventory field.
 	proxysubscribe.DefaultInventory = proxysubscribeDescInventory.Default.(int32)
 	// proxysubscribeDescTraffic is the schema descriptor for traffic field.
-	proxysubscribeDescTraffic := proxysubscribeFields[9].Descriptor()
+	proxysubscribeDescTraffic := proxysubscribeFields[13].Descriptor()
 	// proxysubscribe.DefaultTraffic holds the default value on creation for the traffic field.
 	proxysubscribe.DefaultTraffic = proxysubscribeDescTraffic.Default.(int64)
 	// proxysubscribeDescSpeedLimit is the schema descriptor for speed_limit field.
-	proxysubscribeDescSpeedLimit := proxysubscribeFields[10].Descriptor()
+	proxysubscribeDescSpeedLimit := proxysubscribeFields[14].Descriptor()
 	// proxysubscribe.DefaultSpeedLimit holds the default value on creation for the speed_limit field.
 	proxysubscribe.DefaultSpeedLimit = proxysubscribeDescSpeedLimit.Default.(int32)
 	// proxysubscribeDescDeviceLimit is the schema descriptor for device_limit field.
-	proxysubscribeDescDeviceLimit := proxysubscribeFields[11].Descriptor()
+	proxysubscribeDescDeviceLimit := proxysubscribeFields[15].Descriptor()
 	// proxysubscribe.DefaultDeviceLimit holds the default value on creation for the device_limit field.
 	proxysubscribe.DefaultDeviceLimit = proxysubscribeDescDeviceLimit.Default.(int32)
 	// proxysubscribeDescQuota is the schema descriptor for quota field.
-	proxysubscribeDescQuota := proxysubscribeFields[12].Descriptor()
+	proxysubscribeDescQuota := proxysubscribeFields[16].Descriptor()
 	// proxysubscribe.DefaultQuota holds the default value on creation for the quota field.
 	proxysubscribe.DefaultQuota = proxysubscribeDescQuota.Default.(int32)
 	// proxysubscribeDescCategoryID is the schema descriptor for category_id field.
-	proxysubscribeDescCategoryID := proxysubscribeFields[13].Descriptor()
+	proxysubscribeDescCategoryID := proxysubscribeFields[17].Descriptor()
 	// proxysubscribe.DefaultCategoryID holds the default value on creation for the category_id field.
 	proxysubscribe.DefaultCategoryID = proxysubscribeDescCategoryID.Default.(int64)
 	// proxysubscribeDescNodes is the schema descriptor for nodes field.
-	proxysubscribeDescNodes := proxysubscribeFields[14].Descriptor()
+	proxysubscribeDescNodes := proxysubscribeFields[18].Descriptor()
 	// proxysubscribe.DefaultNodes holds the default value on creation for the nodes field.
 	proxysubscribe.DefaultNodes = proxysubscribeDescNodes.Default.(string)
 	// proxysubscribe.NodesValidator is a validator for the "nodes" field. It is called by the builders before save.
 	proxysubscribe.NodesValidator = proxysubscribeDescNodes.Validators[0].(func(string) error)
 	// proxysubscribeDescNodeTags is the schema descriptor for node_tags field.
-	proxysubscribeDescNodeTags := proxysubscribeFields[15].Descriptor()
+	proxysubscribeDescNodeTags := proxysubscribeFields[19].Descriptor()
 	// proxysubscribe.DefaultNodeTags holds the default value on creation for the node_tags field.
 	proxysubscribe.DefaultNodeTags = proxysubscribeDescNodeTags.Default.(string)
 	// proxysubscribe.NodeTagsValidator is a validator for the "node_tags" field. It is called by the builders before save.
 	proxysubscribe.NodeTagsValidator = proxysubscribeDescNodeTags.Validators[0].(func(string) error)
 	// proxysubscribeDescNodeGroupID is the schema descriptor for node_group_id field.
-	proxysubscribeDescNodeGroupID := proxysubscribeFields[17].Descriptor()
+	proxysubscribeDescNodeGroupID := proxysubscribeFields[21].Descriptor()
 	// proxysubscribe.DefaultNodeGroupID holds the default value on creation for the node_group_id field.
 	proxysubscribe.DefaultNodeGroupID = proxysubscribeDescNodeGroupID.Default.(int64)
 	// proxysubscribeDescShow is the schema descriptor for show field.
-	proxysubscribeDescShow := proxysubscribeFields[19].Descriptor()
+	proxysubscribeDescShow := proxysubscribeFields[23].Descriptor()
 	// proxysubscribe.DefaultShow holds the default value on creation for the show field.
 	proxysubscribe.DefaultShow = proxysubscribeDescShow.Default.(bool)
 	// proxysubscribeDescSell is the schema descriptor for sell field.
-	proxysubscribeDescSell := proxysubscribeFields[20].Descriptor()
+	proxysubscribeDescSell := proxysubscribeFields[24].Descriptor()
 	// proxysubscribe.DefaultSell holds the default value on creation for the sell field.
 	proxysubscribe.DefaultSell = proxysubscribeDescSell.Default.(bool)
 	// proxysubscribeDescSort is the schema descriptor for sort field.
-	proxysubscribeDescSort := proxysubscribeFields[21].Descriptor()
+	proxysubscribeDescSort := proxysubscribeFields[25].Descriptor()
 	// proxysubscribe.DefaultSort holds the default value on creation for the sort field.
 	proxysubscribe.DefaultSort = proxysubscribeDescSort.Default.(int32)
 	// proxysubscribeDescDeductionRatio is the schema descriptor for deduction_ratio field.
-	proxysubscribeDescDeductionRatio := proxysubscribeFields[22].Descriptor()
+	proxysubscribeDescDeductionRatio := proxysubscribeFields[26].Descriptor()
 	// proxysubscribe.DefaultDeductionRatio holds the default value on creation for the deduction_ratio field.
 	proxysubscribe.DefaultDeductionRatio = proxysubscribeDescDeductionRatio.Default.(int32)
 	// proxysubscribeDescAllowDeduction is the schema descriptor for allow_deduction field.
-	proxysubscribeDescAllowDeduction := proxysubscribeFields[23].Descriptor()
+	proxysubscribeDescAllowDeduction := proxysubscribeFields[27].Descriptor()
 	// proxysubscribe.DefaultAllowDeduction holds the default value on creation for the allow_deduction field.
 	proxysubscribe.DefaultAllowDeduction = proxysubscribeDescAllowDeduction.Default.(bool)
 	// proxysubscribeDescResetCycle is the schema descriptor for reset_cycle field.
-	proxysubscribeDescResetCycle := proxysubscribeFields[24].Descriptor()
+	proxysubscribeDescResetCycle := proxysubscribeFields[28].Descriptor()
 	// proxysubscribe.DefaultResetCycle holds the default value on creation for the reset_cycle field.
 	proxysubscribe.DefaultResetCycle = proxysubscribeDescResetCycle.Default.(int32)
 	// proxysubscribeDescRenewalReset is the schema descriptor for renewal_reset field.
-	proxysubscribeDescRenewalReset := proxysubscribeFields[25].Descriptor()
+	proxysubscribeDescRenewalReset := proxysubscribeFields[29].Descriptor()
 	// proxysubscribe.DefaultRenewalReset holds the default value on creation for the renewal_reset field.
 	proxysubscribe.DefaultRenewalReset = proxysubscribeDescRenewalReset.Default.(bool)
 	// proxysubscribeDescShowOriginalPrice is the schema descriptor for show_original_price field.
-	proxysubscribeDescShowOriginalPrice := proxysubscribeFields[26].Descriptor()
+	proxysubscribeDescShowOriginalPrice := proxysubscribeFields[30].Descriptor()
 	// proxysubscribe.DefaultShowOriginalPrice holds the default value on creation for the show_original_price field.
 	proxysubscribe.DefaultShowOriginalPrice = proxysubscribeDescShowOriginalPrice.Default.(bool)
 	// proxysubscribeDescCreatedAt is the schema descriptor for created_at field.
-	proxysubscribeDescCreatedAt := proxysubscribeFields[27].Descriptor()
+	proxysubscribeDescCreatedAt := proxysubscribeFields[31].Descriptor()
 	// proxysubscribe.DefaultCreatedAt holds the default value on creation for the created_at field.
 	proxysubscribe.DefaultCreatedAt = proxysubscribeDescCreatedAt.Default.(func() time.Time)
 	// proxysubscribeDescUpdatedAt is the schema descriptor for updated_at field.
-	proxysubscribeDescUpdatedAt := proxysubscribeFields[28].Descriptor()
+	proxysubscribeDescUpdatedAt := proxysubscribeFields[32].Descriptor()
 	// proxysubscribe.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	proxysubscribe.DefaultUpdatedAt = proxysubscribeDescUpdatedAt.Default.(func() time.Time)
 	// proxysubscribe.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.

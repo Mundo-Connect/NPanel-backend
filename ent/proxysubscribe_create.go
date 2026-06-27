@@ -62,6 +62,62 @@ func (_c *ProxySubscribeCreate) SetNillableDescription(v *string) *ProxySubscrib
 	return _c
 }
 
+// SetShortDescription sets the "short_description" field.
+func (_c *ProxySubscribeCreate) SetShortDescription(v string) *ProxySubscribeCreate {
+	_c.mutation.SetShortDescription(v)
+	return _c
+}
+
+// SetNillableShortDescription sets the "short_description" field if the given value is not nil.
+func (_c *ProxySubscribeCreate) SetNillableShortDescription(v *string) *ProxySubscribeCreate {
+	if v != nil {
+		_c.SetShortDescription(*v)
+	}
+	return _c
+}
+
+// SetFeatures sets the "features" field.
+func (_c *ProxySubscribeCreate) SetFeatures(v string) *ProxySubscribeCreate {
+	_c.mutation.SetFeatures(v)
+	return _c
+}
+
+// SetNillableFeatures sets the "features" field if the given value is not nil.
+func (_c *ProxySubscribeCreate) SetNillableFeatures(v *string) *ProxySubscribeCreate {
+	if v != nil {
+		_c.SetFeatures(*v)
+	}
+	return _c
+}
+
+// SetDetailFormat sets the "detail_format" field.
+func (_c *ProxySubscribeCreate) SetDetailFormat(v string) *ProxySubscribeCreate {
+	_c.mutation.SetDetailFormat(v)
+	return _c
+}
+
+// SetNillableDetailFormat sets the "detail_format" field if the given value is not nil.
+func (_c *ProxySubscribeCreate) SetNillableDetailFormat(v *string) *ProxySubscribeCreate {
+	if v != nil {
+		_c.SetDetailFormat(*v)
+	}
+	return _c
+}
+
+// SetDetailContent sets the "detail_content" field.
+func (_c *ProxySubscribeCreate) SetDetailContent(v string) *ProxySubscribeCreate {
+	_c.mutation.SetDetailContent(v)
+	return _c
+}
+
+// SetNillableDetailContent sets the "detail_content" field if the given value is not nil.
+func (_c *ProxySubscribeCreate) SetNillableDetailContent(v *string) *ProxySubscribeCreate {
+	if v != nil {
+		_c.SetDetailContent(*v)
+	}
+	return _c
+}
+
 // SetUnitPrice sets the "unit_price" field.
 func (_c *ProxySubscribeCreate) SetUnitPrice(v int64) *ProxySubscribeCreate {
 	_c.mutation.SetUnitPrice(v)
@@ -453,6 +509,10 @@ func (_c *ProxySubscribeCreate) defaults() {
 		v := proxysubscribe.DefaultLanguage
 		_c.mutation.SetLanguage(v)
 	}
+	if _, ok := _c.mutation.DetailFormat(); !ok {
+		v := proxysubscribe.DefaultDetailFormat
+		_c.mutation.SetDetailFormat(v)
+	}
 	if _, ok := _c.mutation.UnitPrice(); !ok {
 		v := proxysubscribe.DefaultUnitPrice
 		_c.mutation.SetUnitPrice(v)
@@ -559,6 +619,14 @@ func (_c *ProxySubscribeCreate) check() error {
 	if v, ok := _c.mutation.Language(); ok {
 		if err := proxysubscribe.LanguageValidator(v); err != nil {
 			return &ValidationError{Name: "language", err: fmt.Errorf(`ent: validator failed for field "ProxySubscribe.language": %w`, err)}
+		}
+	}
+	if _, ok := _c.mutation.DetailFormat(); !ok {
+		return &ValidationError{Name: "detail_format", err: errors.New(`ent: missing required field "ProxySubscribe.detail_format"`)}
+	}
+	if v, ok := _c.mutation.DetailFormat(); ok {
+		if err := proxysubscribe.DetailFormatValidator(v); err != nil {
+			return &ValidationError{Name: "detail_format", err: fmt.Errorf(`ent: validator failed for field "ProxySubscribe.detail_format": %w`, err)}
 		}
 	}
 	if _, ok := _c.mutation.UnitPrice(); !ok {
@@ -681,6 +749,22 @@ func (_c *ProxySubscribeCreate) createSpec() (*ProxySubscribe, *sqlgraph.CreateS
 	if value, ok := _c.mutation.Description(); ok {
 		_spec.SetField(proxysubscribe.FieldDescription, field.TypeString, value)
 		_node.Description = &value
+	}
+	if value, ok := _c.mutation.ShortDescription(); ok {
+		_spec.SetField(proxysubscribe.FieldShortDescription, field.TypeString, value)
+		_node.ShortDescription = &value
+	}
+	if value, ok := _c.mutation.Features(); ok {
+		_spec.SetField(proxysubscribe.FieldFeatures, field.TypeString, value)
+		_node.Features = &value
+	}
+	if value, ok := _c.mutation.DetailFormat(); ok {
+		_spec.SetField(proxysubscribe.FieldDetailFormat, field.TypeString, value)
+		_node.DetailFormat = value
+	}
+	if value, ok := _c.mutation.DetailContent(); ok {
+		_spec.SetField(proxysubscribe.FieldDetailContent, field.TypeString, value)
+		_node.DetailContent = &value
 	}
 	if value, ok := _c.mutation.UnitPrice(); ok {
 		_spec.SetField(proxysubscribe.FieldUnitPrice, field.TypeInt64, value)

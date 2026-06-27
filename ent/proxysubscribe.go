@@ -25,6 +25,14 @@ type ProxySubscribe struct {
 	Language string `json:"language,omitempty"`
 	// 订阅套餐描述
 	Description *string `json:"description,omitempty"`
+	// 订阅套餐卡片简介
+	ShortDescription *string `json:"short_description,omitempty"`
+	// 订阅套餐亮点配置
+	Features *string `json:"features,omitempty"`
+	// 订阅套餐详情格式
+	DetailFormat string `json:"detail_format,omitempty"`
+	// 订阅套餐详情正文
+	DetailContent *string `json:"detail_content,omitempty"`
 	// 单位价格
 	UnitPrice int64 `json:"unit_price,omitempty"`
 	// 单位时间
@@ -89,7 +97,7 @@ func (*ProxySubscribe) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullBool)
 		case proxysubscribe.FieldID, proxysubscribe.FieldUnitPrice, proxysubscribe.FieldReplacement, proxysubscribe.FieldInventory, proxysubscribe.FieldTraffic, proxysubscribe.FieldSpeedLimit, proxysubscribe.FieldDeviceLimit, proxysubscribe.FieldQuota, proxysubscribe.FieldCategoryID, proxysubscribe.FieldNodeGroupID, proxysubscribe.FieldSort, proxysubscribe.FieldDeductionRatio, proxysubscribe.FieldResetCycle:
 			values[i] = new(sql.NullInt64)
-		case proxysubscribe.FieldName, proxysubscribe.FieldLanguage, proxysubscribe.FieldDescription, proxysubscribe.FieldUnitTime, proxysubscribe.FieldDiscount, proxysubscribe.FieldNodes, proxysubscribe.FieldNodeTags, proxysubscribe.FieldTrafficLimit:
+		case proxysubscribe.FieldName, proxysubscribe.FieldLanguage, proxysubscribe.FieldDescription, proxysubscribe.FieldShortDescription, proxysubscribe.FieldFeatures, proxysubscribe.FieldDetailFormat, proxysubscribe.FieldDetailContent, proxysubscribe.FieldUnitTime, proxysubscribe.FieldDiscount, proxysubscribe.FieldNodes, proxysubscribe.FieldNodeTags, proxysubscribe.FieldTrafficLimit:
 			values[i] = new(sql.NullString)
 		case proxysubscribe.FieldCreatedAt, proxysubscribe.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -132,6 +140,33 @@ func (_m *ProxySubscribe) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.Description = new(string)
 				*_m.Description = value.String
+			}
+		case proxysubscribe.FieldShortDescription:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field short_description", values[i])
+			} else if value.Valid {
+				_m.ShortDescription = new(string)
+				*_m.ShortDescription = value.String
+			}
+		case proxysubscribe.FieldFeatures:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field features", values[i])
+			} else if value.Valid {
+				_m.Features = new(string)
+				*_m.Features = value.String
+			}
+		case proxysubscribe.FieldDetailFormat:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field detail_format", values[i])
+			} else if value.Valid {
+				_m.DetailFormat = value.String
+			}
+		case proxysubscribe.FieldDetailContent:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field detail_content", values[i])
+			} else if value.Valid {
+				_m.DetailContent = new(string)
+				*_m.DetailContent = value.String
 			}
 		case proxysubscribe.FieldUnitPrice:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -334,6 +369,24 @@ func (_m *ProxySubscribe) String() string {
 	builder.WriteString(", ")
 	if v := _m.Description; v != nil {
 		builder.WriteString("description=")
+		builder.WriteString(*v)
+	}
+	builder.WriteString(", ")
+	if v := _m.ShortDescription; v != nil {
+		builder.WriteString("short_description=")
+		builder.WriteString(*v)
+	}
+	builder.WriteString(", ")
+	if v := _m.Features; v != nil {
+		builder.WriteString("features=")
+		builder.WriteString(*v)
+	}
+	builder.WriteString(", ")
+	builder.WriteString("detail_format=")
+	builder.WriteString(_m.DetailFormat)
+	builder.WriteString(", ")
+	if v := _m.DetailContent; v != nil {
+		builder.WriteString("detail_content=")
 		builder.WriteString(*v)
 	}
 	builder.WriteString(", ")

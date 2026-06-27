@@ -42,6 +42,19 @@ func normalizeAdminProductLanguage(value string) (string, error) {
 	return normalized, nil
 }
 
+func normalizeSubscribeDetailFormat(value string) (string, error) {
+	switch strings.ToLower(strings.TrimSpace(value)) {
+	case "", "markdown", "md":
+		return "markdown", nil
+	case "html":
+		return "html", nil
+	case "text", "plain":
+		return "text", nil
+	default:
+		return "", responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+	}
+}
+
 // SubscribeUseCase subscribe use case
 type SubscribeUseCase struct {
 	repo SubscribeRepo
@@ -115,6 +128,10 @@ func (uc *SubscribeUseCase) CreateSubscribe(ctx context.Context, req *v1.CreateS
 	if err := uc.ensureSubscribeCategoryExists(ctx, req.CategoryId); err != nil {
 		return err
 	}
+	detailFormat, err := normalizeSubscribeDetailFormat(req.DetailFormat)
+	if err != nil {
+		return err
+	}
 	priceOptions, err := convertPriceOptionsToModel(req.GetPriceOptions())
 	if err != nil {
 		return err
@@ -124,6 +141,10 @@ func (uc *SubscribeUseCase) CreateSubscribe(ctx context.Context, req *v1.CreateS
 		Name:              req.Name,
 		Language:          language,
 		Description:       req.Description,
+		ShortDescription:  req.ShortDescription,
+		Features:          req.Features,
+		DetailFormat:      detailFormat,
+		DetailContent:     req.DetailContent,
 		UnitPrice:         req.UnitPrice,
 		UnitTime:          req.UnitTime,
 		Discount:          discountJSON,
@@ -193,6 +214,10 @@ func (uc *SubscribeUseCase) UpdateSubscribe(ctx context.Context, req *v1.UpdateS
 	if err := uc.ensureSubscribeCategoryExists(ctx, req.CategoryId); err != nil {
 		return err
 	}
+	detailFormat, err := normalizeSubscribeDetailFormat(req.DetailFormat)
+	if err != nil {
+		return err
+	}
 	priceOptions, err := convertPriceOptionsToModel(req.GetPriceOptions())
 	if err != nil {
 		return err
@@ -203,6 +228,10 @@ func (uc *SubscribeUseCase) UpdateSubscribe(ctx context.Context, req *v1.UpdateS
 		Name:              req.Name,
 		Language:          language,
 		Description:       req.Description,
+		ShortDescription:  req.ShortDescription,
+		Features:          req.Features,
+		DetailFormat:      detailFormat,
+		DetailContent:     req.DetailContent,
 		UnitPrice:         req.UnitPrice,
 		UnitTime:          req.UnitTime,
 		Discount:          discountJSON,
@@ -1045,6 +1074,18 @@ func convertSubscribeToProto(sub *ent.ProxySubscribe) *v1.SubscribeInfo {
 	if sub.Description != nil {
 		desc = *sub.Description
 	}
+	shortDescription := ""
+	if sub.ShortDescription != nil {
+		shortDescription = *sub.ShortDescription
+	}
+	features := ""
+	if sub.Features != nil {
+		features = *sub.Features
+	}
+	detailContent := ""
+	if sub.DetailContent != nil {
+		detailContent = *sub.DetailContent
+	}
 	discount := ""
 	if sub.Discount != nil {
 		discount = *sub.Discount
@@ -1069,6 +1110,10 @@ func convertSubscribeToProto(sub *ent.ProxySubscribe) *v1.SubscribeInfo {
 		Name:              sub.Name,
 		Language:          sub.Language,
 		Description:       desc,
+		ShortDescription:  shortDescription,
+		Features:          features,
+		DetailFormat:      sub.DetailFormat,
+		DetailContent:     detailContent,
 		UnitPrice:         int64(sub.UnitPrice),
 		UnitTime:          sub.UnitTime,
 		Discount:          convertDiscountFromJSON(discount),
@@ -1103,6 +1148,18 @@ func convertSubscribeToProtoItem(sub *ent.ProxySubscribe) *v1.SubscribeItem {
 	if sub.Description != nil {
 		desc = *sub.Description
 	}
+	shortDescription := ""
+	if sub.ShortDescription != nil {
+		shortDescription = *sub.ShortDescription
+	}
+	features := ""
+	if sub.Features != nil {
+		features = *sub.Features
+	}
+	detailContent := ""
+	if sub.DetailContent != nil {
+		detailContent = *sub.DetailContent
+	}
 	discount := ""
 	if sub.Discount != nil {
 		discount = *sub.Discount
@@ -1127,6 +1184,10 @@ func convertSubscribeToProtoItem(sub *ent.ProxySubscribe) *v1.SubscribeItem {
 		Name:              sub.Name,
 		Language:          sub.Language,
 		Description:       desc,
+		ShortDescription:  shortDescription,
+		Features:          features,
+		DetailFormat:      sub.DetailFormat,
+		DetailContent:     detailContent,
 		UnitPrice:         int64(sub.UnitPrice),
 		UnitTime:          sub.UnitTime,
 		Discount:          convertDiscountFromJSON(discount),

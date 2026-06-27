@@ -86,6 +86,18 @@ func (r *publicSubscribeRepo) QuerySubscribeList(ctx context.Context, language s
 		if s.Description != nil {
 			desc = *s.Description
 		}
+		shortDescription := ""
+		if s.ShortDescription != nil {
+			shortDescription = *s.ShortDescription
+		}
+		features := ""
+		if s.Features != nil {
+			features = *s.Features
+		}
+		detailContent := ""
+		if s.DetailContent != nil {
+			detailContent = *s.DetailContent
+		}
 
 		// 处理ResetCycle和DeductionRatio（指针类型）
 		resetCycle := int64(0)
@@ -140,6 +152,10 @@ func (r *publicSubscribeRepo) QuerySubscribeList(ctx context.Context, language s
 			Name:              s.Name,
 			Language:          s.Language,
 			Description:       desc,
+			ShortDescription:  shortDescription,
+			Features:          features,
+			DetailFormat:      s.DetailFormat,
+			DetailContent:     detailContent,
 			UnitPrice:         s.UnitPrice,
 			UnitTime:          s.UnitTime,
 			Replacement:       int64(s.Replacement),
