@@ -1,5 +1,9 @@
 package model
 
+import "errors"
+
+var ErrSubscribePriceOptionModified = errors.New("subscribe price option has been modified")
+
 // UserSubscribeStatus 用户订阅状态常量
 type UserSubscribeStatus uint8
 
@@ -28,6 +32,10 @@ type Subscribe struct {
 	Name              string
 	Language          string
 	Description       string
+	ShortDescription  string
+	Features          string
+	DetailFormat      string
+	DetailContent     string
 	UnitPrice         int64
 	UnitTime          string
 	Discount          string // JSON string
@@ -58,6 +66,8 @@ type Subscribe struct {
 type SubscribePriceOption struct {
 	ID            int64
 	SubscribeID   int64
+	Code          string
+	Type          string
 	Name          string
 	DurationUnit  string
 	DurationValue int64
@@ -68,6 +78,9 @@ type SubscribePriceOption struct {
 	Sell          bool
 	IsDefault     bool
 	Sort          int64
+	Version       int32
+	CreatedAt     int64
+	UpdatedAt     int64
 }
 
 // SubscribeDiscount discount configuration

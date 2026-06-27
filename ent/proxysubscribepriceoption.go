@@ -20,6 +20,10 @@ type ProxySubscribePriceOption struct {
 	ID int64 `json:"id,omitempty"`
 	// 订阅套餐ID
 	SubscribeID int64 `json:"subscribe_id,omitempty"`
+	// 稳定价格档位编码
+	Code string `json:"code,omitempty"`
+	// 价格档位类型
+	OptionType string `json:"option_type,omitempty"`
 	// 价格档位名称
 	Name string `json:"name,omitempty"`
 	// 时长单位
@@ -40,6 +44,8 @@ type ProxySubscribePriceOption struct {
 	IsDefault bool `json:"is_default,omitempty"`
 	// 排序
 	Sort int32 `json:"sort,omitempty"`
+	// 乐观锁版本
+	Version int32 `json:"version,omitempty"`
 	// 创建时间
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// 更新时间
@@ -54,9 +60,9 @@ func (*ProxySubscribePriceOption) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case proxysubscribepriceoption.FieldShow, proxysubscribepriceoption.FieldSell, proxysubscribepriceoption.FieldIsDefault:
 			values[i] = new(sql.NullBool)
-		case proxysubscribepriceoption.FieldID, proxysubscribepriceoption.FieldSubscribeID, proxysubscribepriceoption.FieldDurationValue, proxysubscribepriceoption.FieldPrice, proxysubscribepriceoption.FieldOriginalPrice, proxysubscribepriceoption.FieldInventory, proxysubscribepriceoption.FieldSort:
+		case proxysubscribepriceoption.FieldID, proxysubscribepriceoption.FieldSubscribeID, proxysubscribepriceoption.FieldDurationValue, proxysubscribepriceoption.FieldPrice, proxysubscribepriceoption.FieldOriginalPrice, proxysubscribepriceoption.FieldInventory, proxysubscribepriceoption.FieldSort, proxysubscribepriceoption.FieldVersion:
 			values[i] = new(sql.NullInt64)
-		case proxysubscribepriceoption.FieldName, proxysubscribepriceoption.FieldDurationUnit:
+		case proxysubscribepriceoption.FieldCode, proxysubscribepriceoption.FieldOptionType, proxysubscribepriceoption.FieldName, proxysubscribepriceoption.FieldDurationUnit:
 			values[i] = new(sql.NullString)
 		case proxysubscribepriceoption.FieldCreatedAt, proxysubscribepriceoption.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -86,6 +92,18 @@ func (_m *ProxySubscribePriceOption) assignValues(columns []string, values []any
 				return fmt.Errorf("unexpected type %T for field subscribe_id", values[i])
 			} else if value.Valid {
 				_m.SubscribeID = value.Int64
+			}
+		case proxysubscribepriceoption.FieldCode:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field code", values[i])
+			} else if value.Valid {
+				_m.Code = value.String
+			}
+		case proxysubscribepriceoption.FieldOptionType:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field option_type", values[i])
+			} else if value.Valid {
+				_m.OptionType = value.String
 			}
 		case proxysubscribepriceoption.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -147,6 +165,12 @@ func (_m *ProxySubscribePriceOption) assignValues(columns []string, values []any
 			} else if value.Valid {
 				_m.Sort = int32(value.Int64)
 			}
+		case proxysubscribepriceoption.FieldVersion:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field version", values[i])
+			} else if value.Valid {
+				_m.Version = int32(value.Int64)
+			}
 		case proxysubscribepriceoption.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
@@ -198,6 +222,12 @@ func (_m *ProxySubscribePriceOption) String() string {
 	builder.WriteString("subscribe_id=")
 	builder.WriteString(fmt.Sprintf("%v", _m.SubscribeID))
 	builder.WriteString(", ")
+	builder.WriteString("code=")
+	builder.WriteString(_m.Code)
+	builder.WriteString(", ")
+	builder.WriteString("option_type=")
+	builder.WriteString(_m.OptionType)
+	builder.WriteString(", ")
 	builder.WriteString("name=")
 	builder.WriteString(_m.Name)
 	builder.WriteString(", ")
@@ -227,6 +257,9 @@ func (_m *ProxySubscribePriceOption) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("sort=")
 	builder.WriteString(fmt.Sprintf("%v", _m.Sort))
+	builder.WriteString(", ")
+	builder.WriteString("version=")
+	builder.WriteString(fmt.Sprintf("%v", _m.Version))
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
 	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))

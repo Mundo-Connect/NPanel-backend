@@ -69,6 +69,26 @@ func Description(v string) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldEQ(FieldDescription, v))
 }
 
+// ShortDescription applies equality check predicate on the "short_description" field. It's identical to ShortDescriptionEQ.
+func ShortDescription(v string) predicate.ProxySubscribe {
+	return predicate.ProxySubscribe(sql.FieldEQ(FieldShortDescription, v))
+}
+
+// Features applies equality check predicate on the "features" field. It's identical to FeaturesEQ.
+func Features(v string) predicate.ProxySubscribe {
+	return predicate.ProxySubscribe(sql.FieldEQ(FieldFeatures, v))
+}
+
+// DetailFormat applies equality check predicate on the "detail_format" field. It's identical to DetailFormatEQ.
+func DetailFormat(v string) predicate.ProxySubscribe {
+	return predicate.ProxySubscribe(sql.FieldEQ(FieldDetailFormat, v))
+}
+
+// DetailContent applies equality check predicate on the "detail_content" field. It's identical to DetailContentEQ.
+func DetailContent(v string) predicate.ProxySubscribe {
+	return predicate.ProxySubscribe(sql.FieldEQ(FieldDetailContent, v))
+}
+
 // UnitPrice applies equality check predicate on the "unit_price" field. It's identical to UnitPriceEQ.
 func UnitPrice(v int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldEQ(FieldUnitPrice, v))
@@ -392,6 +412,296 @@ func DescriptionEqualFold(v string) predicate.ProxySubscribe {
 // DescriptionContainsFold applies the ContainsFold predicate on the "description" field.
 func DescriptionContainsFold(v string) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldContainsFold(FieldDescription, v))
+}
+
+// ShortDescriptionEQ applies the EQ predicate on the "short_description" field.
+func ShortDescriptionEQ(v string) predicate.ProxySubscribe {
+	return predicate.ProxySubscribe(sql.FieldEQ(FieldShortDescription, v))
+}
+
+// ShortDescriptionNEQ applies the NEQ predicate on the "short_description" field.
+func ShortDescriptionNEQ(v string) predicate.ProxySubscribe {
+	return predicate.ProxySubscribe(sql.FieldNEQ(FieldShortDescription, v))
+}
+
+// ShortDescriptionIn applies the In predicate on the "short_description" field.
+func ShortDescriptionIn(vs ...string) predicate.ProxySubscribe {
+	return predicate.ProxySubscribe(sql.FieldIn(FieldShortDescription, vs...))
+}
+
+// ShortDescriptionNotIn applies the NotIn predicate on the "short_description" field.
+func ShortDescriptionNotIn(vs ...string) predicate.ProxySubscribe {
+	return predicate.ProxySubscribe(sql.FieldNotIn(FieldShortDescription, vs...))
+}
+
+// ShortDescriptionGT applies the GT predicate on the "short_description" field.
+func ShortDescriptionGT(v string) predicate.ProxySubscribe {
+	return predicate.ProxySubscribe(sql.FieldGT(FieldShortDescription, v))
+}
+
+// ShortDescriptionGTE applies the GTE predicate on the "short_description" field.
+func ShortDescriptionGTE(v string) predicate.ProxySubscribe {
+	return predicate.ProxySubscribe(sql.FieldGTE(FieldShortDescription, v))
+}
+
+// ShortDescriptionLT applies the LT predicate on the "short_description" field.
+func ShortDescriptionLT(v string) predicate.ProxySubscribe {
+	return predicate.ProxySubscribe(sql.FieldLT(FieldShortDescription, v))
+}
+
+// ShortDescriptionLTE applies the LTE predicate on the "short_description" field.
+func ShortDescriptionLTE(v string) predicate.ProxySubscribe {
+	return predicate.ProxySubscribe(sql.FieldLTE(FieldShortDescription, v))
+}
+
+// ShortDescriptionContains applies the Contains predicate on the "short_description" field.
+func ShortDescriptionContains(v string) predicate.ProxySubscribe {
+	return predicate.ProxySubscribe(sql.FieldContains(FieldShortDescription, v))
+}
+
+// ShortDescriptionHasPrefix applies the HasPrefix predicate on the "short_description" field.
+func ShortDescriptionHasPrefix(v string) predicate.ProxySubscribe {
+	return predicate.ProxySubscribe(sql.FieldHasPrefix(FieldShortDescription, v))
+}
+
+// ShortDescriptionHasSuffix applies the HasSuffix predicate on the "short_description" field.
+func ShortDescriptionHasSuffix(v string) predicate.ProxySubscribe {
+	return predicate.ProxySubscribe(sql.FieldHasSuffix(FieldShortDescription, v))
+}
+
+// ShortDescriptionIsNil applies the IsNil predicate on the "short_description" field.
+func ShortDescriptionIsNil() predicate.ProxySubscribe {
+	return predicate.ProxySubscribe(sql.FieldIsNull(FieldShortDescription))
+}
+
+// ShortDescriptionNotNil applies the NotNil predicate on the "short_description" field.
+func ShortDescriptionNotNil() predicate.ProxySubscribe {
+	return predicate.ProxySubscribe(sql.FieldNotNull(FieldShortDescription))
+}
+
+// ShortDescriptionEqualFold applies the EqualFold predicate on the "short_description" field.
+func ShortDescriptionEqualFold(v string) predicate.ProxySubscribe {
+	return predicate.ProxySubscribe(sql.FieldEqualFold(FieldShortDescription, v))
+}
+
+// ShortDescriptionContainsFold applies the ContainsFold predicate on the "short_description" field.
+func ShortDescriptionContainsFold(v string) predicate.ProxySubscribe {
+	return predicate.ProxySubscribe(sql.FieldContainsFold(FieldShortDescription, v))
+}
+
+// FeaturesEQ applies the EQ predicate on the "features" field.
+func FeaturesEQ(v string) predicate.ProxySubscribe {
+	return predicate.ProxySubscribe(sql.FieldEQ(FieldFeatures, v))
+}
+
+// FeaturesNEQ applies the NEQ predicate on the "features" field.
+func FeaturesNEQ(v string) predicate.ProxySubscribe {
+	return predicate.ProxySubscribe(sql.FieldNEQ(FieldFeatures, v))
+}
+
+// FeaturesIn applies the In predicate on the "features" field.
+func FeaturesIn(vs ...string) predicate.ProxySubscribe {
+	return predicate.ProxySubscribe(sql.FieldIn(FieldFeatures, vs...))
+}
+
+// FeaturesNotIn applies the NotIn predicate on the "features" field.
+func FeaturesNotIn(vs ...string) predicate.ProxySubscribe {
+	return predicate.ProxySubscribe(sql.FieldNotIn(FieldFeatures, vs...))
+}
+
+// FeaturesGT applies the GT predicate on the "features" field.
+func FeaturesGT(v string) predicate.ProxySubscribe {
+	return predicate.ProxySubscribe(sql.FieldGT(FieldFeatures, v))
+}
+
+// FeaturesGTE applies the GTE predicate on the "features" field.
+func FeaturesGTE(v string) predicate.ProxySubscribe {
+	return predicate.ProxySubscribe(sql.FieldGTE(FieldFeatures, v))
+}
+
+// FeaturesLT applies the LT predicate on the "features" field.
+func FeaturesLT(v string) predicate.ProxySubscribe {
+	return predicate.ProxySubscribe(sql.FieldLT(FieldFeatures, v))
+}
+
+// FeaturesLTE applies the LTE predicate on the "features" field.
+func FeaturesLTE(v string) predicate.ProxySubscribe {
+	return predicate.ProxySubscribe(sql.FieldLTE(FieldFeatures, v))
+}
+
+// FeaturesContains applies the Contains predicate on the "features" field.
+func FeaturesContains(v string) predicate.ProxySubscribe {
+	return predicate.ProxySubscribe(sql.FieldContains(FieldFeatures, v))
+}
+
+// FeaturesHasPrefix applies the HasPrefix predicate on the "features" field.
+func FeaturesHasPrefix(v string) predicate.ProxySubscribe {
+	return predicate.ProxySubscribe(sql.FieldHasPrefix(FieldFeatures, v))
+}
+
+// FeaturesHasSuffix applies the HasSuffix predicate on the "features" field.
+func FeaturesHasSuffix(v string) predicate.ProxySubscribe {
+	return predicate.ProxySubscribe(sql.FieldHasSuffix(FieldFeatures, v))
+}
+
+// FeaturesIsNil applies the IsNil predicate on the "features" field.
+func FeaturesIsNil() predicate.ProxySubscribe {
+	return predicate.ProxySubscribe(sql.FieldIsNull(FieldFeatures))
+}
+
+// FeaturesNotNil applies the NotNil predicate on the "features" field.
+func FeaturesNotNil() predicate.ProxySubscribe {
+	return predicate.ProxySubscribe(sql.FieldNotNull(FieldFeatures))
+}
+
+// FeaturesEqualFold applies the EqualFold predicate on the "features" field.
+func FeaturesEqualFold(v string) predicate.ProxySubscribe {
+	return predicate.ProxySubscribe(sql.FieldEqualFold(FieldFeatures, v))
+}
+
+// FeaturesContainsFold applies the ContainsFold predicate on the "features" field.
+func FeaturesContainsFold(v string) predicate.ProxySubscribe {
+	return predicate.ProxySubscribe(sql.FieldContainsFold(FieldFeatures, v))
+}
+
+// DetailFormatEQ applies the EQ predicate on the "detail_format" field.
+func DetailFormatEQ(v string) predicate.ProxySubscribe {
+	return predicate.ProxySubscribe(sql.FieldEQ(FieldDetailFormat, v))
+}
+
+// DetailFormatNEQ applies the NEQ predicate on the "detail_format" field.
+func DetailFormatNEQ(v string) predicate.ProxySubscribe {
+	return predicate.ProxySubscribe(sql.FieldNEQ(FieldDetailFormat, v))
+}
+
+// DetailFormatIn applies the In predicate on the "detail_format" field.
+func DetailFormatIn(vs ...string) predicate.ProxySubscribe {
+	return predicate.ProxySubscribe(sql.FieldIn(FieldDetailFormat, vs...))
+}
+
+// DetailFormatNotIn applies the NotIn predicate on the "detail_format" field.
+func DetailFormatNotIn(vs ...string) predicate.ProxySubscribe {
+	return predicate.ProxySubscribe(sql.FieldNotIn(FieldDetailFormat, vs...))
+}
+
+// DetailFormatGT applies the GT predicate on the "detail_format" field.
+func DetailFormatGT(v string) predicate.ProxySubscribe {
+	return predicate.ProxySubscribe(sql.FieldGT(FieldDetailFormat, v))
+}
+
+// DetailFormatGTE applies the GTE predicate on the "detail_format" field.
+func DetailFormatGTE(v string) predicate.ProxySubscribe {
+	return predicate.ProxySubscribe(sql.FieldGTE(FieldDetailFormat, v))
+}
+
+// DetailFormatLT applies the LT predicate on the "detail_format" field.
+func DetailFormatLT(v string) predicate.ProxySubscribe {
+	return predicate.ProxySubscribe(sql.FieldLT(FieldDetailFormat, v))
+}
+
+// DetailFormatLTE applies the LTE predicate on the "detail_format" field.
+func DetailFormatLTE(v string) predicate.ProxySubscribe {
+	return predicate.ProxySubscribe(sql.FieldLTE(FieldDetailFormat, v))
+}
+
+// DetailFormatContains applies the Contains predicate on the "detail_format" field.
+func DetailFormatContains(v string) predicate.ProxySubscribe {
+	return predicate.ProxySubscribe(sql.FieldContains(FieldDetailFormat, v))
+}
+
+// DetailFormatHasPrefix applies the HasPrefix predicate on the "detail_format" field.
+func DetailFormatHasPrefix(v string) predicate.ProxySubscribe {
+	return predicate.ProxySubscribe(sql.FieldHasPrefix(FieldDetailFormat, v))
+}
+
+// DetailFormatHasSuffix applies the HasSuffix predicate on the "detail_format" field.
+func DetailFormatHasSuffix(v string) predicate.ProxySubscribe {
+	return predicate.ProxySubscribe(sql.FieldHasSuffix(FieldDetailFormat, v))
+}
+
+// DetailFormatEqualFold applies the EqualFold predicate on the "detail_format" field.
+func DetailFormatEqualFold(v string) predicate.ProxySubscribe {
+	return predicate.ProxySubscribe(sql.FieldEqualFold(FieldDetailFormat, v))
+}
+
+// DetailFormatContainsFold applies the ContainsFold predicate on the "detail_format" field.
+func DetailFormatContainsFold(v string) predicate.ProxySubscribe {
+	return predicate.ProxySubscribe(sql.FieldContainsFold(FieldDetailFormat, v))
+}
+
+// DetailContentEQ applies the EQ predicate on the "detail_content" field.
+func DetailContentEQ(v string) predicate.ProxySubscribe {
+	return predicate.ProxySubscribe(sql.FieldEQ(FieldDetailContent, v))
+}
+
+// DetailContentNEQ applies the NEQ predicate on the "detail_content" field.
+func DetailContentNEQ(v string) predicate.ProxySubscribe {
+	return predicate.ProxySubscribe(sql.FieldNEQ(FieldDetailContent, v))
+}
+
+// DetailContentIn applies the In predicate on the "detail_content" field.
+func DetailContentIn(vs ...string) predicate.ProxySubscribe {
+	return predicate.ProxySubscribe(sql.FieldIn(FieldDetailContent, vs...))
+}
+
+// DetailContentNotIn applies the NotIn predicate on the "detail_content" field.
+func DetailContentNotIn(vs ...string) predicate.ProxySubscribe {
+	return predicate.ProxySubscribe(sql.FieldNotIn(FieldDetailContent, vs...))
+}
+
+// DetailContentGT applies the GT predicate on the "detail_content" field.
+func DetailContentGT(v string) predicate.ProxySubscribe {
+	return predicate.ProxySubscribe(sql.FieldGT(FieldDetailContent, v))
+}
+
+// DetailContentGTE applies the GTE predicate on the "detail_content" field.
+func DetailContentGTE(v string) predicate.ProxySubscribe {
+	return predicate.ProxySubscribe(sql.FieldGTE(FieldDetailContent, v))
+}
+
+// DetailContentLT applies the LT predicate on the "detail_content" field.
+func DetailContentLT(v string) predicate.ProxySubscribe {
+	return predicate.ProxySubscribe(sql.FieldLT(FieldDetailContent, v))
+}
+
+// DetailContentLTE applies the LTE predicate on the "detail_content" field.
+func DetailContentLTE(v string) predicate.ProxySubscribe {
+	return predicate.ProxySubscribe(sql.FieldLTE(FieldDetailContent, v))
+}
+
+// DetailContentContains applies the Contains predicate on the "detail_content" field.
+func DetailContentContains(v string) predicate.ProxySubscribe {
+	return predicate.ProxySubscribe(sql.FieldContains(FieldDetailContent, v))
+}
+
+// DetailContentHasPrefix applies the HasPrefix predicate on the "detail_content" field.
+func DetailContentHasPrefix(v string) predicate.ProxySubscribe {
+	return predicate.ProxySubscribe(sql.FieldHasPrefix(FieldDetailContent, v))
+}
+
+// DetailContentHasSuffix applies the HasSuffix predicate on the "detail_content" field.
+func DetailContentHasSuffix(v string) predicate.ProxySubscribe {
+	return predicate.ProxySubscribe(sql.FieldHasSuffix(FieldDetailContent, v))
+}
+
+// DetailContentIsNil applies the IsNil predicate on the "detail_content" field.
+func DetailContentIsNil() predicate.ProxySubscribe {
+	return predicate.ProxySubscribe(sql.FieldIsNull(FieldDetailContent))
+}
+
+// DetailContentNotNil applies the NotNil predicate on the "detail_content" field.
+func DetailContentNotNil() predicate.ProxySubscribe {
+	return predicate.ProxySubscribe(sql.FieldNotNull(FieldDetailContent))
+}
+
+// DetailContentEqualFold applies the EqualFold predicate on the "detail_content" field.
+func DetailContentEqualFold(v string) predicate.ProxySubscribe {
+	return predicate.ProxySubscribe(sql.FieldEqualFold(FieldDetailContent, v))
+}
+
+// DetailContentContainsFold applies the ContainsFold predicate on the "detail_content" field.
+func DetailContentContainsFold(v string) predicate.ProxySubscribe {
+	return predicate.ProxySubscribe(sql.FieldContainsFold(FieldDetailContent, v))
 }
 
 // UnitPriceEQ applies the EQ predicate on the "unit_price" field.

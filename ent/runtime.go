@@ -17,6 +17,14 @@ import (
 	"github.com/npanel-dev/NPanel-backend/ent/proxypayment"
 	"github.com/npanel-dev/NPanel-backend/ent/proxyredemptioncode"
 	"github.com/npanel-dev/NPanel-backend/ent/proxyredemptionrecord"
+	"github.com/npanel-dev/NPanel-backend/ent/proxyroutingdnsresolver"
+	"github.com/npanel-dev/NPanel-backend/ent/proxyroutinggrayrelease"
+	"github.com/npanel-dev/NPanel-backend/ent/proxyroutinghealthreport"
+	"github.com/npanel-dev/NPanel-backend/ent/proxyroutingoutbound"
+	"github.com/npanel-dev/NPanel-backend/ent/proxyroutingprofile"
+	"github.com/npanel-dev/NPanel-backend/ent/proxyroutingrouteevent"
+	"github.com/npanel-dev/NPanel-backend/ent/proxyroutingrule"
+	"github.com/npanel-dev/NPanel-backend/ent/proxyroutingunlockservice"
 	"github.com/npanel-dev/NPanel-backend/ent/proxyserver"
 	"github.com/npanel-dev/NPanel-backend/ent/proxyservergroup"
 	"github.com/npanel-dev/NPanel-backend/ent/proxysubscribe"
@@ -763,6 +771,664 @@ func init() {
 	proxyredemptionrecordDescID := proxyredemptionrecordFields[0].Descriptor()
 	// proxyredemptionrecord.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	proxyredemptionrecord.IDValidator = proxyredemptionrecordDescID.Validators[0].(func(int64) error)
+	proxyroutingdnsresolverFields := schema.ProxyRoutingDNSResolver{}.Fields()
+	_ = proxyroutingdnsresolverFields
+	// proxyroutingdnsresolverDescTag is the schema descriptor for tag field.
+	proxyroutingdnsresolverDescTag := proxyroutingdnsresolverFields[1].Descriptor()
+	// proxyroutingdnsresolver.TagValidator is a validator for the "tag" field. It is called by the builders before save.
+	proxyroutingdnsresolver.TagValidator = func() func(string) error {
+		validators := proxyroutingdnsresolverDescTag.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(tag string) error {
+			for _, fn := range fns {
+				if err := fn(tag); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// proxyroutingdnsresolverDescName is the schema descriptor for name field.
+	proxyroutingdnsresolverDescName := proxyroutingdnsresolverFields[2].Descriptor()
+	// proxyroutingdnsresolver.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	proxyroutingdnsresolver.NameValidator = func() func(string) error {
+		validators := proxyroutingdnsresolverDescName.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(name string) error {
+			for _, fn := range fns {
+				if err := fn(name); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// proxyroutingdnsresolverDescProto is the schema descriptor for proto field.
+	proxyroutingdnsresolverDescProto := proxyroutingdnsresolverFields[3].Descriptor()
+	// proxyroutingdnsresolver.DefaultProto holds the default value on creation for the proto field.
+	proxyroutingdnsresolver.DefaultProto = proxyroutingdnsresolverDescProto.Default.(string)
+	// proxyroutingdnsresolver.ProtoValidator is a validator for the "proto" field. It is called by the builders before save.
+	proxyroutingdnsresolver.ProtoValidator = proxyroutingdnsresolverDescProto.Validators[0].(func(string) error)
+	// proxyroutingdnsresolverDescAddress is the schema descriptor for address field.
+	proxyroutingdnsresolverDescAddress := proxyroutingdnsresolverFields[4].Descriptor()
+	// proxyroutingdnsresolver.AddressValidator is a validator for the "address" field. It is called by the builders before save.
+	proxyroutingdnsresolver.AddressValidator = func() func(string) error {
+		validators := proxyroutingdnsresolverDescAddress.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(address string) error {
+			for _, fn := range fns {
+				if err := fn(address); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// proxyroutingdnsresolverDescPort is the schema descriptor for port field.
+	proxyroutingdnsresolverDescPort := proxyroutingdnsresolverFields[5].Descriptor()
+	// proxyroutingdnsresolver.DefaultPort holds the default value on creation for the port field.
+	proxyroutingdnsresolver.DefaultPort = proxyroutingdnsresolverDescPort.Default.(int)
+	// proxyroutingdnsresolverDescEnabled is the schema descriptor for enabled field.
+	proxyroutingdnsresolverDescEnabled := proxyroutingdnsresolverFields[6].Descriptor()
+	// proxyroutingdnsresolver.DefaultEnabled holds the default value on creation for the enabled field.
+	proxyroutingdnsresolver.DefaultEnabled = proxyroutingdnsresolverDescEnabled.Default.(bool)
+	// proxyroutingdnsresolverDescResolverJSON is the schema descriptor for resolver_json field.
+	proxyroutingdnsresolverDescResolverJSON := proxyroutingdnsresolverFields[7].Descriptor()
+	// proxyroutingdnsresolver.DefaultResolverJSON holds the default value on creation for the resolver_json field.
+	proxyroutingdnsresolver.DefaultResolverJSON = proxyroutingdnsresolverDescResolverJSON.Default.(string)
+	// proxyroutingdnsresolverDescCreatedAt is the schema descriptor for created_at field.
+	proxyroutingdnsresolverDescCreatedAt := proxyroutingdnsresolverFields[8].Descriptor()
+	// proxyroutingdnsresolver.DefaultCreatedAt holds the default value on creation for the created_at field.
+	proxyroutingdnsresolver.DefaultCreatedAt = proxyroutingdnsresolverDescCreatedAt.Default.(func() time.Time)
+	// proxyroutingdnsresolverDescUpdatedAt is the schema descriptor for updated_at field.
+	proxyroutingdnsresolverDescUpdatedAt := proxyroutingdnsresolverFields[9].Descriptor()
+	// proxyroutingdnsresolver.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	proxyroutingdnsresolver.DefaultUpdatedAt = proxyroutingdnsresolverDescUpdatedAt.Default.(func() time.Time)
+	// proxyroutingdnsresolver.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	proxyroutingdnsresolver.UpdateDefaultUpdatedAt = proxyroutingdnsresolverDescUpdatedAt.UpdateDefault.(func() time.Time)
+	proxyroutinggrayreleaseFields := schema.ProxyRoutingGrayRelease{}.Fields()
+	_ = proxyroutinggrayreleaseFields
+	// proxyroutinggrayreleaseDescProfileCode is the schema descriptor for profile_code field.
+	proxyroutinggrayreleaseDescProfileCode := proxyroutinggrayreleaseFields[1].Descriptor()
+	// proxyroutinggrayrelease.ProfileCodeValidator is a validator for the "profile_code" field. It is called by the builders before save.
+	proxyroutinggrayrelease.ProfileCodeValidator = func() func(string) error {
+		validators := proxyroutinggrayreleaseDescProfileCode.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(profile_code string) error {
+			for _, fn := range fns {
+				if err := fn(profile_code); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// proxyroutinggrayreleaseDescName is the schema descriptor for name field.
+	proxyroutinggrayreleaseDescName := proxyroutinggrayreleaseFields[2].Descriptor()
+	// proxyroutinggrayrelease.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	proxyroutinggrayrelease.NameValidator = func() func(string) error {
+		validators := proxyroutinggrayreleaseDescName.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(name string) error {
+			for _, fn := range fns {
+				if err := fn(name); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// proxyroutinggrayreleaseDescStatus is the schema descriptor for status field.
+	proxyroutinggrayreleaseDescStatus := proxyroutinggrayreleaseFields[3].Descriptor()
+	// proxyroutinggrayrelease.DefaultStatus holds the default value on creation for the status field.
+	proxyroutinggrayrelease.DefaultStatus = proxyroutinggrayreleaseDescStatus.Default.(string)
+	// proxyroutinggrayrelease.StatusValidator is a validator for the "status" field. It is called by the builders before save.
+	proxyroutinggrayrelease.StatusValidator = proxyroutinggrayreleaseDescStatus.Validators[0].(func(string) error)
+	// proxyroutinggrayreleaseDescBatchNo is the schema descriptor for batch_no field.
+	proxyroutinggrayreleaseDescBatchNo := proxyroutinggrayreleaseFields[4].Descriptor()
+	// proxyroutinggrayrelease.DefaultBatchNo holds the default value on creation for the batch_no field.
+	proxyroutinggrayrelease.DefaultBatchNo = proxyroutinggrayreleaseDescBatchNo.Default.(int)
+	// proxyroutinggrayreleaseDescTargetType is the schema descriptor for target_type field.
+	proxyroutinggrayreleaseDescTargetType := proxyroutinggrayreleaseFields[5].Descriptor()
+	// proxyroutinggrayrelease.DefaultTargetType holds the default value on creation for the target_type field.
+	proxyroutinggrayrelease.DefaultTargetType = proxyroutinggrayreleaseDescTargetType.Default.(string)
+	// proxyroutinggrayrelease.TargetTypeValidator is a validator for the "target_type" field. It is called by the builders before save.
+	proxyroutinggrayrelease.TargetTypeValidator = proxyroutinggrayreleaseDescTargetType.Validators[0].(func(string) error)
+	// proxyroutinggrayreleaseDescTargetIdsJSON is the schema descriptor for target_ids_json field.
+	proxyroutinggrayreleaseDescTargetIdsJSON := proxyroutinggrayreleaseFields[6].Descriptor()
+	// proxyroutinggrayrelease.DefaultTargetIdsJSON holds the default value on creation for the target_ids_json field.
+	proxyroutinggrayrelease.DefaultTargetIdsJSON = proxyroutinggrayreleaseDescTargetIdsJSON.Default.(string)
+	// proxyroutinggrayreleaseDescOperator is the schema descriptor for operator field.
+	proxyroutinggrayreleaseDescOperator := proxyroutinggrayreleaseFields[7].Descriptor()
+	// proxyroutinggrayrelease.DefaultOperator holds the default value on creation for the operator field.
+	proxyroutinggrayrelease.DefaultOperator = proxyroutinggrayreleaseDescOperator.Default.(string)
+	// proxyroutinggrayrelease.OperatorValidator is a validator for the "operator" field. It is called by the builders before save.
+	proxyroutinggrayrelease.OperatorValidator = proxyroutinggrayreleaseDescOperator.Validators[0].(func(string) error)
+	// proxyroutinggrayreleaseDescReleaseJSON is the schema descriptor for release_json field.
+	proxyroutinggrayreleaseDescReleaseJSON := proxyroutinggrayreleaseFields[11].Descriptor()
+	// proxyroutinggrayrelease.DefaultReleaseJSON holds the default value on creation for the release_json field.
+	proxyroutinggrayrelease.DefaultReleaseJSON = proxyroutinggrayreleaseDescReleaseJSON.Default.(string)
+	// proxyroutinggrayreleaseDescCreatedAt is the schema descriptor for created_at field.
+	proxyroutinggrayreleaseDescCreatedAt := proxyroutinggrayreleaseFields[12].Descriptor()
+	// proxyroutinggrayrelease.DefaultCreatedAt holds the default value on creation for the created_at field.
+	proxyroutinggrayrelease.DefaultCreatedAt = proxyroutinggrayreleaseDescCreatedAt.Default.(func() time.Time)
+	// proxyroutinggrayreleaseDescUpdatedAt is the schema descriptor for updated_at field.
+	proxyroutinggrayreleaseDescUpdatedAt := proxyroutinggrayreleaseFields[13].Descriptor()
+	// proxyroutinggrayrelease.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	proxyroutinggrayrelease.DefaultUpdatedAt = proxyroutinggrayreleaseDescUpdatedAt.Default.(func() time.Time)
+	// proxyroutinggrayrelease.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	proxyroutinggrayrelease.UpdateDefaultUpdatedAt = proxyroutinggrayreleaseDescUpdatedAt.UpdateDefault.(func() time.Time)
+	proxyroutinghealthreportFields := schema.ProxyRoutingHealthReport{}.Fields()
+	_ = proxyroutinghealthreportFields
+	// proxyroutinghealthreportDescReporterType is the schema descriptor for reporter_type field.
+	proxyroutinghealthreportDescReporterType := proxyroutinghealthreportFields[1].Descriptor()
+	// proxyroutinghealthreport.DefaultReporterType holds the default value on creation for the reporter_type field.
+	proxyroutinghealthreport.DefaultReporterType = proxyroutinghealthreportDescReporterType.Default.(string)
+	// proxyroutinghealthreport.ReporterTypeValidator is a validator for the "reporter_type" field. It is called by the builders before save.
+	proxyroutinghealthreport.ReporterTypeValidator = proxyroutinghealthreportDescReporterType.Validators[0].(func(string) error)
+	// proxyroutinghealthreportDescReporterID is the schema descriptor for reporter_id field.
+	proxyroutinghealthreportDescReporterID := proxyroutinghealthreportFields[2].Descriptor()
+	// proxyroutinghealthreport.DefaultReporterID holds the default value on creation for the reporter_id field.
+	proxyroutinghealthreport.DefaultReporterID = proxyroutinghealthreportDescReporterID.Default.(string)
+	// proxyroutinghealthreport.ReporterIDValidator is a validator for the "reporter_id" field. It is called by the builders before save.
+	proxyroutinghealthreport.ReporterIDValidator = proxyroutinghealthreportDescReporterID.Validators[0].(func(string) error)
+	// proxyroutinghealthreportDescProfileCode is the schema descriptor for profile_code field.
+	proxyroutinghealthreportDescProfileCode := proxyroutinghealthreportFields[3].Descriptor()
+	// proxyroutinghealthreport.DefaultProfileCode holds the default value on creation for the profile_code field.
+	proxyroutinghealthreport.DefaultProfileCode = proxyroutinghealthreportDescProfileCode.Default.(string)
+	// proxyroutinghealthreport.ProfileCodeValidator is a validator for the "profile_code" field. It is called by the builders before save.
+	proxyroutinghealthreport.ProfileCodeValidator = proxyroutinghealthreportDescProfileCode.Validators[0].(func(string) error)
+	// proxyroutinghealthreportDescRoutingHash is the schema descriptor for routing_hash field.
+	proxyroutinghealthreportDescRoutingHash := proxyroutinghealthreportFields[4].Descriptor()
+	// proxyroutinghealthreport.DefaultRoutingHash holds the default value on creation for the routing_hash field.
+	proxyroutinghealthreport.DefaultRoutingHash = proxyroutinghealthreportDescRoutingHash.Default.(string)
+	// proxyroutinghealthreport.RoutingHashValidator is a validator for the "routing_hash" field. It is called by the builders before save.
+	proxyroutinghealthreport.RoutingHashValidator = proxyroutinghealthreportDescRoutingHash.Validators[0].(func(string) error)
+	// proxyroutinghealthreportDescSubjectType is the schema descriptor for subject_type field.
+	proxyroutinghealthreportDescSubjectType := proxyroutinghealthreportFields[5].Descriptor()
+	// proxyroutinghealthreport.SubjectTypeValidator is a validator for the "subject_type" field. It is called by the builders before save.
+	proxyroutinghealthreport.SubjectTypeValidator = func() func(string) error {
+		validators := proxyroutinghealthreportDescSubjectType.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(subject_type string) error {
+			for _, fn := range fns {
+				if err := fn(subject_type); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// proxyroutinghealthreportDescSubjectKey is the schema descriptor for subject_key field.
+	proxyroutinghealthreportDescSubjectKey := proxyroutinghealthreportFields[6].Descriptor()
+	// proxyroutinghealthreport.SubjectKeyValidator is a validator for the "subject_key" field. It is called by the builders before save.
+	proxyroutinghealthreport.SubjectKeyValidator = func() func(string) error {
+		validators := proxyroutinghealthreportDescSubjectKey.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(subject_key string) error {
+			for _, fn := range fns {
+				if err := fn(subject_key); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// proxyroutinghealthreportDescRegion is the schema descriptor for region field.
+	proxyroutinghealthreportDescRegion := proxyroutinghealthreportFields[7].Descriptor()
+	// proxyroutinghealthreport.DefaultRegion holds the default value on creation for the region field.
+	proxyroutinghealthreport.DefaultRegion = proxyroutinghealthreportDescRegion.Default.(string)
+	// proxyroutinghealthreport.RegionValidator is a validator for the "region" field. It is called by the builders before save.
+	proxyroutinghealthreport.RegionValidator = proxyroutinghealthreportDescRegion.Validators[0].(func(string) error)
+	// proxyroutinghealthreportDescStatus is the schema descriptor for status field.
+	proxyroutinghealthreportDescStatus := proxyroutinghealthreportFields[8].Descriptor()
+	// proxyroutinghealthreport.DefaultStatus holds the default value on creation for the status field.
+	proxyroutinghealthreport.DefaultStatus = proxyroutinghealthreportDescStatus.Default.(string)
+	// proxyroutinghealthreport.StatusValidator is a validator for the "status" field. It is called by the builders before save.
+	proxyroutinghealthreport.StatusValidator = proxyroutinghealthreportDescStatus.Validators[0].(func(string) error)
+	// proxyroutinghealthreportDescSource is the schema descriptor for source field.
+	proxyroutinghealthreportDescSource := proxyroutinghealthreportFields[9].Descriptor()
+	// proxyroutinghealthreport.DefaultSource holds the default value on creation for the source field.
+	proxyroutinghealthreport.DefaultSource = proxyroutinghealthreportDescSource.Default.(string)
+	// proxyroutinghealthreport.SourceValidator is a validator for the "source" field. It is called by the builders before save.
+	proxyroutinghealthreport.SourceValidator = proxyroutinghealthreportDescSource.Validators[0].(func(string) error)
+	// proxyroutinghealthreportDescRttMs is the schema descriptor for rtt_ms field.
+	proxyroutinghealthreportDescRttMs := proxyroutinghealthreportFields[10].Descriptor()
+	// proxyroutinghealthreport.DefaultRttMs holds the default value on creation for the rtt_ms field.
+	proxyroutinghealthreport.DefaultRttMs = proxyroutinghealthreportDescRttMs.Default.(int)
+	// proxyroutinghealthreportDescConsecutiveFailures is the schema descriptor for consecutive_failures field.
+	proxyroutinghealthreportDescConsecutiveFailures := proxyroutinghealthreportFields[11].Descriptor()
+	// proxyroutinghealthreport.DefaultConsecutiveFailures holds the default value on creation for the consecutive_failures field.
+	proxyroutinghealthreport.DefaultConsecutiveFailures = proxyroutinghealthreportDescConsecutiveFailures.Default.(int)
+	// proxyroutinghealthreportDescOutboundTag is the schema descriptor for outbound_tag field.
+	proxyroutinghealthreportDescOutboundTag := proxyroutinghealthreportFields[13].Descriptor()
+	// proxyroutinghealthreport.DefaultOutboundTag holds the default value on creation for the outbound_tag field.
+	proxyroutinghealthreport.DefaultOutboundTag = proxyroutinghealthreportDescOutboundTag.Default.(string)
+	// proxyroutinghealthreport.OutboundTagValidator is a validator for the "outbound_tag" field. It is called by the builders before save.
+	proxyroutinghealthreport.OutboundTagValidator = proxyroutinghealthreportDescOutboundTag.Validators[0].(func(string) error)
+	// proxyroutinghealthreportDescDNSResolverTag is the schema descriptor for dns_resolver_tag field.
+	proxyroutinghealthreportDescDNSResolverTag := proxyroutinghealthreportFields[14].Descriptor()
+	// proxyroutinghealthreport.DefaultDNSResolverTag holds the default value on creation for the dns_resolver_tag field.
+	proxyroutinghealthreport.DefaultDNSResolverTag = proxyroutinghealthreportDescDNSResolverTag.Default.(string)
+	// proxyroutinghealthreport.DNSResolverTagValidator is a validator for the "dns_resolver_tag" field. It is called by the builders before save.
+	proxyroutinghealthreport.DNSResolverTagValidator = proxyroutinghealthreportDescDNSResolverTag.Validators[0].(func(string) error)
+	// proxyroutinghealthreportDescCheckedAt is the schema descriptor for checked_at field.
+	proxyroutinghealthreportDescCheckedAt := proxyroutinghealthreportFields[15].Descriptor()
+	// proxyroutinghealthreport.DefaultCheckedAt holds the default value on creation for the checked_at field.
+	proxyroutinghealthreport.DefaultCheckedAt = proxyroutinghealthreportDescCheckedAt.Default.(func() time.Time)
+	// proxyroutinghealthreportDescReportJSON is the schema descriptor for report_json field.
+	proxyroutinghealthreportDescReportJSON := proxyroutinghealthreportFields[16].Descriptor()
+	// proxyroutinghealthreport.DefaultReportJSON holds the default value on creation for the report_json field.
+	proxyroutinghealthreport.DefaultReportJSON = proxyroutinghealthreportDescReportJSON.Default.(string)
+	// proxyroutinghealthreportDescCreatedAt is the schema descriptor for created_at field.
+	proxyroutinghealthreportDescCreatedAt := proxyroutinghealthreportFields[17].Descriptor()
+	// proxyroutinghealthreport.DefaultCreatedAt holds the default value on creation for the created_at field.
+	proxyroutinghealthreport.DefaultCreatedAt = proxyroutinghealthreportDescCreatedAt.Default.(func() time.Time)
+	// proxyroutinghealthreportDescUpdatedAt is the schema descriptor for updated_at field.
+	proxyroutinghealthreportDescUpdatedAt := proxyroutinghealthreportFields[18].Descriptor()
+	// proxyroutinghealthreport.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	proxyroutinghealthreport.DefaultUpdatedAt = proxyroutinghealthreportDescUpdatedAt.Default.(func() time.Time)
+	// proxyroutinghealthreport.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	proxyroutinghealthreport.UpdateDefaultUpdatedAt = proxyroutinghealthreportDescUpdatedAt.UpdateDefault.(func() time.Time)
+	proxyroutingoutboundFields := schema.ProxyRoutingOutbound{}.Fields()
+	_ = proxyroutingoutboundFields
+	// proxyroutingoutboundDescTag is the schema descriptor for tag field.
+	proxyroutingoutboundDescTag := proxyroutingoutboundFields[1].Descriptor()
+	// proxyroutingoutbound.TagValidator is a validator for the "tag" field. It is called by the builders before save.
+	proxyroutingoutbound.TagValidator = func() func(string) error {
+		validators := proxyroutingoutboundDescTag.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(tag string) error {
+			for _, fn := range fns {
+				if err := fn(tag); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// proxyroutingoutboundDescName is the schema descriptor for name field.
+	proxyroutingoutboundDescName := proxyroutingoutboundFields[2].Descriptor()
+	// proxyroutingoutbound.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	proxyroutingoutbound.NameValidator = func() func(string) error {
+		validators := proxyroutingoutboundDescName.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(name string) error {
+			for _, fn := range fns {
+				if err := fn(name); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// proxyroutingoutboundDescType is the schema descriptor for type field.
+	proxyroutingoutboundDescType := proxyroutingoutboundFields[3].Descriptor()
+	// proxyroutingoutbound.DefaultType holds the default value on creation for the type field.
+	proxyroutingoutbound.DefaultType = proxyroutingoutboundDescType.Default.(string)
+	// proxyroutingoutbound.TypeValidator is a validator for the "type" field. It is called by the builders before save.
+	proxyroutingoutbound.TypeValidator = proxyroutingoutboundDescType.Validators[0].(func(string) error)
+	// proxyroutingoutboundDescRegion is the schema descriptor for region field.
+	proxyroutingoutboundDescRegion := proxyroutingoutboundFields[4].Descriptor()
+	// proxyroutingoutbound.DefaultRegion holds the default value on creation for the region field.
+	proxyroutingoutbound.DefaultRegion = proxyroutingoutboundDescRegion.Default.(string)
+	// proxyroutingoutbound.RegionValidator is a validator for the "region" field. It is called by the builders before save.
+	proxyroutingoutbound.RegionValidator = proxyroutingoutboundDescRegion.Validators[0].(func(string) error)
+	// proxyroutingoutboundDescEnabled is the schema descriptor for enabled field.
+	proxyroutingoutboundDescEnabled := proxyroutingoutboundFields[5].Descriptor()
+	// proxyroutingoutbound.DefaultEnabled holds the default value on creation for the enabled field.
+	proxyroutingoutbound.DefaultEnabled = proxyroutingoutboundDescEnabled.Default.(bool)
+	// proxyroutingoutboundDescOutboundJSON is the schema descriptor for outbound_json field.
+	proxyroutingoutboundDescOutboundJSON := proxyroutingoutboundFields[6].Descriptor()
+	// proxyroutingoutbound.DefaultOutboundJSON holds the default value on creation for the outbound_json field.
+	proxyroutingoutbound.DefaultOutboundJSON = proxyroutingoutboundDescOutboundJSON.Default.(string)
+	// proxyroutingoutboundDescCreatedAt is the schema descriptor for created_at field.
+	proxyroutingoutboundDescCreatedAt := proxyroutingoutboundFields[7].Descriptor()
+	// proxyroutingoutbound.DefaultCreatedAt holds the default value on creation for the created_at field.
+	proxyroutingoutbound.DefaultCreatedAt = proxyroutingoutboundDescCreatedAt.Default.(func() time.Time)
+	// proxyroutingoutboundDescUpdatedAt is the schema descriptor for updated_at field.
+	proxyroutingoutboundDescUpdatedAt := proxyroutingoutboundFields[8].Descriptor()
+	// proxyroutingoutbound.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	proxyroutingoutbound.DefaultUpdatedAt = proxyroutingoutboundDescUpdatedAt.Default.(func() time.Time)
+	// proxyroutingoutbound.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	proxyroutingoutbound.UpdateDefaultUpdatedAt = proxyroutingoutboundDescUpdatedAt.UpdateDefault.(func() time.Time)
+	proxyroutingprofileFields := schema.ProxyRoutingProfile{}.Fields()
+	_ = proxyroutingprofileFields
+	// proxyroutingprofileDescCode is the schema descriptor for code field.
+	proxyroutingprofileDescCode := proxyroutingprofileFields[1].Descriptor()
+	// proxyroutingprofile.CodeValidator is a validator for the "code" field. It is called by the builders before save.
+	proxyroutingprofile.CodeValidator = func() func(string) error {
+		validators := proxyroutingprofileDescCode.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(code string) error {
+			for _, fn := range fns {
+				if err := fn(code); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// proxyroutingprofileDescName is the schema descriptor for name field.
+	proxyroutingprofileDescName := proxyroutingprofileFields[2].Descriptor()
+	// proxyroutingprofile.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	proxyroutingprofile.NameValidator = func() func(string) error {
+		validators := proxyroutingprofileDescName.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(name string) error {
+			for _, fn := range fns {
+				if err := fn(name); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// proxyroutingprofileDescScopeType is the schema descriptor for scope_type field.
+	proxyroutingprofileDescScopeType := proxyroutingprofileFields[4].Descriptor()
+	// proxyroutingprofile.DefaultScopeType holds the default value on creation for the scope_type field.
+	proxyroutingprofile.DefaultScopeType = proxyroutingprofileDescScopeType.Default.(string)
+	// proxyroutingprofile.ScopeTypeValidator is a validator for the "scope_type" field. It is called by the builders before save.
+	proxyroutingprofile.ScopeTypeValidator = proxyroutingprofileDescScopeType.Validators[0].(func(string) error)
+	// proxyroutingprofileDescScopeID is the schema descriptor for scope_id field.
+	proxyroutingprofileDescScopeID := proxyroutingprofileFields[5].Descriptor()
+	// proxyroutingprofile.DefaultScopeID holds the default value on creation for the scope_id field.
+	proxyroutingprofile.DefaultScopeID = proxyroutingprofileDescScopeID.Default.(string)
+	// proxyroutingprofile.ScopeIDValidator is a validator for the "scope_id" field. It is called by the builders before save.
+	proxyroutingprofile.ScopeIDValidator = proxyroutingprofileDescScopeID.Validators[0].(func(string) error)
+	// proxyroutingprofileDescPriority is the schema descriptor for priority field.
+	proxyroutingprofileDescPriority := proxyroutingprofileFields[6].Descriptor()
+	// proxyroutingprofile.DefaultPriority holds the default value on creation for the priority field.
+	proxyroutingprofile.DefaultPriority = proxyroutingprofileDescPriority.Default.(int)
+	// proxyroutingprofileDescMode is the schema descriptor for mode field.
+	proxyroutingprofileDescMode := proxyroutingprofileFields[7].Descriptor()
+	// proxyroutingprofile.DefaultMode holds the default value on creation for the mode field.
+	proxyroutingprofile.DefaultMode = proxyroutingprofileDescMode.Default.(string)
+	// proxyroutingprofile.ModeValidator is a validator for the "mode" field. It is called by the builders before save.
+	proxyroutingprofile.ModeValidator = proxyroutingprofileDescMode.Validators[0].(func(string) error)
+	// proxyroutingprofileDescEnabled is the schema descriptor for enabled field.
+	proxyroutingprofileDescEnabled := proxyroutingprofileFields[8].Descriptor()
+	// proxyroutingprofile.DefaultEnabled holds the default value on creation for the enabled field.
+	proxyroutingprofile.DefaultEnabled = proxyroutingprofileDescEnabled.Default.(bool)
+	// proxyroutingprofileDescProfileJSON is the schema descriptor for profile_json field.
+	proxyroutingprofileDescProfileJSON := proxyroutingprofileFields[9].Descriptor()
+	// proxyroutingprofile.DefaultProfileJSON holds the default value on creation for the profile_json field.
+	proxyroutingprofile.DefaultProfileJSON = proxyroutingprofileDescProfileJSON.Default.(string)
+	// proxyroutingprofileDescCreatedAt is the schema descriptor for created_at field.
+	proxyroutingprofileDescCreatedAt := proxyroutingprofileFields[10].Descriptor()
+	// proxyroutingprofile.DefaultCreatedAt holds the default value on creation for the created_at field.
+	proxyroutingprofile.DefaultCreatedAt = proxyroutingprofileDescCreatedAt.Default.(func() time.Time)
+	// proxyroutingprofileDescUpdatedAt is the schema descriptor for updated_at field.
+	proxyroutingprofileDescUpdatedAt := proxyroutingprofileFields[11].Descriptor()
+	// proxyroutingprofile.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	proxyroutingprofile.DefaultUpdatedAt = proxyroutingprofileDescUpdatedAt.Default.(func() time.Time)
+	// proxyroutingprofile.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	proxyroutingprofile.UpdateDefaultUpdatedAt = proxyroutingprofileDescUpdatedAt.UpdateDefault.(func() time.Time)
+	proxyroutingrouteeventFields := schema.ProxyRoutingRouteEvent{}.Fields()
+	_ = proxyroutingrouteeventFields
+	// proxyroutingrouteeventDescReporterType is the schema descriptor for reporter_type field.
+	proxyroutingrouteeventDescReporterType := proxyroutingrouteeventFields[1].Descriptor()
+	// proxyroutingrouteevent.DefaultReporterType holds the default value on creation for the reporter_type field.
+	proxyroutingrouteevent.DefaultReporterType = proxyroutingrouteeventDescReporterType.Default.(string)
+	// proxyroutingrouteevent.ReporterTypeValidator is a validator for the "reporter_type" field. It is called by the builders before save.
+	proxyroutingrouteevent.ReporterTypeValidator = proxyroutingrouteeventDescReporterType.Validators[0].(func(string) error)
+	// proxyroutingrouteeventDescReporterID is the schema descriptor for reporter_id field.
+	proxyroutingrouteeventDescReporterID := proxyroutingrouteeventFields[2].Descriptor()
+	// proxyroutingrouteevent.DefaultReporterID holds the default value on creation for the reporter_id field.
+	proxyroutingrouteevent.DefaultReporterID = proxyroutingrouteeventDescReporterID.Default.(string)
+	// proxyroutingrouteevent.ReporterIDValidator is a validator for the "reporter_id" field. It is called by the builders before save.
+	proxyroutingrouteevent.ReporterIDValidator = proxyroutingrouteeventDescReporterID.Validators[0].(func(string) error)
+	// proxyroutingrouteeventDescProfileCode is the schema descriptor for profile_code field.
+	proxyroutingrouteeventDescProfileCode := proxyroutingrouteeventFields[3].Descriptor()
+	// proxyroutingrouteevent.DefaultProfileCode holds the default value on creation for the profile_code field.
+	proxyroutingrouteevent.DefaultProfileCode = proxyroutingrouteeventDescProfileCode.Default.(string)
+	// proxyroutingrouteevent.ProfileCodeValidator is a validator for the "profile_code" field. It is called by the builders before save.
+	proxyroutingrouteevent.ProfileCodeValidator = proxyroutingrouteeventDescProfileCode.Validators[0].(func(string) error)
+	// proxyroutingrouteeventDescRoutingHash is the schema descriptor for routing_hash field.
+	proxyroutingrouteeventDescRoutingHash := proxyroutingrouteeventFields[4].Descriptor()
+	// proxyroutingrouteevent.DefaultRoutingHash holds the default value on creation for the routing_hash field.
+	proxyroutingrouteevent.DefaultRoutingHash = proxyroutingrouteeventDescRoutingHash.Default.(string)
+	// proxyroutingrouteevent.RoutingHashValidator is a validator for the "routing_hash" field. It is called by the builders before save.
+	proxyroutingrouteevent.RoutingHashValidator = proxyroutingrouteeventDescRoutingHash.Validators[0].(func(string) error)
+	// proxyroutingrouteeventDescEventType is the schema descriptor for event_type field.
+	proxyroutingrouteeventDescEventType := proxyroutingrouteeventFields[5].Descriptor()
+	// proxyroutingrouteevent.EventTypeValidator is a validator for the "event_type" field. It is called by the builders before save.
+	proxyroutingrouteevent.EventTypeValidator = func() func(string) error {
+		validators := proxyroutingrouteeventDescEventType.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(event_type string) error {
+			for _, fn := range fns {
+				if err := fn(event_type); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// proxyroutingrouteeventDescSubject is the schema descriptor for subject field.
+	proxyroutingrouteeventDescSubject := proxyroutingrouteeventFields[6].Descriptor()
+	// proxyroutingrouteevent.DefaultSubject holds the default value on creation for the subject field.
+	proxyroutingrouteevent.DefaultSubject = proxyroutingrouteeventDescSubject.Default.(string)
+	// proxyroutingrouteevent.SubjectValidator is a validator for the "subject" field. It is called by the builders before save.
+	proxyroutingrouteevent.SubjectValidator = proxyroutingrouteeventDescSubject.Validators[0].(func(string) error)
+	// proxyroutingrouteeventDescRuleID is the schema descriptor for rule_id field.
+	proxyroutingrouteeventDescRuleID := proxyroutingrouteeventFields[7].Descriptor()
+	// proxyroutingrouteevent.DefaultRuleID holds the default value on creation for the rule_id field.
+	proxyroutingrouteevent.DefaultRuleID = proxyroutingrouteeventDescRuleID.Default.(string)
+	// proxyroutingrouteevent.RuleIDValidator is a validator for the "rule_id" field. It is called by the builders before save.
+	proxyroutingrouteevent.RuleIDValidator = proxyroutingrouteeventDescRuleID.Validators[0].(func(string) error)
+	// proxyroutingrouteeventDescRuleName is the schema descriptor for rule_name field.
+	proxyroutingrouteeventDescRuleName := proxyroutingrouteeventFields[8].Descriptor()
+	// proxyroutingrouteevent.DefaultRuleName holds the default value on creation for the rule_name field.
+	proxyroutingrouteevent.DefaultRuleName = proxyroutingrouteeventDescRuleName.Default.(string)
+	// proxyroutingrouteevent.RuleNameValidator is a validator for the "rule_name" field. It is called by the builders before save.
+	proxyroutingrouteevent.RuleNameValidator = proxyroutingrouteeventDescRuleName.Validators[0].(func(string) error)
+	// proxyroutingrouteeventDescActionType is the schema descriptor for action_type field.
+	proxyroutingrouteeventDescActionType := proxyroutingrouteeventFields[9].Descriptor()
+	// proxyroutingrouteevent.DefaultActionType holds the default value on creation for the action_type field.
+	proxyroutingrouteevent.DefaultActionType = proxyroutingrouteeventDescActionType.Default.(string)
+	// proxyroutingrouteevent.ActionTypeValidator is a validator for the "action_type" field. It is called by the builders before save.
+	proxyroutingrouteevent.ActionTypeValidator = proxyroutingrouteeventDescActionType.Validators[0].(func(string) error)
+	// proxyroutingrouteeventDescOutboundTag is the schema descriptor for outbound_tag field.
+	proxyroutingrouteeventDescOutboundTag := proxyroutingrouteeventFields[10].Descriptor()
+	// proxyroutingrouteevent.DefaultOutboundTag holds the default value on creation for the outbound_tag field.
+	proxyroutingrouteevent.DefaultOutboundTag = proxyroutingrouteeventDescOutboundTag.Default.(string)
+	// proxyroutingrouteevent.OutboundTagValidator is a validator for the "outbound_tag" field. It is called by the builders before save.
+	proxyroutingrouteevent.OutboundTagValidator = proxyroutingrouteeventDescOutboundTag.Validators[0].(func(string) error)
+	// proxyroutingrouteeventDescDNSResolverTag is the schema descriptor for dns_resolver_tag field.
+	proxyroutingrouteeventDescDNSResolverTag := proxyroutingrouteeventFields[11].Descriptor()
+	// proxyroutingrouteevent.DefaultDNSResolverTag holds the default value on creation for the dns_resolver_tag field.
+	proxyroutingrouteevent.DefaultDNSResolverTag = proxyroutingrouteeventDescDNSResolverTag.Default.(string)
+	// proxyroutingrouteevent.DNSResolverTagValidator is a validator for the "dns_resolver_tag" field. It is called by the builders before save.
+	proxyroutingrouteevent.DNSResolverTagValidator = proxyroutingrouteeventDescDNSResolverTag.Validators[0].(func(string) error)
+	// proxyroutingrouteeventDescFallbackTarget is the schema descriptor for fallback_target field.
+	proxyroutingrouteeventDescFallbackTarget := proxyroutingrouteeventFields[12].Descriptor()
+	// proxyroutingrouteevent.DefaultFallbackTarget holds the default value on creation for the fallback_target field.
+	proxyroutingrouteevent.DefaultFallbackTarget = proxyroutingrouteeventDescFallbackTarget.Default.(string)
+	// proxyroutingrouteevent.FallbackTargetValidator is a validator for the "fallback_target" field. It is called by the builders before save.
+	proxyroutingrouteevent.FallbackTargetValidator = proxyroutingrouteeventDescFallbackTarget.Validators[0].(func(string) error)
+	// proxyroutingrouteeventDescStatus is the schema descriptor for status field.
+	proxyroutingrouteeventDescStatus := proxyroutingrouteeventFields[13].Descriptor()
+	// proxyroutingrouteevent.DefaultStatus holds the default value on creation for the status field.
+	proxyroutingrouteevent.DefaultStatus = proxyroutingrouteeventDescStatus.Default.(string)
+	// proxyroutingrouteevent.StatusValidator is a validator for the "status" field. It is called by the builders before save.
+	proxyroutingrouteevent.StatusValidator = proxyroutingrouteeventDescStatus.Validators[0].(func(string) error)
+	// proxyroutingrouteeventDescLatencyMs is the schema descriptor for latency_ms field.
+	proxyroutingrouteeventDescLatencyMs := proxyroutingrouteeventFields[14].Descriptor()
+	// proxyroutingrouteevent.DefaultLatencyMs holds the default value on creation for the latency_ms field.
+	proxyroutingrouteevent.DefaultLatencyMs = proxyroutingrouteeventDescLatencyMs.Default.(int)
+	// proxyroutingrouteeventDescEventAt is the schema descriptor for event_at field.
+	proxyroutingrouteeventDescEventAt := proxyroutingrouteeventFields[16].Descriptor()
+	// proxyroutingrouteevent.DefaultEventAt holds the default value on creation for the event_at field.
+	proxyroutingrouteevent.DefaultEventAt = proxyroutingrouteeventDescEventAt.Default.(func() time.Time)
+	// proxyroutingrouteeventDescEventJSON is the schema descriptor for event_json field.
+	proxyroutingrouteeventDescEventJSON := proxyroutingrouteeventFields[17].Descriptor()
+	// proxyroutingrouteevent.DefaultEventJSON holds the default value on creation for the event_json field.
+	proxyroutingrouteevent.DefaultEventJSON = proxyroutingrouteeventDescEventJSON.Default.(string)
+	// proxyroutingrouteeventDescCreatedAt is the schema descriptor for created_at field.
+	proxyroutingrouteeventDescCreatedAt := proxyroutingrouteeventFields[18].Descriptor()
+	// proxyroutingrouteevent.DefaultCreatedAt holds the default value on creation for the created_at field.
+	proxyroutingrouteevent.DefaultCreatedAt = proxyroutingrouteeventDescCreatedAt.Default.(func() time.Time)
+	// proxyroutingrouteeventDescUpdatedAt is the schema descriptor for updated_at field.
+	proxyroutingrouteeventDescUpdatedAt := proxyroutingrouteeventFields[19].Descriptor()
+	// proxyroutingrouteevent.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	proxyroutingrouteevent.DefaultUpdatedAt = proxyroutingrouteeventDescUpdatedAt.Default.(func() time.Time)
+	// proxyroutingrouteevent.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	proxyroutingrouteevent.UpdateDefaultUpdatedAt = proxyroutingrouteeventDescUpdatedAt.UpdateDefault.(func() time.Time)
+	proxyroutingruleFields := schema.ProxyRoutingRule{}.Fields()
+	_ = proxyroutingruleFields
+	// proxyroutingruleDescProfileID is the schema descriptor for profile_id field.
+	proxyroutingruleDescProfileID := proxyroutingruleFields[1].Descriptor()
+	// proxyroutingrule.DefaultProfileID holds the default value on creation for the profile_id field.
+	proxyroutingrule.DefaultProfileID = proxyroutingruleDescProfileID.Default.(int64)
+	// proxyroutingruleDescName is the schema descriptor for name field.
+	proxyroutingruleDescName := proxyroutingruleFields[2].Descriptor()
+	// proxyroutingrule.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	proxyroutingrule.NameValidator = func() func(string) error {
+		validators := proxyroutingruleDescName.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(name string) error {
+			for _, fn := range fns {
+				if err := fn(name); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// proxyroutingruleDescPriority is the schema descriptor for priority field.
+	proxyroutingruleDescPriority := proxyroutingruleFields[3].Descriptor()
+	// proxyroutingrule.DefaultPriority holds the default value on creation for the priority field.
+	proxyroutingrule.DefaultPriority = proxyroutingruleDescPriority.Default.(int)
+	// proxyroutingruleDescEnabled is the schema descriptor for enabled field.
+	proxyroutingruleDescEnabled := proxyroutingruleFields[4].Descriptor()
+	// proxyroutingrule.DefaultEnabled holds the default value on creation for the enabled field.
+	proxyroutingrule.DefaultEnabled = proxyroutingruleDescEnabled.Default.(bool)
+	// proxyroutingruleDescServiceCode is the schema descriptor for service_code field.
+	proxyroutingruleDescServiceCode := proxyroutingruleFields[5].Descriptor()
+	// proxyroutingrule.DefaultServiceCode holds the default value on creation for the service_code field.
+	proxyroutingrule.DefaultServiceCode = proxyroutingruleDescServiceCode.Default.(string)
+	// proxyroutingrule.ServiceCodeValidator is a validator for the "service_code" field. It is called by the builders before save.
+	proxyroutingrule.ServiceCodeValidator = proxyroutingruleDescServiceCode.Validators[0].(func(string) error)
+	// proxyroutingruleDescMatcherJSON is the schema descriptor for matcher_json field.
+	proxyroutingruleDescMatcherJSON := proxyroutingruleFields[6].Descriptor()
+	// proxyroutingrule.DefaultMatcherJSON holds the default value on creation for the matcher_json field.
+	proxyroutingrule.DefaultMatcherJSON = proxyroutingruleDescMatcherJSON.Default.(string)
+	// proxyroutingruleDescActionJSON is the schema descriptor for action_json field.
+	proxyroutingruleDescActionJSON := proxyroutingruleFields[7].Descriptor()
+	// proxyroutingrule.DefaultActionJSON holds the default value on creation for the action_json field.
+	proxyroutingrule.DefaultActionJSON = proxyroutingruleDescActionJSON.Default.(string)
+	// proxyroutingruleDescCreatedAt is the schema descriptor for created_at field.
+	proxyroutingruleDescCreatedAt := proxyroutingruleFields[8].Descriptor()
+	// proxyroutingrule.DefaultCreatedAt holds the default value on creation for the created_at field.
+	proxyroutingrule.DefaultCreatedAt = proxyroutingruleDescCreatedAt.Default.(func() time.Time)
+	// proxyroutingruleDescUpdatedAt is the schema descriptor for updated_at field.
+	proxyroutingruleDescUpdatedAt := proxyroutingruleFields[9].Descriptor()
+	// proxyroutingrule.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	proxyroutingrule.DefaultUpdatedAt = proxyroutingruleDescUpdatedAt.Default.(func() time.Time)
+	// proxyroutingrule.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	proxyroutingrule.UpdateDefaultUpdatedAt = proxyroutingruleDescUpdatedAt.UpdateDefault.(func() time.Time)
+	proxyroutingunlockserviceFields := schema.ProxyRoutingUnlockService{}.Fields()
+	_ = proxyroutingunlockserviceFields
+	// proxyroutingunlockserviceDescCode is the schema descriptor for code field.
+	proxyroutingunlockserviceDescCode := proxyroutingunlockserviceFields[1].Descriptor()
+	// proxyroutingunlockservice.CodeValidator is a validator for the "code" field. It is called by the builders before save.
+	proxyroutingunlockservice.CodeValidator = func() func(string) error {
+		validators := proxyroutingunlockserviceDescCode.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(code string) error {
+			for _, fn := range fns {
+				if err := fn(code); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// proxyroutingunlockserviceDescName is the schema descriptor for name field.
+	proxyroutingunlockserviceDescName := proxyroutingunlockserviceFields[2].Descriptor()
+	// proxyroutingunlockservice.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	proxyroutingunlockservice.NameValidator = func() func(string) error {
+		validators := proxyroutingunlockserviceDescName.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(name string) error {
+			for _, fn := range fns {
+				if err := fn(name); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// proxyroutingunlockserviceDescCategory is the schema descriptor for category field.
+	proxyroutingunlockserviceDescCategory := proxyroutingunlockserviceFields[3].Descriptor()
+	// proxyroutingunlockservice.DefaultCategory holds the default value on creation for the category field.
+	proxyroutingunlockservice.DefaultCategory = proxyroutingunlockserviceDescCategory.Default.(string)
+	// proxyroutingunlockservice.CategoryValidator is a validator for the "category" field. It is called by the builders before save.
+	proxyroutingunlockservice.CategoryValidator = proxyroutingunlockserviceDescCategory.Validators[0].(func(string) error)
+	// proxyroutingunlockserviceDescEnabled is the schema descriptor for enabled field.
+	proxyroutingunlockserviceDescEnabled := proxyroutingunlockserviceFields[4].Descriptor()
+	// proxyroutingunlockservice.DefaultEnabled holds the default value on creation for the enabled field.
+	proxyroutingunlockservice.DefaultEnabled = proxyroutingunlockserviceDescEnabled.Default.(bool)
+	// proxyroutingunlockserviceDescServiceJSON is the schema descriptor for service_json field.
+	proxyroutingunlockserviceDescServiceJSON := proxyroutingunlockserviceFields[5].Descriptor()
+	// proxyroutingunlockservice.DefaultServiceJSON holds the default value on creation for the service_json field.
+	proxyroutingunlockservice.DefaultServiceJSON = proxyroutingunlockserviceDescServiceJSON.Default.(string)
+	// proxyroutingunlockserviceDescCreatedAt is the schema descriptor for created_at field.
+	proxyroutingunlockserviceDescCreatedAt := proxyroutingunlockserviceFields[6].Descriptor()
+	// proxyroutingunlockservice.DefaultCreatedAt holds the default value on creation for the created_at field.
+	proxyroutingunlockservice.DefaultCreatedAt = proxyroutingunlockserviceDescCreatedAt.Default.(func() time.Time)
+	// proxyroutingunlockserviceDescUpdatedAt is the schema descriptor for updated_at field.
+	proxyroutingunlockserviceDescUpdatedAt := proxyroutingunlockserviceFields[7].Descriptor()
+	// proxyroutingunlockservice.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	proxyroutingunlockservice.DefaultUpdatedAt = proxyroutingunlockserviceDescUpdatedAt.Default.(func() time.Time)
+	// proxyroutingunlockservice.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	proxyroutingunlockservice.UpdateDefaultUpdatedAt = proxyroutingunlockserviceDescUpdatedAt.UpdateDefault.(func() time.Time)
 	proxyserverFields := schema.ProxyServer{}.Fields()
 	_ = proxyserverFields
 	// proxyserverDescName is the schema descriptor for name field.
@@ -905,98 +1571,104 @@ func init() {
 	proxysubscribe.DefaultLanguage = proxysubscribeDescLanguage.Default.(string)
 	// proxysubscribe.LanguageValidator is a validator for the "language" field. It is called by the builders before save.
 	proxysubscribe.LanguageValidator = proxysubscribeDescLanguage.Validators[0].(func(string) error)
+	// proxysubscribeDescDetailFormat is the schema descriptor for detail_format field.
+	proxysubscribeDescDetailFormat := proxysubscribeFields[6].Descriptor()
+	// proxysubscribe.DefaultDetailFormat holds the default value on creation for the detail_format field.
+	proxysubscribe.DefaultDetailFormat = proxysubscribeDescDetailFormat.Default.(string)
+	// proxysubscribe.DetailFormatValidator is a validator for the "detail_format" field. It is called by the builders before save.
+	proxysubscribe.DetailFormatValidator = proxysubscribeDescDetailFormat.Validators[0].(func(string) error)
 	// proxysubscribeDescUnitPrice is the schema descriptor for unit_price field.
-	proxysubscribeDescUnitPrice := proxysubscribeFields[4].Descriptor()
+	proxysubscribeDescUnitPrice := proxysubscribeFields[8].Descriptor()
 	// proxysubscribe.DefaultUnitPrice holds the default value on creation for the unit_price field.
 	proxysubscribe.DefaultUnitPrice = proxysubscribeDescUnitPrice.Default.(int64)
 	// proxysubscribeDescUnitTime is the schema descriptor for unit_time field.
-	proxysubscribeDescUnitTime := proxysubscribeFields[5].Descriptor()
+	proxysubscribeDescUnitTime := proxysubscribeFields[9].Descriptor()
 	// proxysubscribe.DefaultUnitTime holds the default value on creation for the unit_time field.
 	proxysubscribe.DefaultUnitTime = proxysubscribeDescUnitTime.Default.(string)
 	// proxysubscribe.UnitTimeValidator is a validator for the "unit_time" field. It is called by the builders before save.
 	proxysubscribe.UnitTimeValidator = proxysubscribeDescUnitTime.Validators[0].(func(string) error)
 	// proxysubscribeDescReplacement is the schema descriptor for replacement field.
-	proxysubscribeDescReplacement := proxysubscribeFields[7].Descriptor()
+	proxysubscribeDescReplacement := proxysubscribeFields[11].Descriptor()
 	// proxysubscribe.DefaultReplacement holds the default value on creation for the replacement field.
 	proxysubscribe.DefaultReplacement = proxysubscribeDescReplacement.Default.(int64)
 	// proxysubscribeDescInventory is the schema descriptor for inventory field.
-	proxysubscribeDescInventory := proxysubscribeFields[8].Descriptor()
+	proxysubscribeDescInventory := proxysubscribeFields[12].Descriptor()
 	// proxysubscribe.DefaultInventory holds the default value on creation for the inventory field.
 	proxysubscribe.DefaultInventory = proxysubscribeDescInventory.Default.(int32)
 	// proxysubscribeDescTraffic is the schema descriptor for traffic field.
-	proxysubscribeDescTraffic := proxysubscribeFields[9].Descriptor()
+	proxysubscribeDescTraffic := proxysubscribeFields[13].Descriptor()
 	// proxysubscribe.DefaultTraffic holds the default value on creation for the traffic field.
 	proxysubscribe.DefaultTraffic = proxysubscribeDescTraffic.Default.(int64)
 	// proxysubscribeDescSpeedLimit is the schema descriptor for speed_limit field.
-	proxysubscribeDescSpeedLimit := proxysubscribeFields[10].Descriptor()
+	proxysubscribeDescSpeedLimit := proxysubscribeFields[14].Descriptor()
 	// proxysubscribe.DefaultSpeedLimit holds the default value on creation for the speed_limit field.
 	proxysubscribe.DefaultSpeedLimit = proxysubscribeDescSpeedLimit.Default.(int32)
 	// proxysubscribeDescDeviceLimit is the schema descriptor for device_limit field.
-	proxysubscribeDescDeviceLimit := proxysubscribeFields[11].Descriptor()
+	proxysubscribeDescDeviceLimit := proxysubscribeFields[15].Descriptor()
 	// proxysubscribe.DefaultDeviceLimit holds the default value on creation for the device_limit field.
 	proxysubscribe.DefaultDeviceLimit = proxysubscribeDescDeviceLimit.Default.(int32)
 	// proxysubscribeDescQuota is the schema descriptor for quota field.
-	proxysubscribeDescQuota := proxysubscribeFields[12].Descriptor()
+	proxysubscribeDescQuota := proxysubscribeFields[16].Descriptor()
 	// proxysubscribe.DefaultQuota holds the default value on creation for the quota field.
 	proxysubscribe.DefaultQuota = proxysubscribeDescQuota.Default.(int32)
 	// proxysubscribeDescCategoryID is the schema descriptor for category_id field.
-	proxysubscribeDescCategoryID := proxysubscribeFields[13].Descriptor()
+	proxysubscribeDescCategoryID := proxysubscribeFields[17].Descriptor()
 	// proxysubscribe.DefaultCategoryID holds the default value on creation for the category_id field.
 	proxysubscribe.DefaultCategoryID = proxysubscribeDescCategoryID.Default.(int64)
 	// proxysubscribeDescNodes is the schema descriptor for nodes field.
-	proxysubscribeDescNodes := proxysubscribeFields[14].Descriptor()
+	proxysubscribeDescNodes := proxysubscribeFields[18].Descriptor()
 	// proxysubscribe.DefaultNodes holds the default value on creation for the nodes field.
 	proxysubscribe.DefaultNodes = proxysubscribeDescNodes.Default.(string)
 	// proxysubscribe.NodesValidator is a validator for the "nodes" field. It is called by the builders before save.
 	proxysubscribe.NodesValidator = proxysubscribeDescNodes.Validators[0].(func(string) error)
 	// proxysubscribeDescNodeTags is the schema descriptor for node_tags field.
-	proxysubscribeDescNodeTags := proxysubscribeFields[15].Descriptor()
+	proxysubscribeDescNodeTags := proxysubscribeFields[19].Descriptor()
 	// proxysubscribe.DefaultNodeTags holds the default value on creation for the node_tags field.
 	proxysubscribe.DefaultNodeTags = proxysubscribeDescNodeTags.Default.(string)
 	// proxysubscribe.NodeTagsValidator is a validator for the "node_tags" field. It is called by the builders before save.
 	proxysubscribe.NodeTagsValidator = proxysubscribeDescNodeTags.Validators[0].(func(string) error)
 	// proxysubscribeDescNodeGroupID is the schema descriptor for node_group_id field.
-	proxysubscribeDescNodeGroupID := proxysubscribeFields[17].Descriptor()
+	proxysubscribeDescNodeGroupID := proxysubscribeFields[21].Descriptor()
 	// proxysubscribe.DefaultNodeGroupID holds the default value on creation for the node_group_id field.
 	proxysubscribe.DefaultNodeGroupID = proxysubscribeDescNodeGroupID.Default.(int64)
 	// proxysubscribeDescShow is the schema descriptor for show field.
-	proxysubscribeDescShow := proxysubscribeFields[19].Descriptor()
+	proxysubscribeDescShow := proxysubscribeFields[23].Descriptor()
 	// proxysubscribe.DefaultShow holds the default value on creation for the show field.
 	proxysubscribe.DefaultShow = proxysubscribeDescShow.Default.(bool)
 	// proxysubscribeDescSell is the schema descriptor for sell field.
-	proxysubscribeDescSell := proxysubscribeFields[20].Descriptor()
+	proxysubscribeDescSell := proxysubscribeFields[24].Descriptor()
 	// proxysubscribe.DefaultSell holds the default value on creation for the sell field.
 	proxysubscribe.DefaultSell = proxysubscribeDescSell.Default.(bool)
 	// proxysubscribeDescSort is the schema descriptor for sort field.
-	proxysubscribeDescSort := proxysubscribeFields[21].Descriptor()
+	proxysubscribeDescSort := proxysubscribeFields[25].Descriptor()
 	// proxysubscribe.DefaultSort holds the default value on creation for the sort field.
 	proxysubscribe.DefaultSort = proxysubscribeDescSort.Default.(int32)
 	// proxysubscribeDescDeductionRatio is the schema descriptor for deduction_ratio field.
-	proxysubscribeDescDeductionRatio := proxysubscribeFields[22].Descriptor()
+	proxysubscribeDescDeductionRatio := proxysubscribeFields[26].Descriptor()
 	// proxysubscribe.DefaultDeductionRatio holds the default value on creation for the deduction_ratio field.
 	proxysubscribe.DefaultDeductionRatio = proxysubscribeDescDeductionRatio.Default.(int32)
 	// proxysubscribeDescAllowDeduction is the schema descriptor for allow_deduction field.
-	proxysubscribeDescAllowDeduction := proxysubscribeFields[23].Descriptor()
+	proxysubscribeDescAllowDeduction := proxysubscribeFields[27].Descriptor()
 	// proxysubscribe.DefaultAllowDeduction holds the default value on creation for the allow_deduction field.
 	proxysubscribe.DefaultAllowDeduction = proxysubscribeDescAllowDeduction.Default.(bool)
 	// proxysubscribeDescResetCycle is the schema descriptor for reset_cycle field.
-	proxysubscribeDescResetCycle := proxysubscribeFields[24].Descriptor()
+	proxysubscribeDescResetCycle := proxysubscribeFields[28].Descriptor()
 	// proxysubscribe.DefaultResetCycle holds the default value on creation for the reset_cycle field.
 	proxysubscribe.DefaultResetCycle = proxysubscribeDescResetCycle.Default.(int32)
 	// proxysubscribeDescRenewalReset is the schema descriptor for renewal_reset field.
-	proxysubscribeDescRenewalReset := proxysubscribeFields[25].Descriptor()
+	proxysubscribeDescRenewalReset := proxysubscribeFields[29].Descriptor()
 	// proxysubscribe.DefaultRenewalReset holds the default value on creation for the renewal_reset field.
 	proxysubscribe.DefaultRenewalReset = proxysubscribeDescRenewalReset.Default.(bool)
 	// proxysubscribeDescShowOriginalPrice is the schema descriptor for show_original_price field.
-	proxysubscribeDescShowOriginalPrice := proxysubscribeFields[26].Descriptor()
+	proxysubscribeDescShowOriginalPrice := proxysubscribeFields[30].Descriptor()
 	// proxysubscribe.DefaultShowOriginalPrice holds the default value on creation for the show_original_price field.
 	proxysubscribe.DefaultShowOriginalPrice = proxysubscribeDescShowOriginalPrice.Default.(bool)
 	// proxysubscribeDescCreatedAt is the schema descriptor for created_at field.
-	proxysubscribeDescCreatedAt := proxysubscribeFields[27].Descriptor()
+	proxysubscribeDescCreatedAt := proxysubscribeFields[31].Descriptor()
 	// proxysubscribe.DefaultCreatedAt holds the default value on creation for the created_at field.
 	proxysubscribe.DefaultCreatedAt = proxysubscribeDescCreatedAt.Default.(func() time.Time)
 	// proxysubscribeDescUpdatedAt is the schema descriptor for updated_at field.
-	proxysubscribeDescUpdatedAt := proxysubscribeFields[28].Descriptor()
+	proxysubscribeDescUpdatedAt := proxysubscribeFields[32].Descriptor()
 	// proxysubscribe.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	proxysubscribe.DefaultUpdatedAt = proxysubscribeDescUpdatedAt.Default.(func() time.Time)
 	// proxysubscribe.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
@@ -1161,56 +1833,72 @@ func init() {
 	proxysubscribegroup.IDValidator = proxysubscribegroupDescID.Validators[0].(func(int64) error)
 	proxysubscribepriceoptionFields := schema.ProxySubscribePriceOption{}.Fields()
 	_ = proxysubscribepriceoptionFields
+	// proxysubscribepriceoptionDescCode is the schema descriptor for code field.
+	proxysubscribepriceoptionDescCode := proxysubscribepriceoptionFields[2].Descriptor()
+	// proxysubscribepriceoption.DefaultCode holds the default value on creation for the code field.
+	proxysubscribepriceoption.DefaultCode = proxysubscribepriceoptionDescCode.Default.(string)
+	// proxysubscribepriceoption.CodeValidator is a validator for the "code" field. It is called by the builders before save.
+	proxysubscribepriceoption.CodeValidator = proxysubscribepriceoptionDescCode.Validators[0].(func(string) error)
+	// proxysubscribepriceoptionDescOptionType is the schema descriptor for option_type field.
+	proxysubscribepriceoptionDescOptionType := proxysubscribepriceoptionFields[3].Descriptor()
+	// proxysubscribepriceoption.DefaultOptionType holds the default value on creation for the option_type field.
+	proxysubscribepriceoption.DefaultOptionType = proxysubscribepriceoptionDescOptionType.Default.(string)
+	// proxysubscribepriceoption.OptionTypeValidator is a validator for the "option_type" field. It is called by the builders before save.
+	proxysubscribepriceoption.OptionTypeValidator = proxysubscribepriceoptionDescOptionType.Validators[0].(func(string) error)
 	// proxysubscribepriceoptionDescName is the schema descriptor for name field.
-	proxysubscribepriceoptionDescName := proxysubscribepriceoptionFields[2].Descriptor()
+	proxysubscribepriceoptionDescName := proxysubscribepriceoptionFields[4].Descriptor()
 	// proxysubscribepriceoption.DefaultName holds the default value on creation for the name field.
 	proxysubscribepriceoption.DefaultName = proxysubscribepriceoptionDescName.Default.(string)
 	// proxysubscribepriceoption.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	proxysubscribepriceoption.NameValidator = proxysubscribepriceoptionDescName.Validators[0].(func(string) error)
 	// proxysubscribepriceoptionDescDurationUnit is the schema descriptor for duration_unit field.
-	proxysubscribepriceoptionDescDurationUnit := proxysubscribepriceoptionFields[3].Descriptor()
+	proxysubscribepriceoptionDescDurationUnit := proxysubscribepriceoptionFields[5].Descriptor()
 	// proxysubscribepriceoption.DefaultDurationUnit holds the default value on creation for the duration_unit field.
 	proxysubscribepriceoption.DefaultDurationUnit = proxysubscribepriceoptionDescDurationUnit.Default.(string)
 	// proxysubscribepriceoption.DurationUnitValidator is a validator for the "duration_unit" field. It is called by the builders before save.
 	proxysubscribepriceoption.DurationUnitValidator = proxysubscribepriceoptionDescDurationUnit.Validators[0].(func(string) error)
 	// proxysubscribepriceoptionDescDurationValue is the schema descriptor for duration_value field.
-	proxysubscribepriceoptionDescDurationValue := proxysubscribepriceoptionFields[4].Descriptor()
+	proxysubscribepriceoptionDescDurationValue := proxysubscribepriceoptionFields[6].Descriptor()
 	// proxysubscribepriceoption.DefaultDurationValue holds the default value on creation for the duration_value field.
 	proxysubscribepriceoption.DefaultDurationValue = proxysubscribepriceoptionDescDurationValue.Default.(int64)
 	// proxysubscribepriceoptionDescPrice is the schema descriptor for price field.
-	proxysubscribepriceoptionDescPrice := proxysubscribepriceoptionFields[5].Descriptor()
+	proxysubscribepriceoptionDescPrice := proxysubscribepriceoptionFields[7].Descriptor()
 	// proxysubscribepriceoption.DefaultPrice holds the default value on creation for the price field.
 	proxysubscribepriceoption.DefaultPrice = proxysubscribepriceoptionDescPrice.Default.(int64)
 	// proxysubscribepriceoptionDescOriginalPrice is the schema descriptor for original_price field.
-	proxysubscribepriceoptionDescOriginalPrice := proxysubscribepriceoptionFields[6].Descriptor()
+	proxysubscribepriceoptionDescOriginalPrice := proxysubscribepriceoptionFields[8].Descriptor()
 	// proxysubscribepriceoption.DefaultOriginalPrice holds the default value on creation for the original_price field.
 	proxysubscribepriceoption.DefaultOriginalPrice = proxysubscribepriceoptionDescOriginalPrice.Default.(int64)
 	// proxysubscribepriceoptionDescInventory is the schema descriptor for inventory field.
-	proxysubscribepriceoptionDescInventory := proxysubscribepriceoptionFields[7].Descriptor()
+	proxysubscribepriceoptionDescInventory := proxysubscribepriceoptionFields[9].Descriptor()
 	// proxysubscribepriceoption.DefaultInventory holds the default value on creation for the inventory field.
 	proxysubscribepriceoption.DefaultInventory = proxysubscribepriceoptionDescInventory.Default.(int32)
 	// proxysubscribepriceoptionDescShow is the schema descriptor for show field.
-	proxysubscribepriceoptionDescShow := proxysubscribepriceoptionFields[8].Descriptor()
+	proxysubscribepriceoptionDescShow := proxysubscribepriceoptionFields[10].Descriptor()
 	// proxysubscribepriceoption.DefaultShow holds the default value on creation for the show field.
 	proxysubscribepriceoption.DefaultShow = proxysubscribepriceoptionDescShow.Default.(bool)
 	// proxysubscribepriceoptionDescSell is the schema descriptor for sell field.
-	proxysubscribepriceoptionDescSell := proxysubscribepriceoptionFields[9].Descriptor()
+	proxysubscribepriceoptionDescSell := proxysubscribepriceoptionFields[11].Descriptor()
 	// proxysubscribepriceoption.DefaultSell holds the default value on creation for the sell field.
 	proxysubscribepriceoption.DefaultSell = proxysubscribepriceoptionDescSell.Default.(bool)
 	// proxysubscribepriceoptionDescIsDefault is the schema descriptor for is_default field.
-	proxysubscribepriceoptionDescIsDefault := proxysubscribepriceoptionFields[10].Descriptor()
+	proxysubscribepriceoptionDescIsDefault := proxysubscribepriceoptionFields[12].Descriptor()
 	// proxysubscribepriceoption.DefaultIsDefault holds the default value on creation for the is_default field.
 	proxysubscribepriceoption.DefaultIsDefault = proxysubscribepriceoptionDescIsDefault.Default.(bool)
 	// proxysubscribepriceoptionDescSort is the schema descriptor for sort field.
-	proxysubscribepriceoptionDescSort := proxysubscribepriceoptionFields[11].Descriptor()
+	proxysubscribepriceoptionDescSort := proxysubscribepriceoptionFields[13].Descriptor()
 	// proxysubscribepriceoption.DefaultSort holds the default value on creation for the sort field.
 	proxysubscribepriceoption.DefaultSort = proxysubscribepriceoptionDescSort.Default.(int32)
+	// proxysubscribepriceoptionDescVersion is the schema descriptor for version field.
+	proxysubscribepriceoptionDescVersion := proxysubscribepriceoptionFields[14].Descriptor()
+	// proxysubscribepriceoption.DefaultVersion holds the default value on creation for the version field.
+	proxysubscribepriceoption.DefaultVersion = proxysubscribepriceoptionDescVersion.Default.(int32)
 	// proxysubscribepriceoptionDescCreatedAt is the schema descriptor for created_at field.
-	proxysubscribepriceoptionDescCreatedAt := proxysubscribepriceoptionFields[12].Descriptor()
+	proxysubscribepriceoptionDescCreatedAt := proxysubscribepriceoptionFields[15].Descriptor()
 	// proxysubscribepriceoption.DefaultCreatedAt holds the default value on creation for the created_at field.
 	proxysubscribepriceoption.DefaultCreatedAt = proxysubscribepriceoptionDescCreatedAt.Default.(func() time.Time)
 	// proxysubscribepriceoptionDescUpdatedAt is the schema descriptor for updated_at field.
-	proxysubscribepriceoptionDescUpdatedAt := proxysubscribepriceoptionFields[13].Descriptor()
+	proxysubscribepriceoptionDescUpdatedAt := proxysubscribepriceoptionFields[16].Descriptor()
 	// proxysubscribepriceoption.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	proxysubscribepriceoption.DefaultUpdatedAt = proxysubscribepriceoptionDescUpdatedAt.Default.(func() time.Time)
 	// proxysubscribepriceoption.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.

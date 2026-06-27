@@ -59,6 +59,16 @@ func SubscribeID(v int64) predicate.ProxySubscribePriceOption {
 	return predicate.ProxySubscribePriceOption(sql.FieldEQ(FieldSubscribeID, v))
 }
 
+// Code applies equality check predicate on the "code" field. It's identical to CodeEQ.
+func Code(v string) predicate.ProxySubscribePriceOption {
+	return predicate.ProxySubscribePriceOption(sql.FieldEQ(FieldCode, v))
+}
+
+// OptionType applies equality check predicate on the "option_type" field. It's identical to OptionTypeEQ.
+func OptionType(v string) predicate.ProxySubscribePriceOption {
+	return predicate.ProxySubscribePriceOption(sql.FieldEQ(FieldOptionType, v))
+}
+
 // Name applies equality check predicate on the "name" field. It's identical to NameEQ.
 func Name(v string) predicate.ProxySubscribePriceOption {
 	return predicate.ProxySubscribePriceOption(sql.FieldEQ(FieldName, v))
@@ -109,6 +119,11 @@ func Sort(v int32) predicate.ProxySubscribePriceOption {
 	return predicate.ProxySubscribePriceOption(sql.FieldEQ(FieldSort, v))
 }
 
+// Version applies equality check predicate on the "version" field. It's identical to VersionEQ.
+func Version(v int32) predicate.ProxySubscribePriceOption {
+	return predicate.ProxySubscribePriceOption(sql.FieldEQ(FieldVersion, v))
+}
+
 // CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
 func CreatedAt(v time.Time) predicate.ProxySubscribePriceOption {
 	return predicate.ProxySubscribePriceOption(sql.FieldEQ(FieldCreatedAt, v))
@@ -157,6 +172,136 @@ func SubscribeIDLT(v int64) predicate.ProxySubscribePriceOption {
 // SubscribeIDLTE applies the LTE predicate on the "subscribe_id" field.
 func SubscribeIDLTE(v int64) predicate.ProxySubscribePriceOption {
 	return predicate.ProxySubscribePriceOption(sql.FieldLTE(FieldSubscribeID, v))
+}
+
+// CodeEQ applies the EQ predicate on the "code" field.
+func CodeEQ(v string) predicate.ProxySubscribePriceOption {
+	return predicate.ProxySubscribePriceOption(sql.FieldEQ(FieldCode, v))
+}
+
+// CodeNEQ applies the NEQ predicate on the "code" field.
+func CodeNEQ(v string) predicate.ProxySubscribePriceOption {
+	return predicate.ProxySubscribePriceOption(sql.FieldNEQ(FieldCode, v))
+}
+
+// CodeIn applies the In predicate on the "code" field.
+func CodeIn(vs ...string) predicate.ProxySubscribePriceOption {
+	return predicate.ProxySubscribePriceOption(sql.FieldIn(FieldCode, vs...))
+}
+
+// CodeNotIn applies the NotIn predicate on the "code" field.
+func CodeNotIn(vs ...string) predicate.ProxySubscribePriceOption {
+	return predicate.ProxySubscribePriceOption(sql.FieldNotIn(FieldCode, vs...))
+}
+
+// CodeGT applies the GT predicate on the "code" field.
+func CodeGT(v string) predicate.ProxySubscribePriceOption {
+	return predicate.ProxySubscribePriceOption(sql.FieldGT(FieldCode, v))
+}
+
+// CodeGTE applies the GTE predicate on the "code" field.
+func CodeGTE(v string) predicate.ProxySubscribePriceOption {
+	return predicate.ProxySubscribePriceOption(sql.FieldGTE(FieldCode, v))
+}
+
+// CodeLT applies the LT predicate on the "code" field.
+func CodeLT(v string) predicate.ProxySubscribePriceOption {
+	return predicate.ProxySubscribePriceOption(sql.FieldLT(FieldCode, v))
+}
+
+// CodeLTE applies the LTE predicate on the "code" field.
+func CodeLTE(v string) predicate.ProxySubscribePriceOption {
+	return predicate.ProxySubscribePriceOption(sql.FieldLTE(FieldCode, v))
+}
+
+// CodeContains applies the Contains predicate on the "code" field.
+func CodeContains(v string) predicate.ProxySubscribePriceOption {
+	return predicate.ProxySubscribePriceOption(sql.FieldContains(FieldCode, v))
+}
+
+// CodeHasPrefix applies the HasPrefix predicate on the "code" field.
+func CodeHasPrefix(v string) predicate.ProxySubscribePriceOption {
+	return predicate.ProxySubscribePriceOption(sql.FieldHasPrefix(FieldCode, v))
+}
+
+// CodeHasSuffix applies the HasSuffix predicate on the "code" field.
+func CodeHasSuffix(v string) predicate.ProxySubscribePriceOption {
+	return predicate.ProxySubscribePriceOption(sql.FieldHasSuffix(FieldCode, v))
+}
+
+// CodeEqualFold applies the EqualFold predicate on the "code" field.
+func CodeEqualFold(v string) predicate.ProxySubscribePriceOption {
+	return predicate.ProxySubscribePriceOption(sql.FieldEqualFold(FieldCode, v))
+}
+
+// CodeContainsFold applies the ContainsFold predicate on the "code" field.
+func CodeContainsFold(v string) predicate.ProxySubscribePriceOption {
+	return predicate.ProxySubscribePriceOption(sql.FieldContainsFold(FieldCode, v))
+}
+
+// OptionTypeEQ applies the EQ predicate on the "option_type" field.
+func OptionTypeEQ(v string) predicate.ProxySubscribePriceOption {
+	return predicate.ProxySubscribePriceOption(sql.FieldEQ(FieldOptionType, v))
+}
+
+// OptionTypeNEQ applies the NEQ predicate on the "option_type" field.
+func OptionTypeNEQ(v string) predicate.ProxySubscribePriceOption {
+	return predicate.ProxySubscribePriceOption(sql.FieldNEQ(FieldOptionType, v))
+}
+
+// OptionTypeIn applies the In predicate on the "option_type" field.
+func OptionTypeIn(vs ...string) predicate.ProxySubscribePriceOption {
+	return predicate.ProxySubscribePriceOption(sql.FieldIn(FieldOptionType, vs...))
+}
+
+// OptionTypeNotIn applies the NotIn predicate on the "option_type" field.
+func OptionTypeNotIn(vs ...string) predicate.ProxySubscribePriceOption {
+	return predicate.ProxySubscribePriceOption(sql.FieldNotIn(FieldOptionType, vs...))
+}
+
+// OptionTypeGT applies the GT predicate on the "option_type" field.
+func OptionTypeGT(v string) predicate.ProxySubscribePriceOption {
+	return predicate.ProxySubscribePriceOption(sql.FieldGT(FieldOptionType, v))
+}
+
+// OptionTypeGTE applies the GTE predicate on the "option_type" field.
+func OptionTypeGTE(v string) predicate.ProxySubscribePriceOption {
+	return predicate.ProxySubscribePriceOption(sql.FieldGTE(FieldOptionType, v))
+}
+
+// OptionTypeLT applies the LT predicate on the "option_type" field.
+func OptionTypeLT(v string) predicate.ProxySubscribePriceOption {
+	return predicate.ProxySubscribePriceOption(sql.FieldLT(FieldOptionType, v))
+}
+
+// OptionTypeLTE applies the LTE predicate on the "option_type" field.
+func OptionTypeLTE(v string) predicate.ProxySubscribePriceOption {
+	return predicate.ProxySubscribePriceOption(sql.FieldLTE(FieldOptionType, v))
+}
+
+// OptionTypeContains applies the Contains predicate on the "option_type" field.
+func OptionTypeContains(v string) predicate.ProxySubscribePriceOption {
+	return predicate.ProxySubscribePriceOption(sql.FieldContains(FieldOptionType, v))
+}
+
+// OptionTypeHasPrefix applies the HasPrefix predicate on the "option_type" field.
+func OptionTypeHasPrefix(v string) predicate.ProxySubscribePriceOption {
+	return predicate.ProxySubscribePriceOption(sql.FieldHasPrefix(FieldOptionType, v))
+}
+
+// OptionTypeHasSuffix applies the HasSuffix predicate on the "option_type" field.
+func OptionTypeHasSuffix(v string) predicate.ProxySubscribePriceOption {
+	return predicate.ProxySubscribePriceOption(sql.FieldHasSuffix(FieldOptionType, v))
+}
+
+// OptionTypeEqualFold applies the EqualFold predicate on the "option_type" field.
+func OptionTypeEqualFold(v string) predicate.ProxySubscribePriceOption {
+	return predicate.ProxySubscribePriceOption(sql.FieldEqualFold(FieldOptionType, v))
+}
+
+// OptionTypeContainsFold applies the ContainsFold predicate on the "option_type" field.
+func OptionTypeContainsFold(v string) predicate.ProxySubscribePriceOption {
+	return predicate.ProxySubscribePriceOption(sql.FieldContainsFold(FieldOptionType, v))
 }
 
 // NameEQ applies the EQ predicate on the "name" field.
@@ -517,6 +662,46 @@ func SortLT(v int32) predicate.ProxySubscribePriceOption {
 // SortLTE applies the LTE predicate on the "sort" field.
 func SortLTE(v int32) predicate.ProxySubscribePriceOption {
 	return predicate.ProxySubscribePriceOption(sql.FieldLTE(FieldSort, v))
+}
+
+// VersionEQ applies the EQ predicate on the "version" field.
+func VersionEQ(v int32) predicate.ProxySubscribePriceOption {
+	return predicate.ProxySubscribePriceOption(sql.FieldEQ(FieldVersion, v))
+}
+
+// VersionNEQ applies the NEQ predicate on the "version" field.
+func VersionNEQ(v int32) predicate.ProxySubscribePriceOption {
+	return predicate.ProxySubscribePriceOption(sql.FieldNEQ(FieldVersion, v))
+}
+
+// VersionIn applies the In predicate on the "version" field.
+func VersionIn(vs ...int32) predicate.ProxySubscribePriceOption {
+	return predicate.ProxySubscribePriceOption(sql.FieldIn(FieldVersion, vs...))
+}
+
+// VersionNotIn applies the NotIn predicate on the "version" field.
+func VersionNotIn(vs ...int32) predicate.ProxySubscribePriceOption {
+	return predicate.ProxySubscribePriceOption(sql.FieldNotIn(FieldVersion, vs...))
+}
+
+// VersionGT applies the GT predicate on the "version" field.
+func VersionGT(v int32) predicate.ProxySubscribePriceOption {
+	return predicate.ProxySubscribePriceOption(sql.FieldGT(FieldVersion, v))
+}
+
+// VersionGTE applies the GTE predicate on the "version" field.
+func VersionGTE(v int32) predicate.ProxySubscribePriceOption {
+	return predicate.ProxySubscribePriceOption(sql.FieldGTE(FieldVersion, v))
+}
+
+// VersionLT applies the LT predicate on the "version" field.
+func VersionLT(v int32) predicate.ProxySubscribePriceOption {
+	return predicate.ProxySubscribePriceOption(sql.FieldLT(FieldVersion, v))
+}
+
+// VersionLTE applies the LTE predicate on the "version" field.
+func VersionLTE(v int32) predicate.ProxySubscribePriceOption {
+	return predicate.ProxySubscribePriceOption(sql.FieldLTE(FieldVersion, v))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.

@@ -328,6 +328,8 @@ func convertUserSubscribePriceOptions(items []userBiz.SubscribePriceOption) []*v
 		result = append(result, &v1.SubscribePriceOption{
 			Id:            item.ID,
 			SubscribeId:   item.SubscribeID,
+			Code:          item.Code,
+			Type:          item.Type,
 			Name:          item.Name,
 			DurationUnit:  item.DurationUnit,
 			DurationValue: item.DurationValue,

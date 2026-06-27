@@ -84,6 +84,8 @@ type SubscribeInfo struct {
 type SubscribePriceOption struct {
 	ID            int64
 	SubscribeID   int64
+	Code          string
+	Type          string
 	Name          string
 	DurationUnit  string
 	DurationValue int64

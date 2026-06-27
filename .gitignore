@@ -23,6 +23,7 @@ profile.cov
 /npanel
 /build/
 /dist/
+/doc/
 /tmp/
 
 # Dependency directories (remove the comment below to include it)

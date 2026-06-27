@@ -2502,6 +2502,10 @@ func (m *SubscribePriceOption) validate(all bool) error {
 
 	// no validation rules for UpdatedAt
 
+	// no validation rules for Code
+
+	// no validation rules for Type
+
 	if len(errors) > 0 {
 		return SubscribePriceOptionMultiError(errors)
 	}

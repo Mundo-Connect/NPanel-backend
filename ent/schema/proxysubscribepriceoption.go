@@ -7,6 +7,7 @@ import (
 	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/field"
+	"entgo.io/ent/schema/index"
 )
 
 // ProxySubscribePriceOption holds the schema definition for the ProxySubscribePriceOption entity.
@@ -25,6 +26,8 @@ func (ProxySubscribePriceOption) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int64("id").Positive().Comment("价格档位ID"),
 		field.Int64("subscribe_id").Comment("订阅套餐ID"),
+		field.String("code").MaxLen(64).Default("").Comment("稳定价格档位编码"),
+		field.String("option_type").MaxLen(32).Default("duration").Comment("价格档位类型"),
 		field.String("name").MaxLen(255).Default("").Comment("价格档位名称"),
 		field.String("duration_unit").MaxLen(32).Default("Month").Comment("时长单位"),
 		field.Int64("duration_value").Default(1).Comment("时长数值"),
@@ -35,8 +38,17 @@ func (ProxySubscribePriceOption) Fields() []ent.Field {
 		field.Bool("sell").Default(true).Comment("是否售卖"),
 		field.Bool("is_default").Default(false).Comment("默认档位"),
 		field.Int32("sort").Default(0).Comment("排序"),
+		field.Int32("version").Default(1).Comment("乐观锁版本"),
 		field.Time("created_at").Default(time.Now).Immutable().Comment("创建时间"),
 		field.Time("updated_at").Default(time.Now).UpdateDefault(time.Now).Comment("更新时间"),
+	}
+}
+
+func (ProxySubscribePriceOption) Indexes() []ent.Index {
+	return []ent.Index{
+		index.Fields("subscribe_id", "code"),
+		index.Fields("subscribe_id", "option_type", "sell", "sort"),
+		index.Fields("subscribe_id", "option_type", "show", "sort"),
 	}
 }
 

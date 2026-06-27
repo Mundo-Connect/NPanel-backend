@@ -182,6 +182,9 @@ message SubscribePriceOption {
   int32 sort = 12;               // 排序
   int64 created_at = 13;         // 创建时间
   int64 updated_at = 14;         // 更新时间
+  string code = 15;              // 稳定档位编码
+  string type = 16;              // 档位类型: duration/traffic_pack/reset_pack
+  int32 version = 17;            // 乐观锁版本
 }
 
 // SubscribeInfo 订阅套餐信息
@@ -217,6 +220,10 @@ message SubscribeInfo {
   int64 created_at = 27;                    // 创建时间
   int64 updated_at = 28;                    // 更新时间
   repeated SubscribePriceOption price_options = 31; // 商品价格档位
+  string short_description = 40;            // 套餐卡片简介
+  string features = 41;                     // 套餐亮点 JSON
+  string detail_format = 42;                // 套餐详情格式: markdown/html/text
+  string detail_content = 43;               // 套餐详情正文
 }
 
 // SubscribeItem 订阅套餐列表项（包含销量）
@@ -253,6 +260,10 @@ message SubscribeItem {
   int64 updated_at = 28;
   int64 sold = 29;  // 销量
   repeated SubscribePriceOption price_options = 32; // 商品价格档位
+  string short_description = 40;            // 套餐卡片简介
+  string features = 41;                     // 套餐亮点 JSON
+  string detail_format = 42;                // 套餐详情格式: markdown/html/text
+  string detail_content = 43;               // 套餐详情正文
 }
 
 // CreateSubscribeRequest 创建订阅套餐请求
@@ -285,6 +296,10 @@ message CreateSubscribeRequest {
   bool show_original_price = 25;            // 显示原价
   bool auto_create_group = 26;              // 自动创建分组
   repeated SubscribePriceOption price_options = 28; // 商品价格档位
+  string short_description = 40;            // 套餐卡片简介
+  string features = 41;                     // 套餐亮点 JSON
+  string detail_format = 42;                // 套餐详情格式: markdown/html/text
+  string detail_content = 43;               // 套餐详情正文
 }
 
 // CreateSubscribeData 创建订阅套餐数据
@@ -329,6 +344,10 @@ message UpdateSubscribeRequest {
   optional bool renewal_reset = 25;         // 续费重置
   bool show_original_price = 26;            // 显示原价
   repeated SubscribePriceOption price_options = 28; // 商品价格档位
+  string short_description = 40;            // 套餐卡片简介
+  string features = 41;                     // 套餐亮点 JSON
+  string detail_format = 42;                // 套餐详情格式: markdown/html/text
+  string detail_content = 43;               // 套餐详情正文
 }
 
 // UpdateSubscribeData 更新订阅套餐数据

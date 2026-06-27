@@ -24,6 +24,14 @@ import (
 	"github.com/npanel-dev/NPanel-backend/ent/proxypayment"
 	"github.com/npanel-dev/NPanel-backend/ent/proxyredemptioncode"
 	"github.com/npanel-dev/NPanel-backend/ent/proxyredemptionrecord"
+	"github.com/npanel-dev/NPanel-backend/ent/proxyroutingdnsresolver"
+	"github.com/npanel-dev/NPanel-backend/ent/proxyroutinggrayrelease"
+	"github.com/npanel-dev/NPanel-backend/ent/proxyroutinghealthreport"
+	"github.com/npanel-dev/NPanel-backend/ent/proxyroutingoutbound"
+	"github.com/npanel-dev/NPanel-backend/ent/proxyroutingprofile"
+	"github.com/npanel-dev/NPanel-backend/ent/proxyroutingrouteevent"
+	"github.com/npanel-dev/NPanel-backend/ent/proxyroutingrule"
+	"github.com/npanel-dev/NPanel-backend/ent/proxyroutingunlockservice"
 	"github.com/npanel-dev/NPanel-backend/ent/proxyschemamigrations"
 	"github.com/npanel-dev/NPanel-backend/ent/proxyserver"
 	"github.com/npanel-dev/NPanel-backend/ent/proxyservergroup"
@@ -116,6 +124,14 @@ func checkColumn(t, c string) error {
 			proxypayment.Table:                proxypayment.ValidColumn,
 			proxyredemptioncode.Table:         proxyredemptioncode.ValidColumn,
 			proxyredemptionrecord.Table:       proxyredemptionrecord.ValidColumn,
+			proxyroutingdnsresolver.Table:     proxyroutingdnsresolver.ValidColumn,
+			proxyroutinggrayrelease.Table:     proxyroutinggrayrelease.ValidColumn,
+			proxyroutinghealthreport.Table:    proxyroutinghealthreport.ValidColumn,
+			proxyroutingoutbound.Table:        proxyroutingoutbound.ValidColumn,
+			proxyroutingprofile.Table:         proxyroutingprofile.ValidColumn,
+			proxyroutingrouteevent.Table:      proxyroutingrouteevent.ValidColumn,
+			proxyroutingrule.Table:            proxyroutingrule.ValidColumn,
+			proxyroutingunlockservice.Table:   proxyroutingunlockservice.ValidColumn,
 			proxyschemamigrations.Table:       proxyschemamigrations.ValidColumn,
 			proxyserver.Table:                 proxyserver.ValidColumn,
 			proxyservergroup.Table:            proxyservergroup.ValidColumn,

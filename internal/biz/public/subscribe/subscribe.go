@@ -19,6 +19,10 @@ type Subscribe struct {
 	Name              string
 	Language          string
 	Description       string
+	ShortDescription  string
+	Features          string
+	DetailFormat      string
+	DetailContent     string
 	UnitPrice         int64
 	UnitTime          string
 	Discount          []*SubscribeDiscount
@@ -51,6 +55,8 @@ type Subscribe struct {
 type SubscribePriceOption struct {
 	ID            int64
 	SubscribeID   int64
+	Code          string
+	Type          string
 	Name          string
 	DurationUnit  string
 	DurationValue int64

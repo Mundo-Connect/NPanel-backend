@@ -15,6 +15,10 @@ const (
 	FieldID = "id"
 	// FieldSubscribeID holds the string denoting the subscribe_id field in the database.
 	FieldSubscribeID = "subscribe_id"
+	// FieldCode holds the string denoting the code field in the database.
+	FieldCode = "code"
+	// FieldOptionType holds the string denoting the option_type field in the database.
+	FieldOptionType = "option_type"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
 	// FieldDurationUnit holds the string denoting the duration_unit field in the database.
@@ -35,6 +39,8 @@ const (
 	FieldIsDefault = "is_default"
 	// FieldSort holds the string denoting the sort field in the database.
 	FieldSort = "sort"
+	// FieldVersion holds the string denoting the version field in the database.
+	FieldVersion = "version"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
@@ -47,6 +53,8 @@ const (
 var Columns = []string{
 	FieldID,
 	FieldSubscribeID,
+	FieldCode,
+	FieldOptionType,
 	FieldName,
 	FieldDurationUnit,
 	FieldDurationValue,
@@ -57,6 +65,7 @@ var Columns = []string{
 	FieldSell,
 	FieldIsDefault,
 	FieldSort,
+	FieldVersion,
 	FieldCreatedAt,
 	FieldUpdatedAt,
 }
@@ -72,6 +81,14 @@ func ValidColumn(column string) bool {
 }
 
 var (
+	// DefaultCode holds the default value on creation for the "code" field.
+	DefaultCode string
+	// CodeValidator is a validator for the "code" field. It is called by the builders before save.
+	CodeValidator func(string) error
+	// DefaultOptionType holds the default value on creation for the "option_type" field.
+	DefaultOptionType string
+	// OptionTypeValidator is a validator for the "option_type" field. It is called by the builders before save.
+	OptionTypeValidator func(string) error
 	// DefaultName holds the default value on creation for the "name" field.
 	DefaultName string
 	// NameValidator is a validator for the "name" field. It is called by the builders before save.
@@ -96,6 +113,8 @@ var (
 	DefaultIsDefault bool
 	// DefaultSort holds the default value on creation for the "sort" field.
 	DefaultSort int32
+	// DefaultVersion holds the default value on creation for the "version" field.
+	DefaultVersion int32
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
 	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
@@ -117,6 +136,16 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 // BySubscribeID orders the results by the subscribe_id field.
 func BySubscribeID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldSubscribeID, opts...).ToFunc()
+}
+
+// ByCode orders the results by the code field.
+func ByCode(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCode, opts...).ToFunc()
+}
+
+// ByOptionType orders the results by the option_type field.
+func ByOptionType(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldOptionType, opts...).ToFunc()
 }
 
 // ByName orders the results by the name field.
@@ -167,6 +196,11 @@ func ByIsDefault(opts ...sql.OrderTermOption) OrderOption {
 // BySort orders the results by the sort field.
 func BySort(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldSort, opts...).ToFunc()
+}
+
+// ByVersion orders the results by the version field.
+func ByVersion(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldVersion, opts...).ToFunc()
 }
 
 // ByCreatedAt orders the results by the created_at field.

@@ -453,6 +453,14 @@ func (m *Subscribe) validate(all bool) error {
 
 	}
 
+	// no validation rules for ShortDescription
+
+	// no validation rules for Features
+
+	// no validation rules for DetailFormat
+
+	// no validation rules for DetailContent
+
 	if len(errors) > 0 {
 		return SubscribeMultiError(errors)
 	}
@@ -579,6 +587,10 @@ func (m *SubscribePriceOption) validate(all bool) error {
 	// no validation rules for CreatedAt
 
 	// no validation rules for UpdatedAt
+
+	// no validation rules for Code
+
+	// no validation rules for Type
 
 	if len(errors) > 0 {
 		return SubscribePriceOptionMultiError(errors)

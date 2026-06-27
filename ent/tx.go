@@ -36,6 +36,22 @@ type Tx struct {
 	ProxyRedemptionCode *ProxyRedemptionCodeClient
 	// ProxyRedemptionRecord is the client for interacting with the ProxyRedemptionRecord builders.
 	ProxyRedemptionRecord *ProxyRedemptionRecordClient
+	// ProxyRoutingDNSResolver is the client for interacting with the ProxyRoutingDNSResolver builders.
+	ProxyRoutingDNSResolver *ProxyRoutingDNSResolverClient
+	// ProxyRoutingGrayRelease is the client for interacting with the ProxyRoutingGrayRelease builders.
+	ProxyRoutingGrayRelease *ProxyRoutingGrayReleaseClient
+	// ProxyRoutingHealthReport is the client for interacting with the ProxyRoutingHealthReport builders.
+	ProxyRoutingHealthReport *ProxyRoutingHealthReportClient
+	// ProxyRoutingOutbound is the client for interacting with the ProxyRoutingOutbound builders.
+	ProxyRoutingOutbound *ProxyRoutingOutboundClient
+	// ProxyRoutingProfile is the client for interacting with the ProxyRoutingProfile builders.
+	ProxyRoutingProfile *ProxyRoutingProfileClient
+	// ProxyRoutingRouteEvent is the client for interacting with the ProxyRoutingRouteEvent builders.
+	ProxyRoutingRouteEvent *ProxyRoutingRouteEventClient
+	// ProxyRoutingRule is the client for interacting with the ProxyRoutingRule builders.
+	ProxyRoutingRule *ProxyRoutingRuleClient
+	// ProxyRoutingUnlockService is the client for interacting with the ProxyRoutingUnlockService builders.
+	ProxyRoutingUnlockService *ProxyRoutingUnlockServiceClient
 	// ProxySchemaMigrations is the client for interacting with the ProxySchemaMigrations builders.
 	ProxySchemaMigrations *ProxySchemaMigrationsClient
 	// ProxyServer is the client for interacting with the ProxyServer builders.
@@ -219,6 +235,14 @@ func (tx *Tx) init() {
 	tx.ProxyPayment = NewProxyPaymentClient(tx.config)
 	tx.ProxyRedemptionCode = NewProxyRedemptionCodeClient(tx.config)
 	tx.ProxyRedemptionRecord = NewProxyRedemptionRecordClient(tx.config)
+	tx.ProxyRoutingDNSResolver = NewProxyRoutingDNSResolverClient(tx.config)
+	tx.ProxyRoutingGrayRelease = NewProxyRoutingGrayReleaseClient(tx.config)
+	tx.ProxyRoutingHealthReport = NewProxyRoutingHealthReportClient(tx.config)
+	tx.ProxyRoutingOutbound = NewProxyRoutingOutboundClient(tx.config)
+	tx.ProxyRoutingProfile = NewProxyRoutingProfileClient(tx.config)
+	tx.ProxyRoutingRouteEvent = NewProxyRoutingRouteEventClient(tx.config)
+	tx.ProxyRoutingRule = NewProxyRoutingRuleClient(tx.config)
+	tx.ProxyRoutingUnlockService = NewProxyRoutingUnlockServiceClient(tx.config)
 	tx.ProxySchemaMigrations = NewProxySchemaMigrationsClient(tx.config)
 	tx.ProxyServer = NewProxyServerClient(tx.config)
 	tx.ProxyServerGroup = NewProxyServerGroupClient(tx.config)

@@ -1,0 +1,1189 @@
+package routing
+
+import (
+	"context"
+	"strings"
+	"testing"
+	"time"
+
+	"github.com/go-kratos/kratos/v2/log"
+	publicrouting "github.com/npanel-dev/NPanel-backend/internal/biz/public/routing"
+)
+
+type fakeRoutingRepo struct {
+	profiles      []*RouteProfile
+	rules         []*RouteRule
+	dnsResolvers  []*DNSResolver
+	outbounds     []*RouteOutbound
+	services      []*UnlockService
+	healthReports []*RoutingHealthReport
+	routeEvents   []*RoutingRouteEvent
+	grayReleases  []*RoutingGrayRelease
+	tokenScope    ScopeContext
+}
+
+func (r fakeRoutingRepo) SaveProfile(context.Context, *RouteProfile) (*RouteProfile, error) {
+	panic("not used")
+}
+func (r fakeRoutingRepo) UpdateProfile(_ context.Context, item *RouteProfile) (*RouteProfile, error) {
+	for _, profile := range r.profiles {
+		if profile.ID == item.ID {
+			*profile = *item
+			return profile, nil
+		}
+	}
+	return item, nil
+}
+func (r fakeRoutingRepo) FindProfileByID(_ context.Context, id int64) (*RouteProfile, error) {
+	for _, profile := range r.profiles {
+		if profile.ID == id {
+			return profile, nil
+		}
+	}
+	return nil, nil
+}
+func (r fakeRoutingRepo) ListProfiles(context.Context, int, int, string, *bool) ([]*RouteProfile, int32, error) {
+	return r.profiles, int32(len(r.profiles)), nil
+}
+func (r fakeRoutingRepo) DeleteProfile(context.Context, int64) error { panic("not used") }
+func (r fakeRoutingRepo) SaveRule(context.Context, *RouteRule) (*RouteRule, error) {
+	panic("not used")
+}
+func (r fakeRoutingRepo) UpdateRule(context.Context, *RouteRule) (*RouteRule, error) {
+	panic("not used")
+}
+func (r fakeRoutingRepo) FindRuleByID(context.Context, int64) (*RouteRule, error) {
+	panic("not used")
+}
+func (r fakeRoutingRepo) ListRules(context.Context, int, int, int64, string, *bool) ([]*RouteRule, int32, error) {
+	return r.rules, int32(len(r.rules)), nil
+}
+func (r fakeRoutingRepo) DeleteRule(context.Context, int64) error { panic("not used") }
+func (r fakeRoutingRepo) SaveDNSResolver(context.Context, *DNSResolver) (*DNSResolver, error) {
+	panic("not used")
+}
+func (r fakeRoutingRepo) UpdateDNSResolver(context.Context, *DNSResolver) (*DNSResolver, error) {
+	panic("not used")
+}
+func (r fakeRoutingRepo) FindDNSResolverByID(context.Context, int64) (*DNSResolver, error) {
+	panic("not used")
+}
+func (r fakeRoutingRepo) ListDNSResolvers(context.Context, int, int, string, *bool) ([]*DNSResolver, int32, error) {
+	return r.dnsResolvers, int32(len(r.dnsResolvers)), nil
+}
+func (r fakeRoutingRepo) DeleteDNSResolver(context.Context, int64) error { panic("not used") }
+func (r fakeRoutingRepo) SaveOutbound(context.Context, *RouteOutbound) (*RouteOutbound, error) {
+	panic("not used")
+}
+func (r fakeRoutingRepo) UpdateOutbound(context.Context, *RouteOutbound) (*RouteOutbound, error) {
+	panic("not used")
+}
+func (r fakeRoutingRepo) FindOutboundByID(context.Context, int64) (*RouteOutbound, error) {
+	panic("not used")
+}
+func (r fakeRoutingRepo) ListOutbounds(context.Context, int, int, string, *bool) ([]*RouteOutbound, int32, error) {
+	return r.outbounds, int32(len(r.outbounds)), nil
+}
+func (r fakeRoutingRepo) DeleteOutbound(context.Context, int64) error { panic("not used") }
+func (r fakeRoutingRepo) SaveUnlockService(context.Context, *UnlockService) (*UnlockService, error) {
+	panic("not used")
+}
+func (r fakeRoutingRepo) UpdateUnlockService(context.Context, *UnlockService) (*UnlockService, error) {
+	panic("not used")
+}
+func (r fakeRoutingRepo) FindUnlockServiceByID(context.Context, int64) (*UnlockService, error) {
+	panic("not used")
+}
+func (r fakeRoutingRepo) ListUnlockServices(context.Context, int, int, string, *bool) ([]*UnlockService, int32, error) {
+	return r.services, int32(len(r.services)), nil
+}
+func (r fakeRoutingRepo) DeleteUnlockService(context.Context, int64) error { panic("not used") }
+func (r fakeRoutingRepo) ResolveScopeBySubscribeToken(context.Context, string) (ScopeContext, error) {
+	return r.tokenScope, nil
+}
+func (r fakeRoutingRepo) SaveHealthReports(context.Context, []*RoutingHealthReport) error {
+	return nil
+}
+func (r fakeRoutingRepo) ListHealthReports(context.Context, int, int, string, string, string) ([]*RoutingHealthReport, int32, error) {
+	return r.healthReports, int32(len(r.healthReports)), nil
+}
+func (r fakeRoutingRepo) SaveRouteEvents(context.Context, []*RoutingRouteEvent) error {
+	return nil
+}
+func (r fakeRoutingRepo) ListRouteEvents(context.Context, int, int, string, string, string) ([]*RoutingRouteEvent, int32, error) {
+	return r.routeEvents, int32(len(r.routeEvents)), nil
+}
+func (r fakeRoutingRepo) SaveGrayRelease(_ context.Context, item *RoutingGrayRelease) (*RoutingGrayRelease, error) {
+	item.ID = 1
+	return item, nil
+}
+func (r fakeRoutingRepo) UpdateGrayRelease(_ context.Context, item *RoutingGrayRelease) (*RoutingGrayRelease, error) {
+	return item, nil
+}
+func (r fakeRoutingRepo) FindGrayReleaseByID(_ context.Context, id int64) (*RoutingGrayRelease, error) {
+	for _, item := range r.grayReleases {
+		if item.ID == id {
+			return item, nil
+		}
+	}
+	return nil, nil
+}
+func (r fakeRoutingRepo) ListGrayReleases(context.Context, int, int, string, string) ([]*RoutingGrayRelease, int32, error) {
+	return r.grayReleases, int32(len(r.grayReleases)), nil
+}
+func (r fakeRoutingRepo) DeleteGrayRelease(context.Context, int64) error { return nil }
+
+func TestRecordRouteEventAcceptsRouteDecision(t *testing.T) {
+	uc := NewRoutingUsecase(fakeRoutingRepo{}, log.DefaultLogger)
+
+	err := uc.RecordRouteEvent(context.Background(), publicrouting.RouteEventRequest{
+		ReporterType: "client",
+		ReporterID:   "device-1",
+		ProfileCode:  "user_profile",
+		RoutingHash:  "hash-1",
+		Events: []publicrouting.RouteEventItem{
+			{
+				EventType:   "route_decision",
+				Subject:     "openai.com",
+				RuleID:      "rule_openai",
+				ActionType:  "outbound",
+				OutboundTag: "unlock:openai:us",
+				Status:      "matched",
+			},
+		},
+	})
+	if err != nil {
+		t.Fatalf("RecordRouteEvent() error = %v", err)
+	}
+}
+
+func TestActGrayReleaseAdvanceIncrementsBatch(t *testing.T) {
+	uc := NewRoutingUsecase(fakeRoutingRepo{
+		grayReleases: []*RoutingGrayRelease{
+			{
+				ID:            1,
+				ProfileCode:   "p_user_1",
+				Name:          "user 1 gray",
+				Status:        "draft",
+				TargetType:    "user",
+				TargetIDsJSON: `[1]`,
+				ReleaseJSON:   `{}`,
+			},
+		},
+	}, log.DefaultLogger)
+
+	release, err := uc.ActGrayRelease(context.Background(), 1, "advance", "admin", "")
+	if err != nil {
+		t.Fatalf("ActGrayRelease() error = %v", err)
+	}
+	if release.Status != "running" {
+		t.Fatalf("Status = %q, want running", release.Status)
+	}
+	if release.BatchNo != 1 {
+		t.Fatalf("BatchNo = %d, want 1", release.BatchNo)
+	}
+	if release.StartedAt.IsZero() {
+		t.Fatal("StartedAt is zero, want action timestamp")
+	}
+}
+
+func TestRoutingAnalyticsAggregatesFallbackAndHealthFailures(t *testing.T) {
+	now := time.Now()
+	uc := NewRoutingUsecase(fakeRoutingRepo{
+		routeEvents: []*RoutingRouteEvent{
+			{
+				ReporterID:  "device-1",
+				ProfileCode: "p_user_1",
+				RoutingHash: "hash-1",
+				EventType:   "route_decision",
+				Status:      "matched",
+				EventAt:     now.Add(-time.Minute),
+			},
+			{
+				ReporterID:  "device-1",
+				ProfileCode: "p_user_1",
+				RoutingHash: "hash-1",
+				EventType:   "route_fallback",
+				Status:      "fallback",
+				Error:       "outbound failed",
+				EventAt:     now.Add(-30 * time.Second),
+			},
+		},
+		healthReports: []*RoutingHealthReport{
+			{
+				ReporterID:  "device-1",
+				ProfileCode: "p_user_1",
+				RoutingHash: "hash-1",
+				SubjectType: "dns_resolver",
+				SubjectKey:  "dns:cloudflare-doh",
+				Status:      "failed",
+				LastError:   "dns timeout",
+				CheckedAt:   now.Add(-20 * time.Second),
+			},
+		},
+	}, log.DefaultLogger)
+
+	analytics, err := uc.Analytics(context.Background(), "p_user_1", "hash-1", 60)
+	if err != nil {
+		t.Fatalf("Analytics() error = %v", err)
+	}
+	if analytics.TotalRouteEvents != 2 {
+		t.Fatalf("TotalRouteEvents = %d, want 2", analytics.TotalRouteEvents)
+	}
+	if analytics.FallbackRateBP != 10_000 {
+		t.Fatalf("FallbackRateBP = %d, want 10000", analytics.FallbackRateBP)
+	}
+	if analytics.DNSFailRateBP != 10_000 {
+		t.Fatalf("DNSFailRateBP = %d, want 10000", analytics.DNSFailRateBP)
+	}
+	if len(analytics.TopErrors) == 0 {
+		t.Fatal("TopErrors is empty, want aggregated errors")
+	}
+}
+
+func TestRoutingReportsProvideTrendDrilldownAndNotifications(t *testing.T) {
+	now := time.Now()
+	uc := NewRoutingUsecase(fakeRoutingRepo{
+		profiles: []*RouteProfile{
+			{ID: 1, Code: "p_user_1", Name: "User Profile", ScopeType: "user", ScopeID: "1", Enabled: true, ProfileJSON: `{}`},
+		},
+		grayReleases: []*RoutingGrayRelease{
+			{
+				ID:            1,
+				ProfileCode:   "p_user_1",
+				Name:          "user gray",
+				Status:        "running",
+				BatchNo:       1,
+				TargetType:    "user",
+				TargetIDsJSON: `[1]`,
+				ReleaseJSON:   `{}`,
+			},
+		},
+		routeEvents: []*RoutingRouteEvent{
+			{
+				ReporterID:  "device-1",
+				ProfileCode: "p_user_1",
+				RoutingHash: "hash-1",
+				EventType:   "route_decision",
+				Status:      "matched",
+				OutboundTag: "unlock:openai:us",
+				EventAt:     now.Add(-30 * time.Minute),
+			},
+			{
+				ReporterID:  "device-1",
+				ProfileCode: "p_user_1",
+				RoutingHash: "hash-1",
+				EventType:   "route_fallback",
+				Status:      "fallback",
+				OutboundTag: "unlock:openai:us",
+				Error:       "outbound failed",
+				EventAt:     now.Add(-20 * time.Minute),
+			},
+		},
+		healthReports: []*RoutingHealthReport{
+			{
+				ReporterID:  "device-1",
+				ProfileCode: "p_user_1",
+				RoutingHash: "hash-1",
+				SubjectType: "outbound",
+				SubjectKey:  "unlock:openai:us",
+				Status:      "failed",
+				LastError:   "outbound failed",
+				CheckedAt:   now.Add(-10 * time.Minute),
+			},
+		},
+	}, log.DefaultLogger)
+
+	trend, err := uc.TrendReport(context.Background(), "p_user_1", "hash-1", 120, 60)
+	if err != nil {
+		t.Fatalf("TrendReport() error = %v", err)
+	}
+	if len(trend.Points) == 0 {
+		t.Fatal("TrendReport() points is empty")
+	}
+	totalEvents := 0
+	for _, point := range trend.Points {
+		totalEvents += point.RouteEvents
+	}
+	if totalEvents != 2 {
+		t.Fatalf("TrendReport() total events = %d, want 2", totalEvents)
+	}
+
+	drilldown, err := uc.DrilldownReport(context.Background(), "p_user_1", "hash-1", "outbound", 120)
+	if err != nil {
+		t.Fatalf("DrilldownReport() error = %v", err)
+	}
+	if len(drilldown.Items) == 0 || drilldown.Items[0].Key != "unlock:openai:us" {
+		t.Fatalf("DrilldownReport() items = %+v, want outbound row", drilldown.Items)
+	}
+	if drilldown.Items[0].RouteFallbacks != 1 {
+		t.Fatalf("RouteFallbacks = %d, want 1", drilldown.Items[0].RouteFallbacks)
+	}
+
+	notifications, err := uc.Notifications(context.Background(), "p_user_1", "hash-1", 120, "warning")
+	if err != nil {
+		t.Fatalf("Notifications() error = %v", err)
+	}
+	if len(notifications) == 0 {
+		t.Fatal("Notifications() is empty, want top error warning")
+	}
+	if notifications[0].Severity != "warning" {
+		t.Fatalf("notification severity = %q, want warning", notifications[0].Severity)
+	}
+}
+
+func TestReleaseGateBlocksGlobalProfileAndHighFallback(t *testing.T) {
+	now := time.Now()
+	uc := NewRoutingUsecase(fakeRoutingRepo{
+		profiles: []*RouteProfile{
+			{
+				ID:          1,
+				Code:        "global_profile",
+				Name:        "Global Profile",
+				ScopeType:   "global",
+				ScopeID:     "default",
+				Enabled:     true,
+				ProfileJSON: `{}`,
+			},
+		},
+		grayReleases: []*RoutingGrayRelease{
+			{
+				ID:            1,
+				ProfileCode:   "global_profile",
+				Name:          "global gray",
+				Status:        "running",
+				BatchNo:       1,
+				TargetType:    "user",
+				TargetIDsJSON: `[1]`,
+				ReleaseJSON:   `{}`,
+			},
+		},
+		routeEvents: []*RoutingRouteEvent{
+			{
+				ReporterID:  "device-1",
+				ProfileCode: "global_profile",
+				RoutingHash: "hash-1",
+				EventType:   "route_decision",
+				Status:      "matched",
+				EventAt:     now.Add(-time.Minute),
+			},
+			{
+				ReporterID:  "device-1",
+				ProfileCode: "global_profile",
+				RoutingHash: "hash-1",
+				EventType:   "route_fallback",
+				Status:      "fallback",
+				EventAt:     now.Add(-30 * time.Second),
+			},
+		},
+	}, log.DefaultLogger)
+
+	gate, err := uc.ReleaseGate(context.Background(), "global_profile", "hash-1", 60)
+	if err != nil {
+		t.Fatalf("ReleaseGate() error = %v", err)
+	}
+	if gate.Allowed {
+		t.Fatal("Allowed = true, want blocked for global/high fallback")
+	}
+	if !hasGateCheck(gate.Checks, "profile_not_global", false) {
+		t.Fatal("profile_not_global check did not block")
+	}
+	if !hasGateCheck(gate.Checks, "fallback_rate_ok", false) {
+		t.Fatal("fallback_rate_ok check did not block")
+	}
+}
+
+func TestReleaseGateUsesConfigurableThresholds(t *testing.T) {
+	now := time.Now()
+	uc := NewRoutingUsecase(fakeRoutingRepo{
+		profiles: []*RouteProfile{
+			{
+				ID:          1,
+				Code:        "p_user_1",
+				Name:        "User Profile",
+				ScopeType:   "user",
+				ScopeID:     "1",
+				Enabled:     true,
+				ProfileJSON: `{}`,
+			},
+		},
+		grayReleases: []*RoutingGrayRelease{
+			{
+				ID:            1,
+				ProfileCode:   "p_user_1",
+				Name:          "user gray",
+				Status:        "running",
+				BatchNo:       1,
+				TargetType:    "user",
+				TargetIDsJSON: `[1]`,
+				ReleaseJSON:   `{}`,
+			},
+		},
+		routeEvents: []*RoutingRouteEvent{
+			{ReporterID: "device-1", ProfileCode: "p_user_1", RoutingHash: "hash-1", EventType: "route_decision", Status: "matched", EventAt: now.Add(-time.Minute)},
+			{ReporterID: "device-1", ProfileCode: "p_user_1", RoutingHash: "hash-1", EventType: "route_fallback", Status: "fallback", EventAt: now.Add(-30 * time.Second)},
+		},
+		healthReports: []*RoutingHealthReport{
+			{ReporterID: "device-1", ProfileCode: "p_user_1", RoutingHash: "hash-1", SubjectType: "outbound", SubjectKey: "unlock:openai:us", Status: "healthy", CheckedAt: now.Add(-20 * time.Second)},
+		},
+	}, log.DefaultLogger)
+
+	blocked, err := uc.ReleaseGate(context.Background(), "p_user_1", "hash-1", 60)
+	if err != nil {
+		t.Fatalf("ReleaseGate() error = %v", err)
+	}
+	if blocked.Allowed {
+		t.Fatal("ReleaseGate() allowed with default fallback threshold, want blocked")
+	}
+
+	allowed, err := uc.ReleaseGate(context.Background(), "p_user_1", "hash-1", 60, RoutingReleaseThresholds{
+		FallbackRateBP:     10_000,
+		DNSFailRateBP:      500,
+		OutboundFailRateBP: 500,
+		MinRouteEvents:     1,
+		MinHealthReports:   1,
+	})
+	if err != nil {
+		t.Fatalf("ReleaseGate() with thresholds error = %v", err)
+	}
+	if !allowed.Allowed {
+		t.Fatalf("ReleaseGate() blocked with relaxed threshold: %+v", allowed.Checks)
+	}
+}
+
+func TestSnapshotReleaseAuditPersistsReleaseJSON(t *testing.T) {
+	now := time.Now()
+	release := &RoutingGrayRelease{
+		ID:            1,
+		ProfileCode:   "p_user_1",
+		Name:          "user gray",
+		Status:        "running",
+		BatchNo:       1,
+		TargetType:    "user",
+		TargetIDsJSON: `[1]`,
+		ReleaseJSON:   `{}`,
+	}
+	uc := NewRoutingUsecase(fakeRoutingRepo{
+		profiles: []*RouteProfile{
+			{ID: 1, Code: "p_user_1", Name: "User Profile", ScopeType: "user", ScopeID: "1", Enabled: true, ProfileJSON: `{}`},
+		},
+		grayReleases: []*RoutingGrayRelease{release},
+		routeEvents: []*RoutingRouteEvent{
+			{ReporterID: "device-1", ProfileCode: "p_user_1", RoutingHash: "hash-1", EventType: "route_decision", Status: "matched", EventAt: now.Add(-time.Minute)},
+		},
+		healthReports: []*RoutingHealthReport{
+			{ReporterID: "device-1", ProfileCode: "p_user_1", RoutingHash: "hash-1", SubjectType: "outbound", SubjectKey: "unlock:openai:us", Status: "healthy", CheckedAt: now.Add(-20 * time.Second)},
+		},
+	}, log.DefaultLogger)
+
+	snapshot, err := uc.SnapshotReleaseAudit(context.Background(), 1, "p_user_1", "hash-1", 60, "admin", RoutingReleaseThresholds{})
+	if err != nil {
+		t.Fatalf("SnapshotReleaseAudit() error = %v", err)
+	}
+	if snapshot.ID == "" {
+		t.Fatal("SnapshotReleaseAudit() snapshot ID is empty")
+	}
+	if !strings.Contains(release.ReleaseJSON, "audit_snapshots") {
+		t.Fatalf("ReleaseJSON = %s, want audit_snapshots", release.ReleaseJSON)
+	}
+	if !strings.Contains(release.ReleaseJSON, "thresholds") {
+		t.Fatalf("ReleaseJSON = %s, want thresholds", release.ReleaseJSON)
+	}
+}
+
+func TestUpdateProfileRejectsEnforceWithoutApproval(t *testing.T) {
+	uc := NewRoutingUsecase(fakeRoutingRepo{
+		profiles: []*RouteProfile{
+			{ID: 1, Code: "p_user_1", Name: "User Profile", ScopeType: "user", ScopeID: "1", Mode: "observe", Enabled: true, ProfileJSON: `{}`},
+		},
+	}, log.DefaultLogger)
+
+	_, err := uc.UpdateProfile(context.Background(), &RouteProfile{
+		ID:          1,
+		Code:        "p_user_1",
+		Name:        "User Profile",
+		ScopeType:   "user",
+		ScopeID:     "1",
+		Mode:        "enforce",
+		Enabled:     true,
+		ProfileJSON: `{}`,
+	})
+	if err == nil {
+		t.Fatal("UpdateProfile() allowed enforce without release approval")
+	}
+}
+
+func TestConfirmReleaseEnforceRequiresAllowedSnapshot(t *testing.T) {
+	now := time.Now()
+	profile := &RouteProfile{ID: 1, Code: "p_user_1", Name: "User Profile", ScopeType: "user", ScopeID: "1", Mode: "observe", Enabled: true, ProfileJSON: `{}`}
+	release := &RoutingGrayRelease{
+		ID:            1,
+		ProfileCode:   "p_user_1",
+		Name:          "user gray",
+		Status:        "running",
+		BatchNo:       1,
+		TargetType:    "user",
+		TargetIDsJSON: `[1]`,
+		ReleaseJSON:   `{}`,
+	}
+	uc := NewRoutingUsecase(fakeRoutingRepo{
+		profiles:     []*RouteProfile{profile},
+		grayReleases: []*RoutingGrayRelease{release},
+		routeEvents: []*RoutingRouteEvent{
+			{ReporterID: "device-1", ProfileCode: "p_user_1", RoutingHash: "hash-1", EventType: "route_decision", Status: "matched", EventAt: now.Add(-time.Minute)},
+		},
+		healthReports: []*RoutingHealthReport{
+			{ReporterID: "device-1", ProfileCode: "p_user_1", RoutingHash: "hash-1", SubjectType: "outbound", SubjectKey: "unlock:openai:us", Status: "healthy", CheckedAt: now.Add(-20 * time.Second)},
+		},
+	}, log.DefaultLogger)
+
+	snapshot, err := uc.SnapshotReleaseAudit(context.Background(), 1, "p_user_1", "hash-1", 60, "admin", RoutingReleaseThresholds{})
+	if err != nil {
+		t.Fatalf("SnapshotReleaseAudit() error = %v", err)
+	}
+	if !snapshot.Allowed {
+		t.Fatalf("snapshot.Allowed = false, checks = %+v", snapshot.Gate.Checks)
+	}
+	approval, err := uc.ConfirmReleaseEnforce(context.Background(), 1, snapshot.ID, "p_user_1", "hash-1", "admin", "small scope verified")
+	if err != nil {
+		t.Fatalf("ConfirmReleaseEnforce() error = %v", err)
+	}
+	if approval.ID == "" {
+		t.Fatal("approval ID is empty")
+	}
+	if profile.Mode != "enforce" {
+		t.Fatalf("profile.Mode = %q, want enforce", profile.Mode)
+	}
+	if !strings.Contains(profile.ProfileJSON, "release_approval") {
+		t.Fatalf("ProfileJSON = %s, want release_approval", profile.ProfileJSON)
+	}
+}
+
+func TestRollbackReleaseAuditRecordsAuditAndObserveMode(t *testing.T) {
+	now := time.Now()
+	profile := &RouteProfile{ID: 1, Code: "p_user_1", Name: "User Profile", ScopeType: "user", ScopeID: "1", Mode: "enforce", Enabled: true, ProfileJSON: `{}`}
+	release := &RoutingGrayRelease{
+		ID:            1,
+		ProfileCode:   "p_user_1",
+		Name:          "user gray",
+		Status:        "running",
+		BatchNo:       1,
+		TargetType:    "user",
+		TargetIDsJSON: `[1]`,
+		ReleaseJSON:   `{}`,
+	}
+	uc := NewRoutingUsecase(fakeRoutingRepo{
+		profiles:     []*RouteProfile{profile},
+		grayReleases: []*RoutingGrayRelease{release},
+		routeEvents: []*RoutingRouteEvent{
+			{ReporterID: "device-1", ProfileCode: "p_user_1", RoutingHash: "hash-1", EventType: "route_fallback", Status: "fallback", Error: "manual rollback smoke", EventAt: now.Add(-time.Minute)},
+		},
+		healthReports: []*RoutingHealthReport{
+			{ReporterID: "device-1", ProfileCode: "p_user_1", RoutingHash: "hash-1", SubjectType: "outbound", SubjectKey: "unlock:openai:us", Status: "failed", LastError: "outbound failed", CheckedAt: now.Add(-20 * time.Second)},
+		},
+	}, log.DefaultLogger)
+
+	audit, err := uc.RollbackReleaseAudit(context.Background(), 1, "p_user_1", "hash-1", 60, "admin", "fallback spike")
+	if err != nil {
+		t.Fatalf("RollbackReleaseAudit() error = %v", err)
+	}
+	if audit.ID == "" {
+		t.Fatal("rollback audit ID is empty")
+	}
+	if profile.Mode != "observe" {
+		t.Fatalf("profile.Mode = %q, want observe", profile.Mode)
+	}
+	if release.Status != "rolled_back" {
+		t.Fatalf("release.Status = %q, want rolled_back", release.Status)
+	}
+	if !strings.Contains(release.ReleaseJSON, "rollback_audits") {
+		t.Fatalf("ReleaseJSON = %s, want rollback_audits", release.ReleaseJSON)
+	}
+}
+
+func TestCapabilityMatrixKeepsNonPpanelOutOfEnforce(t *testing.T) {
+	uc := NewRoutingUsecase(fakeRoutingRepo{}, log.DefaultLogger)
+	matrix := uc.CapabilityMatrix(context.Background())
+	foundLegacyPanel := false
+	foundPpanel := false
+	for _, item := range matrix.Items {
+		if item.Client == "OwlClient" && item.Panel == "ppanel" {
+			foundPpanel = true
+			if !featureListContains(item.SupportedFeatures, "dot") {
+				t.Fatal("ppanel OwlClient matrix does not declare dot support")
+			}
+			if !featureListContains(item.SupportedFeatures, "route_events") || !featureListContains(item.SupportedFeatures, "client_health_report") {
+				t.Fatal("ppanel OwlClient matrix does not declare event and client health support")
+			}
+			if !featureListContains(item.MissingFeatures, "external_wireguard") || !featureListContains(item.MissingFeatures, "external_socks") || !featureListContains(item.MissingFeatures, "external_http") {
+				t.Fatal("ppanel OwlClient matrix should keep External Outbound gated")
+			}
+		}
+		if item.Panel == "xboard/xiaov2board/v2board/sspanel" {
+			foundLegacyPanel = true
+			if item.EnforceCandidate {
+				t.Fatal("non-ppanel matrix item is enforce candidate")
+			}
+		}
+	}
+	if !foundPpanel {
+		t.Fatal("ppanel OwlClient capability matrix item not found")
+	}
+	if !foundLegacyPanel {
+		t.Fatal("non-ppanel capability matrix item not found")
+	}
+}
+
+func TestBuildConfigGeneratesDotCapabilityFromResolver(t *testing.T) {
+	now := time.Date(2026, 6, 27, 10, 0, 0, 0, time.UTC)
+	uc := NewRoutingUsecase(fakeRoutingRepo{
+		profiles: []*RouteProfile{
+			{
+				ID:          1,
+				Code:        "dot_profile",
+				Name:        "DoT Profile",
+				ScopeType:   "global",
+				ScopeID:     "default",
+				Mode:        publicrouting.ModeObserve,
+				Enabled:     true,
+				ProfileJSON: `{"default_action":{"type":"proxy"},"default_dns_resolver_tag":"dns:cloudflare-dot","default_fallback_policy":"fallback_default"}`,
+			},
+		},
+		dnsResolvers: []*DNSResolver{
+			{
+				ID:           1,
+				Tag:          "dns:cloudflare-dot",
+				Name:         "Cloudflare DoT",
+				Proto:        "dot",
+				Address:      "1.1.1.1",
+				Port:         853,
+				Enabled:      true,
+				ResolverJSON: `{"server_name":"cloudflare-dns.com","detour":{"type":"proxy"},"health_check":{"enabled":true,"domain":"www.cloudflare.com","interval_seconds":60}}`,
+			},
+		},
+	}, log.DefaultLogger)
+
+	cfg, err := uc.BuildConfig(context.Background(), now)
+	if err != nil {
+		t.Fatalf("BuildConfig() error = %v", err)
+	}
+	if !featureListContains(cfg.CapabilityRequirements.RequiredFeatures, "dot") {
+		t.Fatalf("RequiredFeatures = %#v, want dot", cfg.CapabilityRequirements.RequiredFeatures)
+	}
+	if featureListContains(cfg.CapabilityRequirements.RequiredFeatures, "doh") {
+		t.Fatalf("RequiredFeatures = %#v, did not want doh for a DoT-only resolver", cfg.CapabilityRequirements.RequiredFeatures)
+	}
+}
+
+func TestBuildConfigGeneratesExternalCapabilityAndPreservesConfig(t *testing.T) {
+	now := time.Date(2026, 6, 27, 10, 0, 0, 0, time.UTC)
+	uc := NewRoutingUsecase(fakeRoutingRepo{
+		profiles: []*RouteProfile{
+			{
+				ID:          1,
+				Code:        "external_profile",
+				Name:        "External Profile",
+				ScopeType:   "global",
+				ScopeID:     "default",
+				Mode:        publicrouting.ModeObserve,
+				Enabled:     true,
+				ProfileJSON: `{"default_action":{"type":"outbound","outbound_tag":"external:socks:sg"},"default_dns_resolver_tag":"dns:system","default_fallback_policy":"fallback_default"}`,
+			},
+		},
+		outbounds: []*RouteOutbound{
+			{
+				ID:      1,
+				Tag:     "external:socks:sg",
+				Name:    "External SOCKS SG",
+				Type:    "external",
+				Region:  "SG",
+				Enabled: true,
+				OutboundJSON: `{
+					"selection_policy":"fixed",
+					"fail_policy":"fallback_default",
+					"fallback_pool_tags":["proxy:default"],
+					"external":{"protocol":"socks","host":"127.0.0.1","port":1080,"username":"u","password":"p"}
+				}`,
+			},
+		},
+	}, log.DefaultLogger)
+
+	cfg, err := uc.BuildConfig(context.Background(), now)
+	if err != nil {
+		t.Fatalf("BuildConfig() error = %v", err)
+	}
+	if !featureListContains(cfg.CapabilityRequirements.RequiredFeatures, "external_socks") {
+		t.Fatalf("RequiredFeatures = %#v, want external_socks", cfg.CapabilityRequirements.RequiredFeatures)
+	}
+	if len(cfg.Outbounds) != 1 || cfg.Outbounds[0].External == nil || cfg.Outbounds[0].External.Protocol != "socks" {
+		t.Fatalf("external outbound was not preserved: %#v", cfg.Outbounds)
+	}
+	if cfg.Outbounds[0].External.Password != "p" {
+		t.Fatal("external outbound credentials were not preserved in enhanced routing config")
+	}
+}
+
+func TestBuildPublicConfigKeepsDotResolverWhenClientSupportsDot(t *testing.T) {
+	now := time.Date(2026, 6, 27, 10, 0, 0, 0, time.UTC)
+	uc := NewRoutingUsecase(fakeRoutingRepo{
+		profiles: []*RouteProfile{
+			{
+				ID:          1,
+				Code:        "dot_profile",
+				Name:        "DoT Profile",
+				ScopeType:   "user",
+				ScopeID:     "10001",
+				Mode:        "enforce",
+				Enabled:     true,
+				ProfileJSON: `{"default_action":{"type":"proxy"},"default_dns_resolver_tag":"dns:cloudflare-dot","default_fallback_policy":"fallback_default"}`,
+			},
+		},
+		dnsResolvers: []*DNSResolver{
+			{
+				ID:           1,
+				Tag:          "dns:cloudflare-dot",
+				Name:         "Cloudflare DoT",
+				Proto:        "dot",
+				Address:      "1.1.1.1",
+				Port:         853,
+				Enabled:      true,
+				ResolverJSON: `{"server_name":"cloudflare-dns.com","detour":{"type":"proxy"},"health_check":{"enabled":true,"domain":"www.cloudflare.com","interval_seconds":60}}`,
+			},
+		},
+	}, log.DefaultLogger)
+
+	cfg, err := uc.BuildPublicConfig(context.Background(), now, publicrouting.ConfigOptions{
+		UserID:            10001,
+		SupportedFeatures: supportedRoutingFeatures("dot"),
+	})
+	if err != nil {
+		t.Fatalf("BuildPublicConfig() error = %v", err)
+	}
+	if cfg.Mode != "enforce" {
+		t.Fatalf("Mode = %q, want enforce", cfg.Mode)
+	}
+	if len(cfg.DNSResolvers) != 1 || cfg.DNSResolvers[0].Tag != "dns:cloudflare-dot" {
+		t.Fatalf("DNSResolvers = %#v, want dot resolver", cfg.DNSResolvers)
+	}
+	if missing := publicrouting.MissingRequiredFeatures(cfg.CapabilityRequirements.RequiredFeatures, supportedRoutingFeatures("dot")); len(missing) != 0 {
+		t.Fatalf("MissingRequiredFeatures = %#v, want none", missing)
+	}
+}
+
+func TestBuildPublicConfigBlocksAndPrunesDotWhenUnsupported(t *testing.T) {
+	now := time.Date(2026, 6, 27, 10, 0, 0, 0, time.UTC)
+	uc := NewRoutingUsecase(fakeRoutingRepo{
+		profiles: []*RouteProfile{
+			{
+				ID:          1,
+				Code:        "dot_profile",
+				Name:        "DoT Profile",
+				ScopeType:   "user",
+				ScopeID:     "10001",
+				Mode:        "enforce",
+				Enabled:     true,
+				ProfileJSON: `{"default_action":{"type":"proxy"},"default_dns_resolver_tag":"dns:cloudflare-dot","default_fallback_policy":"fallback_default"}`,
+			},
+		},
+		dnsResolvers: []*DNSResolver{
+			{
+				ID:           1,
+				Tag:          "dns:cloudflare-dot",
+				Name:         "Cloudflare DoT",
+				Proto:        "dot",
+				Address:      "1.1.1.1",
+				Port:         853,
+				Enabled:      true,
+				ResolverJSON: `{"server_name":"cloudflare-dns.com","detour":{"type":"proxy"},"health_check":{"enabled":true,"domain":"www.cloudflare.com","interval_seconds":60}}`,
+			},
+		},
+	}, log.DefaultLogger)
+
+	features := supportedRoutingFeatures()
+	cfg, err := uc.BuildPublicConfig(context.Background(), now, publicrouting.ConfigOptions{
+		UserID:            10001,
+		SupportedFeatures: features,
+	})
+	if err != nil {
+		t.Fatalf("BuildPublicConfig() error = %v", err)
+	}
+	if cfg.Mode != publicrouting.ModeObserve {
+		t.Fatalf("Mode = %q, want observe", cfg.Mode)
+	}
+	if len(cfg.DNSResolvers) != 0 {
+		t.Fatalf("DNSResolvers = %#v, want unsupported dot resolver pruned", cfg.DNSResolvers)
+	}
+	if cfg.Profile.DefaultDNSResolverTag != "dns:system" {
+		t.Fatalf("DefaultDNSResolverTag = %q, want dns:system", cfg.Profile.DefaultDNSResolverTag)
+	}
+	if missing := publicrouting.MissingRequiredFeatures(cfg.CapabilityRequirements.RequiredFeatures, features); !featureListContains(missing, "dot") {
+		t.Fatalf("MissingRequiredFeatures = %#v, want dot", missing)
+	}
+}
+
+func TestBuildPublicConfigBlocksAndPrunesExternalOutboundWhenUnsupported(t *testing.T) {
+	now := time.Date(2026, 6, 27, 10, 0, 0, 0, time.UTC)
+	uc := NewRoutingUsecase(fakeRoutingRepo{
+		profiles: []*RouteProfile{
+			{
+				ID:          1,
+				Code:        "external_profile",
+				Name:        "External Profile",
+				ScopeType:   "user",
+				ScopeID:     "10001",
+				Mode:        "enforce",
+				Enabled:     true,
+				ProfileJSON: `{"default_action":{"type":"outbound","outbound_tag":"external:socks:sg"},"default_dns_resolver_tag":"dns:system","default_fallback_policy":"fallback_default"}`,
+			},
+		},
+		outbounds: []*RouteOutbound{
+			{
+				ID:           1,
+				Tag:          "external:socks:sg",
+				Name:         "External SOCKS SG",
+				Type:         "external",
+				Region:       "SG",
+				Enabled:      true,
+				OutboundJSON: `{"selection_policy":"fixed","fail_policy":"fallback_default","external":{"protocol":"socks","host":"127.0.0.1","port":1080,"password":"secret"}}`,
+			},
+		},
+		rules: []*RouteRule{
+			{
+				ID:          1,
+				ProfileID:   1,
+				Name:        "External OpenAI",
+				Priority:    100,
+				Enabled:     true,
+				MatcherJSON: `{"type":"domain_suffix","value":"openai.com"}`,
+				ActionJSON:  `{"type":"outbound","outbound_tag":"external:socks:sg","fail_policy":"fallback_default"}`,
+			},
+		},
+	}, log.DefaultLogger)
+
+	features := supportedRoutingFeatures()
+	cfg, err := uc.BuildPublicConfig(context.Background(), now, publicrouting.ConfigOptions{
+		UserID:            10001,
+		SupportedFeatures: features,
+	})
+	if err != nil {
+		t.Fatalf("BuildPublicConfig() error = %v", err)
+	}
+	if cfg.Mode != publicrouting.ModeObserve {
+		t.Fatalf("Mode = %q, want observe", cfg.Mode)
+	}
+	if len(cfg.Outbounds) != 0 {
+		t.Fatalf("Outbounds = %#v, want unsupported external outbound pruned", cfg.Outbounds)
+	}
+	if len(cfg.Rules) != 0 {
+		t.Fatalf("Rules = %#v, want rules referencing pruned external outbound removed", cfg.Rules)
+	}
+	if cfg.Profile.DefaultAction.Type != "proxy" {
+		t.Fatalf("DefaultAction = %#v, want proxy fallback", cfg.Profile.DefaultAction)
+	}
+	if missing := publicrouting.MissingRequiredFeatures(cfg.CapabilityRequirements.RequiredFeatures, features); !featureListContains(missing, "external_socks") {
+		t.Fatalf("MissingRequiredFeatures = %#v, want external_socks", missing)
+	}
+}
+
+func TestBuildPublicConfigEmptyFeaturesReturnsObserveOnlySafeConfig(t *testing.T) {
+	now := time.Date(2026, 6, 27, 10, 0, 0, 0, time.UTC)
+	uc := NewRoutingUsecase(fakeRoutingRepo{
+		profiles: []*RouteProfile{
+			{
+				ID:          1,
+				Code:        "user_profile",
+				Name:        "User Profile",
+				ScopeType:   "user",
+				ScopeID:     "10001",
+				Mode:        "enforce",
+				Enabled:     true,
+				ProfileJSON: `{"default_action":{"type":"proxy"},"default_dns_resolver_tag":"dns:cloudflare-doh","default_fallback_policy":"fallback_default"}`,
+			},
+		},
+	}, log.DefaultLogger)
+
+	cfg, err := uc.BuildPublicConfig(context.Background(), now, publicrouting.ConfigOptions{UserID: 10001})
+	if err != nil {
+		t.Fatalf("BuildPublicConfig() error = %v", err)
+	}
+	if cfg.Mode != publicrouting.ModeObserve {
+		t.Fatalf("Mode = %q, want observe", cfg.Mode)
+	}
+	if len(cfg.Outbounds) != 0 || len(cfg.Rules) != 0 {
+		t.Fatalf("Outbounds=%#v Rules=%#v, want non-executable config for empty capabilities", cfg.Outbounds, cfg.Rules)
+	}
+	if missing := publicrouting.MissingRequiredFeatures(cfg.CapabilityRequirements.RequiredFeatures, nil); len(missing) == 0 {
+		t.Fatal("MissingRequiredFeatures is empty, want old/unknown clients blocked")
+	}
+}
+
+func hasGateCheck(checks []RoutingReleaseGateCheck, key string, passed bool) bool {
+	for _, check := range checks {
+		if check.Key == key && check.Passed == passed {
+			return true
+		}
+	}
+	return false
+}
+
+func featureListContains(features []string, expected string) bool {
+	for _, feature := range features {
+		if feature == expected {
+			return true
+		}
+	}
+	return false
+}
+
+func supportedRoutingFeatures(extra ...string) []string {
+	features := []string{
+		"routing_profile_v1",
+		"route_dns_resolver",
+		"route_outbound",
+		"route_fail_policy",
+		"route_fallback",
+		"doh",
+		"route_events",
+		"client_health_report",
+	}
+	features = append(features, extra...)
+	return features
+}
+
+func TestBuildConfigFallsBackToFixtureWhenStoreIsEmpty(t *testing.T) {
+	now := time.Date(2026, 6, 27, 10, 0, 0, 0, time.UTC)
+	uc := NewRoutingUsecase(fakeRoutingRepo{}, log.DefaultLogger)
+
+	cfg, err := uc.BuildConfig(context.Background(), now)
+	if err != nil {
+		t.Fatalf("BuildConfig() error = %v", err)
+	}
+	if cfg.Profile.Code != "p0_default_smart" {
+		t.Fatalf("Profile.Code = %q, want p0_default_smart", cfg.Profile.Code)
+	}
+}
+
+func TestBuildConfigKeepsPreviewDefaultsWhenProfileHasNoResources(t *testing.T) {
+	now := time.Date(2026, 6, 27, 10, 0, 0, 0, time.UTC)
+	uc := NewRoutingUsecase(fakeRoutingRepo{
+		profiles: []*RouteProfile{
+			{
+				ID:          1,
+				Code:        "db_profile",
+				Name:        "DB Profile",
+				ScopeType:   "global",
+				ScopeID:     "default",
+				Mode:        publicrouting.ModeObserve,
+				Enabled:     true,
+				ProfileJSON: `{"default_action":{"type":"proxy"},"default_dns_resolver_tag":"dns:cloudflare-doh","default_fallback_policy":"fallback_default"}`,
+			},
+		},
+	}, log.DefaultLogger)
+
+	cfg, err := uc.BuildConfig(context.Background(), now)
+	if err != nil {
+		t.Fatalf("BuildConfig() error = %v", err)
+	}
+	if cfg.Profile.Code != "db_profile" {
+		t.Fatalf("Profile.Code = %q, want db_profile", cfg.Profile.Code)
+	}
+	if len(cfg.DNSResolvers) == 0 {
+		t.Fatal("DNSResolvers is empty, want preview defaults")
+	}
+	if len(cfg.Outbounds) == 0 {
+		t.Fatal("Outbounds is empty, want preview defaults")
+	}
+}
+
+func TestBuildConfigSelectsUserProfileBeforeGlobal(t *testing.T) {
+	now := time.Date(2026, 6, 27, 10, 0, 0, 0, time.UTC)
+	uc := NewRoutingUsecase(fakeRoutingRepo{
+		profiles: []*RouteProfile{
+			{
+				ID:          1,
+				Code:        "global_profile",
+				Name:        "Global Profile",
+				ScopeType:   "global",
+				ScopeID:     "default",
+				Mode:        publicrouting.ModeObserve,
+				Enabled:     true,
+				ProfileJSON: `{"default_action":{"type":"proxy"},"default_dns_resolver_tag":"dns:system","default_fallback_policy":"fallback_default"}`,
+			},
+			{
+				ID:          2,
+				Code:        "user_profile",
+				Name:        "User Profile",
+				ScopeType:   "user",
+				ScopeID:     "10001",
+				Mode:        publicrouting.ModeObserve,
+				Enabled:     true,
+				ProfileJSON: `{"default_action":{"type":"proxy"},"default_dns_resolver_tag":"dns:system","default_fallback_policy":"fallback_default"}`,
+			},
+		},
+	}, log.DefaultLogger)
+
+	cfg, err := uc.BuildConfig(context.Background(), now, publicrouting.ConfigOptions{UserID: 10001})
+	if err != nil {
+		t.Fatalf("BuildConfig() error = %v", err)
+	}
+	if cfg.Profile.Code != "user_profile" {
+		t.Fatalf("Profile.Code = %q, want user_profile", cfg.Profile.Code)
+	}
+}
+
+func TestBuildConfigResolveScopeFromSubscribeToken(t *testing.T) {
+	now := time.Date(2026, 6, 27, 10, 0, 0, 0, time.UTC)
+	uc := NewRoutingUsecase(fakeRoutingRepo{
+		tokenScope: ScopeContext{UserID: 10001, SubscribeID: 7, UserSubscribeID: 88},
+		profiles: []*RouteProfile{
+			{
+				ID:          1,
+				Code:        "global_profile",
+				Name:        "Global Profile",
+				ScopeType:   "global",
+				ScopeID:     "default",
+				Mode:        publicrouting.ModeObserve,
+				Enabled:     true,
+				ProfileJSON: `{"default_action":{"type":"proxy"},"default_dns_resolver_tag":"dns:system","default_fallback_policy":"fallback_default"}`,
+			},
+			{
+				ID:          2,
+				Code:        "subscription_instance_profile",
+				Name:        "Subscription Instance Profile",
+				ScopeType:   "user_subscribe",
+				ScopeID:     "88",
+				Mode:        publicrouting.ModeObserve,
+				Enabled:     true,
+				ProfileJSON: `{"default_action":{"type":"proxy"},"default_dns_resolver_tag":"dns:system","default_fallback_policy":"fallback_default"}`,
+			},
+		},
+	}, log.DefaultLogger)
+
+	cfg, err := uc.BuildConfig(context.Background(), now, publicrouting.ConfigOptions{SubscribeToken: "sub-token"})
+	if err != nil {
+		t.Fatalf("BuildConfig() error = %v", err)
+	}
+	if cfg.Profile.Code != "subscription_instance_profile" {
+		t.Fatalf("Profile.Code = %q, want subscription_instance_profile", cfg.Profile.Code)
+	}
+}
+
+func TestBuildConfigMergesFreshHealthReports(t *testing.T) {
+	now := time.Date(2026, 6, 27, 10, 0, 0, 0, time.UTC)
+	uc := NewRoutingUsecase(fakeRoutingRepo{
+		profiles: []*RouteProfile{
+			{
+				ID:          1,
+				Code:        "db_profile",
+				Name:        "DB Profile",
+				ScopeType:   "user",
+				ScopeID:     "10001",
+				Mode:        "enforce",
+				Enabled:     true,
+				ProfileJSON: `{"default_action":{"type":"proxy"},"default_dns_resolver_tag":"dns:system","default_fallback_policy":"fallback_default"}`,
+			},
+		},
+		healthReports: []*RoutingHealthReport{
+			{
+				SubjectType: "outbound",
+				SubjectKey:  "unlock:openai:us",
+				Status:      "healthy",
+				Source:      "client_health_report",
+				RTTMS:       42,
+				CheckedAt:   now.Add(-time.Minute),
+			},
+			{
+				SubjectType: "dns_resolver",
+				SubjectKey:  "dns:cloudflare-doh",
+				Status:      "healthy",
+				Source:      "client_health_report",
+				CheckedAt:   now.Add(-time.Minute),
+			},
+			{
+				SubjectType: "service",
+				SubjectKey:  "openai",
+				Status:      "healthy",
+				Source:      "client_health_report",
+				CheckedAt:   now.Add(-time.Minute),
+			},
+		},
+	}, log.DefaultLogger)
+
+	cfg, err := uc.BuildConfig(context.Background(), now, publicrouting.ConfigOptions{UserID: 10001})
+	if err != nil {
+		t.Fatalf("BuildConfig() error = %v", err)
+	}
+	result := publicrouting.PreviewRouteConfig(cfg, publicrouting.PreviewRequest{
+		Domain:            "example.com",
+		SupportedFeatures: cfg.CapabilityRequirements.RequiredFeatures,
+	})
+	if !result.ExecutionEnabled {
+		t.Fatal("ExecutionEnabled = false, want true for enforce gray scope with healthy reports")
+	}
+	if cfg.HealthSnapshot.Outbounds[0].Status != "healthy" {
+		t.Fatalf("outbound status = %q, want healthy", cfg.HealthSnapshot.Outbounds[0].Status)
+	}
+}
+
+func TestBuildConfigDoesNotLeakUserProfileWithoutScope(t *testing.T) {
+	now := time.Date(2026, 6, 27, 10, 0, 0, 0, time.UTC)
+	uc := NewRoutingUsecase(fakeRoutingRepo{
+		profiles: []*RouteProfile{
+			{
+				ID:          1,
+				Code:        "user_profile",
+				Name:        "User Profile",
+				ScopeType:   "user",
+				ScopeID:     "10001",
+				Mode:        publicrouting.ModeObserve,
+				Enabled:     true,
+				ProfileJSON: `{"default_action":{"type":"proxy"},"default_dns_resolver_tag":"dns:system","default_fallback_policy":"fallback_default"}`,
+			},
+		},
+	}, log.DefaultLogger)
+
+	cfg, err := uc.BuildConfig(context.Background(), now)
+	if err != nil {
+		t.Fatalf("BuildConfig() error = %v", err)
+	}
+	if cfg.Profile.Code != "p0_default_smart" {
+		t.Fatalf("Profile.Code = %q, want p0_default_smart", cfg.Profile.Code)
+	}
+}
+
+func TestBuildConfigFallsBackWhenRuleReferencesMissingOutbound(t *testing.T) {
+	now := time.Date(2026, 6, 27, 10, 0, 0, 0, time.UTC)
+	uc := NewRoutingUsecase(fakeRoutingRepo{
+		profiles: []*RouteProfile{
+			{
+				ID:          1,
+				Code:        "db_profile",
+				Name:        "DB Profile",
+				ScopeType:   "global",
+				ScopeID:     "default",
+				Mode:        publicrouting.ModeObserve,
+				Enabled:     true,
+				ProfileJSON: `{"default_action":{"type":"proxy"},"default_dns_resolver_tag":"dns:system","default_fallback_policy":"fallback_default"}`,
+			},
+		},
+		rules: []*RouteRule{
+			{
+				ID:          1,
+				ProfileID:   1,
+				Name:        "Broken outbound",
+				Priority:    100,
+				Enabled:     true,
+				MatcherJSON: `{"type":"domain_suffix","value":"openai.com"}`,
+				ActionJSON:  `{"type":"outbound","outbound_tag":"missing:outbound","fail_policy":"fallback_default"}`,
+			},
+		},
+	}, log.DefaultLogger)
+
+	cfg, err := uc.BuildConfig(context.Background(), now)
+	if err == nil {
+		t.Fatal("BuildConfig() error = nil, want missing outbound error")
+	}
+	if cfg.Profile.Code != "p0_default_smart" {
+		t.Fatalf("Profile.Code = %q, want p0_default_smart", cfg.Profile.Code)
+	}
+}

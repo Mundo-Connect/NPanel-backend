@@ -296,6 +296,180 @@ var (
 			},
 		},
 	}
+	// RoutingDNSResolverColumns holds the columns for the "routing_dns_resolver" table.
+	RoutingDNSResolverColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "DNS Resolver ID"},
+		{Name: "tag", Type: field.TypeString, Unique: true, Size: 128, Comment: "Stable resolver tag"},
+		{Name: "name", Type: field.TypeString, Size: 255, Comment: "Resolver display name"},
+		{Name: "proto", Type: field.TypeString, Size: 32, Comment: "doh/dot/udp/tcp", Default: "doh"},
+		{Name: "address", Type: field.TypeString, Size: 512, Comment: "Resolver address"},
+		{Name: "port", Type: field.TypeInt, Comment: "Resolver port", Default: 443},
+		{Name: "enabled", Type: field.TypeBool, Comment: "Resolver enabled", Default: true},
+		{Name: "resolver_json", Type: field.TypeString, Size: 2147483647, Comment: "routing_profile.v1 DNS resolver JSON", Default: "{}"},
+		{Name: "created_at", Type: field.TypeTime, Comment: "Created at"},
+		{Name: "updated_at", Type: field.TypeTime, Comment: "Updated at"},
+	}
+	// RoutingDNSResolverTable holds the schema information for the "routing_dns_resolver" table.
+	RoutingDNSResolverTable = &schema.Table{
+		Name:       "routing_dns_resolver",
+		Columns:    RoutingDNSResolverColumns,
+		PrimaryKey: []*schema.Column{RoutingDNSResolverColumns[0]},
+	}
+	// RoutingGrayReleaseColumns holds the columns for the "routing_gray_release" table.
+	RoutingGrayReleaseColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "Routing gray release ID"},
+		{Name: "profile_code", Type: field.TypeString, Size: 128, Comment: "Routing profile code"},
+		{Name: "name", Type: field.TypeString, Size: 255, Comment: "Gray release name"},
+		{Name: "status", Type: field.TypeString, Size: 32, Comment: "draft/running/paused/completed/rolled_back", Default: "draft"},
+		{Name: "batch_no", Type: field.TypeInt, Comment: "Current gray batch number", Default: 0},
+		{Name: "target_type", Type: field.TypeString, Size: 32, Comment: "user/user_subscribe/subscribe/node", Default: "user"},
+		{Name: "target_ids_json", Type: field.TypeString, Size: 2147483647, Comment: "Target IDs JSON array", Default: "[]"},
+		{Name: "operator", Type: field.TypeString, Size: 128, Comment: "Operator", Default: ""},
+		{Name: "rollback_reason", Type: field.TypeString, Nullable: true, Size: 2147483647, Comment: "Rollback reason"},
+		{Name: "started_at", Type: field.TypeTime, Nullable: true, Comment: "Started at"},
+		{Name: "ended_at", Type: field.TypeTime, Nullable: true, Comment: "Ended at"},
+		{Name: "release_json", Type: field.TypeString, Size: 2147483647, Comment: "Release metadata JSON", Default: "{}"},
+		{Name: "created_at", Type: field.TypeTime, Comment: "Created at"},
+		{Name: "updated_at", Type: field.TypeTime, Comment: "Updated at"},
+	}
+	// RoutingGrayReleaseTable holds the schema information for the "routing_gray_release" table.
+	RoutingGrayReleaseTable = &schema.Table{
+		Name:       "routing_gray_release",
+		Columns:    RoutingGrayReleaseColumns,
+		PrimaryKey: []*schema.Column{RoutingGrayReleaseColumns[0]},
+	}
+	// RoutingHealthReportColumns holds the columns for the "routing_health_report" table.
+	RoutingHealthReportColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "Routing health report ID"},
+		{Name: "reporter_type", Type: field.TypeString, Size: 32, Comment: "client/node/backend", Default: "client"},
+		{Name: "reporter_id", Type: field.TypeString, Size: 128, Comment: "Reporter identifier", Default: ""},
+		{Name: "profile_code", Type: field.TypeString, Size: 128, Comment: "Routing profile code", Default: ""},
+		{Name: "routing_hash", Type: field.TypeString, Size: 128, Comment: "Routing hash", Default: ""},
+		{Name: "subject_type", Type: field.TypeString, Size: 32, Comment: "outbound/dns_resolver/service"},
+		{Name: "subject_key", Type: field.TypeString, Size: 128, Comment: "Outbound tag, DNS resolver tag or service code"},
+		{Name: "region", Type: field.TypeString, Size: 32, Comment: "Region code", Default: ""},
+		{Name: "status", Type: field.TypeString, Size: 32, Comment: "healthy/ok/failed/degraded/stale/disabled/unknown", Default: "unknown"},
+		{Name: "source", Type: field.TypeString, Size: 64, Comment: "Health source", Default: "health_report"},
+		{Name: "rtt_ms", Type: field.TypeInt, Comment: "RTT in milliseconds", Default: 0},
+		{Name: "consecutive_failures", Type: field.TypeInt, Comment: "Consecutive failures", Default: 0},
+		{Name: "last_error", Type: field.TypeString, Nullable: true, Size: 2147483647, Comment: "Last health error"},
+		{Name: "outbound_tag", Type: field.TypeString, Size: 128, Comment: "Related outbound tag", Default: ""},
+		{Name: "dns_resolver_tag", Type: field.TypeString, Size: 128, Comment: "Related DNS resolver tag", Default: ""},
+		{Name: "checked_at", Type: field.TypeTime, Comment: "Checked at"},
+		{Name: "report_json", Type: field.TypeString, Size: 2147483647, Comment: "Raw health report JSON", Default: "{}"},
+		{Name: "created_at", Type: field.TypeTime, Comment: "Created at"},
+		{Name: "updated_at", Type: field.TypeTime, Comment: "Updated at"},
+	}
+	// RoutingHealthReportTable holds the schema information for the "routing_health_report" table.
+	RoutingHealthReportTable = &schema.Table{
+		Name:       "routing_health_report",
+		Columns:    RoutingHealthReportColumns,
+		PrimaryKey: []*schema.Column{RoutingHealthReportColumns[0]},
+	}
+	// RoutingOutboundColumns holds the columns for the "routing_outbound" table.
+	RoutingOutboundColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "Route Outbound ID"},
+		{Name: "tag", Type: field.TypeString, Unique: true, Size: 128, Comment: "Stable outbound tag"},
+		{Name: "name", Type: field.TypeString, Size: 255, Comment: "Outbound display name"},
+		{Name: "type", Type: field.TypeString, Size: 32, Comment: "node/node_group/external", Default: "node_group"},
+		{Name: "region", Type: field.TypeString, Size: 32, Comment: "Region code", Default: ""},
+		{Name: "enabled", Type: field.TypeBool, Comment: "Outbound enabled", Default: true},
+		{Name: "outbound_json", Type: field.TypeString, Size: 2147483647, Comment: "routing_profile.v1 outbound JSON", Default: "{}"},
+		{Name: "created_at", Type: field.TypeTime, Comment: "Created at"},
+		{Name: "updated_at", Type: field.TypeTime, Comment: "Updated at"},
+	}
+	// RoutingOutboundTable holds the schema information for the "routing_outbound" table.
+	RoutingOutboundTable = &schema.Table{
+		Name:       "routing_outbound",
+		Columns:    RoutingOutboundColumns,
+		PrimaryKey: []*schema.Column{RoutingOutboundColumns[0]},
+	}
+	// RoutingProfileColumns holds the columns for the "routing_profile" table.
+	RoutingProfileColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "Routing Profile ID"},
+		{Name: "code", Type: field.TypeString, Unique: true, Size: 128, Comment: "Stable profile code"},
+		{Name: "name", Type: field.TypeString, Size: 255, Comment: "Profile display name"},
+		{Name: "description", Type: field.TypeString, Nullable: true, Size: 2147483647, Comment: "Profile description"},
+		{Name: "scope_type", Type: field.TypeString, Size: 32, Comment: "user/plan/group/node/global", Default: "global"},
+		{Name: "scope_id", Type: field.TypeString, Size: 128, Comment: "Scope identifier", Default: "default"},
+		{Name: "priority", Type: field.TypeInt, Comment: "Lower priority matches first", Default: 100},
+		{Name: "mode", Type: field.TypeString, Size: 32, Comment: "off/observe/enforce", Default: "observe"},
+		{Name: "enabled", Type: field.TypeBool, Comment: "Profile enabled", Default: true},
+		{Name: "profile_json", Type: field.TypeString, Size: 2147483647, Comment: "routing_profile.v1 profile object JSON", Default: "{}"},
+		{Name: "created_at", Type: field.TypeTime, Comment: "Created at"},
+		{Name: "updated_at", Type: field.TypeTime, Comment: "Updated at"},
+	}
+	// RoutingProfileTable holds the schema information for the "routing_profile" table.
+	RoutingProfileTable = &schema.Table{
+		Name:       "routing_profile",
+		Columns:    RoutingProfileColumns,
+		PrimaryKey: []*schema.Column{RoutingProfileColumns[0]},
+	}
+	// RoutingRouteEventColumns holds the columns for the "routing_route_event" table.
+	RoutingRouteEventColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "Routing route event ID"},
+		{Name: "reporter_type", Type: field.TypeString, Size: 32, Comment: "client/node/backend", Default: "client"},
+		{Name: "reporter_id", Type: field.TypeString, Size: 128, Comment: "Reporter identifier", Default: ""},
+		{Name: "profile_code", Type: field.TypeString, Size: 128, Comment: "Routing profile code", Default: ""},
+		{Name: "routing_hash", Type: field.TypeString, Size: 128, Comment: "Routing hash", Default: ""},
+		{Name: "event_type", Type: field.TypeString, Size: 64, Comment: "route_decision/route_fallback/outbound_health_changed/dns_resolver_health_changed"},
+		{Name: "subject", Type: field.TypeString, Size: 256, Comment: "Domain, IP, service or target", Default: ""},
+		{Name: "rule_id", Type: field.TypeString, Size: 128, Comment: "Matched rule ID", Default: ""},
+		{Name: "rule_name", Type: field.TypeString, Size: 128, Comment: "Matched rule name", Default: ""},
+		{Name: "action_type", Type: field.TypeString, Size: 32, Comment: "direct/proxy/reject/dns_resolver/outbound", Default: ""},
+		{Name: "outbound_tag", Type: field.TypeString, Size: 128, Comment: "Outbound tag", Default: ""},
+		{Name: "dns_resolver_tag", Type: field.TypeString, Size: 128, Comment: "DNS resolver tag", Default: ""},
+		{Name: "fallback_target", Type: field.TypeString, Size: 128, Comment: "Fallback target", Default: ""},
+		{Name: "status", Type: field.TypeString, Size: 32, Comment: "matched/fallback/healthy/failed/degraded/unknown", Default: "unknown"},
+		{Name: "latency_ms", Type: field.TypeInt, Comment: "Latency in milliseconds", Default: 0},
+		{Name: "error", Type: field.TypeString, Nullable: true, Size: 2147483647, Comment: "Event error"},
+		{Name: "event_at", Type: field.TypeTime, Comment: "Event time"},
+		{Name: "event_json", Type: field.TypeString, Size: 2147483647, Comment: "Raw route event JSON", Default: "{}"},
+		{Name: "created_at", Type: field.TypeTime, Comment: "Created at"},
+		{Name: "updated_at", Type: field.TypeTime, Comment: "Updated at"},
+	}
+	// RoutingRouteEventTable holds the schema information for the "routing_route_event" table.
+	RoutingRouteEventTable = &schema.Table{
+		Name:       "routing_route_event",
+		Columns:    RoutingRouteEventColumns,
+		PrimaryKey: []*schema.Column{RoutingRouteEventColumns[0]},
+	}
+	// RoutingRuleColumns holds the columns for the "routing_rule" table.
+	RoutingRuleColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "Routing Rule ID"},
+		{Name: "profile_id", Type: field.TypeInt64, Comment: "Bound routing_profile.id, 0 means default P1 profile", Default: 0},
+		{Name: "name", Type: field.TypeString, Size: 255, Comment: "Rule display name"},
+		{Name: "priority", Type: field.TypeInt, Comment: "Lower priority matches first", Default: 100},
+		{Name: "enabled", Type: field.TypeBool, Comment: "Rule enabled", Default: true},
+		{Name: "service_code", Type: field.TypeString, Size: 128, Comment: "Unlock service code", Default: ""},
+		{Name: "matcher_json", Type: field.TypeString, Size: 2147483647, Comment: "routing_profile.v1 matcher JSON", Default: "{}"},
+		{Name: "action_json", Type: field.TypeString, Size: 2147483647, Comment: "routing_profile.v1 action JSON", Default: "{}"},
+		{Name: "created_at", Type: field.TypeTime, Comment: "Created at"},
+		{Name: "updated_at", Type: field.TypeTime, Comment: "Updated at"},
+	}
+	// RoutingRuleTable holds the schema information for the "routing_rule" table.
+	RoutingRuleTable = &schema.Table{
+		Name:       "routing_rule",
+		Columns:    RoutingRuleColumns,
+		PrimaryKey: []*schema.Column{RoutingRuleColumns[0]},
+	}
+	// RoutingUnlockServiceColumns holds the columns for the "routing_unlock_service" table.
+	RoutingUnlockServiceColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "Unlock Service ID"},
+		{Name: "code", Type: field.TypeString, Unique: true, Size: 128, Comment: "Stable service code"},
+		{Name: "name", Type: field.TypeString, Size: 255, Comment: "Service display name"},
+		{Name: "category", Type: field.TypeString, Size: 128, Comment: "Service category", Default: ""},
+		{Name: "enabled", Type: field.TypeBool, Comment: "Service enabled", Default: true},
+		{Name: "service_json", Type: field.TypeString, Size: 2147483647, Comment: "routing_profile.v1 unlock service JSON", Default: "{}"},
+		{Name: "created_at", Type: field.TypeTime, Comment: "Created at"},
+		{Name: "updated_at", Type: field.TypeTime, Comment: "Updated at"},
+	}
+	// RoutingUnlockServiceTable holds the schema information for the "routing_unlock_service" table.
+	RoutingUnlockServiceTable = &schema.Table{
+		Name:       "routing_unlock_service",
+		Columns:    RoutingUnlockServiceColumns,
+		PrimaryKey: []*schema.Column{RoutingUnlockServiceColumns[0]},
+	}
 	// SchemaMigrationsColumns holds the columns for the "schema_migrations" table.
 	SchemaMigrationsColumns = []*schema.Column{
 		{Name: "version", Type: field.TypeInt64, Comment: "迁移版本号"},
@@ -359,6 +533,10 @@ var (
 		{Name: "name", Type: field.TypeString, Size: 255, Comment: "订阅套餐名称", Default: ""},
 		{Name: "language", Type: field.TypeString, Size: 255, Comment: "语言", Default: ""},
 		{Name: "description", Type: field.TypeString, Nullable: true, Size: 2147483647, Comment: "订阅套餐描述"},
+		{Name: "short_description", Type: field.TypeString, Nullable: true, Size: 2147483647, Comment: "订阅套餐卡片简介"},
+		{Name: "features", Type: field.TypeString, Nullable: true, Size: 2147483647, Comment: "订阅套餐亮点配置"},
+		{Name: "detail_format", Type: field.TypeString, Size: 32, Comment: "订阅套餐详情格式", Default: "markdown"},
+		{Name: "detail_content", Type: field.TypeString, Nullable: true, Size: 2147483647, Comment: "订阅套餐详情正文"},
 		{Name: "unit_price", Type: field.TypeInt64, Comment: "单位价格", Default: 0},
 		{Name: "unit_time", Type: field.TypeString, Size: 255, Comment: "单位时间", Default: ""},
 		{Name: "discount", Type: field.TypeString, Nullable: true, Size: 2147483647, Comment: "折扣配置"},
@@ -452,6 +630,8 @@ var (
 	SubscribePriceOptionColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "价格档位ID"},
 		{Name: "subscribe_id", Type: field.TypeInt64, Comment: "订阅套餐ID"},
+		{Name: "code", Type: field.TypeString, Size: 64, Comment: "稳定价格档位编码", Default: ""},
+		{Name: "option_type", Type: field.TypeString, Size: 32, Comment: "价格档位类型", Default: "duration"},
 		{Name: "name", Type: field.TypeString, Size: 255, Comment: "价格档位名称", Default: ""},
 		{Name: "duration_unit", Type: field.TypeString, Size: 32, Comment: "时长单位", Default: "Month"},
 		{Name: "duration_value", Type: field.TypeInt64, Comment: "时长数值", Default: 1},
@@ -462,6 +642,7 @@ var (
 		{Name: "sell", Type: field.TypeBool, Comment: "是否售卖", Default: true},
 		{Name: "is_default", Type: field.TypeBool, Comment: "默认档位", Default: false},
 		{Name: "sort", Type: field.TypeInt32, Comment: "排序", Default: 0},
+		{Name: "version", Type: field.TypeInt32, Comment: "乐观锁版本", Default: 1},
 		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间"},
 		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间"},
 	}
@@ -470,6 +651,23 @@ var (
 		Name:       "subscribe_price_option",
 		Columns:    SubscribePriceOptionColumns,
 		PrimaryKey: []*schema.Column{SubscribePriceOptionColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "proxysubscribepriceoption_subscribe_id_code",
+				Unique:  false,
+				Columns: []*schema.Column{SubscribePriceOptionColumns[1], SubscribePriceOptionColumns[2]},
+			},
+			{
+				Name:    "proxysubscribepriceoption_subscribe_id_option_type_sell_sort",
+				Unique:  false,
+				Columns: []*schema.Column{SubscribePriceOptionColumns[1], SubscribePriceOptionColumns[3], SubscribePriceOptionColumns[11], SubscribePriceOptionColumns[13]},
+			},
+			{
+				Name:    "proxysubscribepriceoption_subscribe_id_option_type_show_sort",
+				Unique:  false,
+				Columns: []*schema.Column{SubscribePriceOptionColumns[1], SubscribePriceOptionColumns[3], SubscribePriceOptionColumns[10], SubscribePriceOptionColumns[13]},
+			},
+		},
 	}
 	// SystemColumns holds the columns for the "system" table.
 	SystemColumns = []*schema.Column{
@@ -733,6 +931,14 @@ var (
 		PaymentTable,
 		RedemptionCodeTable,
 		RedemptionRecordTable,
+		RoutingDNSResolverTable,
+		RoutingGrayReleaseTable,
+		RoutingHealthReportTable,
+		RoutingOutboundTable,
+		RoutingProfileTable,
+		RoutingRouteEventTable,
+		RoutingRuleTable,
+		RoutingUnlockServiceTable,
 		SchemaMigrationsTable,
 		ServersTable,
 		NodeGroupTable,
@@ -794,6 +1000,30 @@ func init() {
 	RedemptionRecordTable.ForeignKeys[1].RefTable = UserTable
 	RedemptionRecordTable.Annotation = &entsql.Annotation{
 		Table: "redemption_record",
+	}
+	RoutingDNSResolverTable.Annotation = &entsql.Annotation{
+		Table: "routing_dns_resolver",
+	}
+	RoutingGrayReleaseTable.Annotation = &entsql.Annotation{
+		Table: "routing_gray_release",
+	}
+	RoutingHealthReportTable.Annotation = &entsql.Annotation{
+		Table: "routing_health_report",
+	}
+	RoutingOutboundTable.Annotation = &entsql.Annotation{
+		Table: "routing_outbound",
+	}
+	RoutingProfileTable.Annotation = &entsql.Annotation{
+		Table: "routing_profile",
+	}
+	RoutingRouteEventTable.Annotation = &entsql.Annotation{
+		Table: "routing_route_event",
+	}
+	RoutingRuleTable.Annotation = &entsql.Annotation{
+		Table: "routing_rule",
+	}
+	RoutingUnlockServiceTable.Annotation = &entsql.Annotation{
+		Table: "routing_unlock_service",
 	}
 	SchemaMigrationsTable.Annotation = &entsql.Annotation{
 		Table: "schema_migrations",

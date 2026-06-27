@@ -77,6 +77,80 @@ func (_u *ProxySubscribeUpdate) ClearDescription() *ProxySubscribeUpdate {
 	return _u
 }
 
+// SetShortDescription sets the "short_description" field.
+func (_u *ProxySubscribeUpdate) SetShortDescription(v string) *ProxySubscribeUpdate {
+	_u.mutation.SetShortDescription(v)
+	return _u
+}
+
+// SetNillableShortDescription sets the "short_description" field if the given value is not nil.
+func (_u *ProxySubscribeUpdate) SetNillableShortDescription(v *string) *ProxySubscribeUpdate {
+	if v != nil {
+		_u.SetShortDescription(*v)
+	}
+	return _u
+}
+
+// ClearShortDescription clears the value of the "short_description" field.
+func (_u *ProxySubscribeUpdate) ClearShortDescription() *ProxySubscribeUpdate {
+	_u.mutation.ClearShortDescription()
+	return _u
+}
+
+// SetFeatures sets the "features" field.
+func (_u *ProxySubscribeUpdate) SetFeatures(v string) *ProxySubscribeUpdate {
+	_u.mutation.SetFeatures(v)
+	return _u
+}
+
+// SetNillableFeatures sets the "features" field if the given value is not nil.
+func (_u *ProxySubscribeUpdate) SetNillableFeatures(v *string) *ProxySubscribeUpdate {
+	if v != nil {
+		_u.SetFeatures(*v)
+	}
+	return _u
+}
+
+// ClearFeatures clears the value of the "features" field.
+func (_u *ProxySubscribeUpdate) ClearFeatures() *ProxySubscribeUpdate {
+	_u.mutation.ClearFeatures()
+	return _u
+}
+
+// SetDetailFormat sets the "detail_format" field.
+func (_u *ProxySubscribeUpdate) SetDetailFormat(v string) *ProxySubscribeUpdate {
+	_u.mutation.SetDetailFormat(v)
+	return _u
+}
+
+// SetNillableDetailFormat sets the "detail_format" field if the given value is not nil.
+func (_u *ProxySubscribeUpdate) SetNillableDetailFormat(v *string) *ProxySubscribeUpdate {
+	if v != nil {
+		_u.SetDetailFormat(*v)
+	}
+	return _u
+}
+
+// SetDetailContent sets the "detail_content" field.
+func (_u *ProxySubscribeUpdate) SetDetailContent(v string) *ProxySubscribeUpdate {
+	_u.mutation.SetDetailContent(v)
+	return _u
+}
+
+// SetNillableDetailContent sets the "detail_content" field if the given value is not nil.
+func (_u *ProxySubscribeUpdate) SetNillableDetailContent(v *string) *ProxySubscribeUpdate {
+	if v != nil {
+		_u.SetDetailContent(*v)
+	}
+	return _u
+}
+
+// ClearDetailContent clears the value of the "detail_content" field.
+func (_u *ProxySubscribeUpdate) ClearDetailContent() *ProxySubscribeUpdate {
+	_u.mutation.ClearDetailContent()
+	return _u
+}
+
 // SetUnitPrice sets the "unit_price" field.
 func (_u *ProxySubscribeUpdate) SetUnitPrice(v int64) *ProxySubscribeUpdate {
 	_u.mutation.ResetUnitPrice()
@@ -576,6 +650,11 @@ func (_u *ProxySubscribeUpdate) check() error {
 			return &ValidationError{Name: "language", err: fmt.Errorf(`ent: validator failed for field "ProxySubscribe.language": %w`, err)}
 		}
 	}
+	if v, ok := _u.mutation.DetailFormat(); ok {
+		if err := proxysubscribe.DetailFormatValidator(v); err != nil {
+			return &ValidationError{Name: "detail_format", err: fmt.Errorf(`ent: validator failed for field "ProxySubscribe.detail_format": %w`, err)}
+		}
+	}
 	if v, ok := _u.mutation.UnitTime(); ok {
 		if err := proxysubscribe.UnitTimeValidator(v); err != nil {
 			return &ValidationError{Name: "unit_time", err: fmt.Errorf(`ent: validator failed for field "ProxySubscribe.unit_time": %w`, err)}
@@ -617,6 +696,27 @@ func (_u *ProxySubscribeUpdate) sqlSave(ctx context.Context) (_node int, err err
 	}
 	if _u.mutation.DescriptionCleared() {
 		_spec.ClearField(proxysubscribe.FieldDescription, field.TypeString)
+	}
+	if value, ok := _u.mutation.ShortDescription(); ok {
+		_spec.SetField(proxysubscribe.FieldShortDescription, field.TypeString, value)
+	}
+	if _u.mutation.ShortDescriptionCleared() {
+		_spec.ClearField(proxysubscribe.FieldShortDescription, field.TypeString)
+	}
+	if value, ok := _u.mutation.Features(); ok {
+		_spec.SetField(proxysubscribe.FieldFeatures, field.TypeString, value)
+	}
+	if _u.mutation.FeaturesCleared() {
+		_spec.ClearField(proxysubscribe.FieldFeatures, field.TypeString)
+	}
+	if value, ok := _u.mutation.DetailFormat(); ok {
+		_spec.SetField(proxysubscribe.FieldDetailFormat, field.TypeString, value)
+	}
+	if value, ok := _u.mutation.DetailContent(); ok {
+		_spec.SetField(proxysubscribe.FieldDetailContent, field.TypeString, value)
+	}
+	if _u.mutation.DetailContentCleared() {
+		_spec.ClearField(proxysubscribe.FieldDetailContent, field.TypeString)
 	}
 	if value, ok := _u.mutation.UnitPrice(); ok {
 		_spec.SetField(proxysubscribe.FieldUnitPrice, field.TypeInt64, value)
@@ -814,6 +914,80 @@ func (_u *ProxySubscribeUpdateOne) SetNillableDescription(v *string) *ProxySubsc
 // ClearDescription clears the value of the "description" field.
 func (_u *ProxySubscribeUpdateOne) ClearDescription() *ProxySubscribeUpdateOne {
 	_u.mutation.ClearDescription()
+	return _u
+}
+
+// SetShortDescription sets the "short_description" field.
+func (_u *ProxySubscribeUpdateOne) SetShortDescription(v string) *ProxySubscribeUpdateOne {
+	_u.mutation.SetShortDescription(v)
+	return _u
+}
+
+// SetNillableShortDescription sets the "short_description" field if the given value is not nil.
+func (_u *ProxySubscribeUpdateOne) SetNillableShortDescription(v *string) *ProxySubscribeUpdateOne {
+	if v != nil {
+		_u.SetShortDescription(*v)
+	}
+	return _u
+}
+
+// ClearShortDescription clears the value of the "short_description" field.
+func (_u *ProxySubscribeUpdateOne) ClearShortDescription() *ProxySubscribeUpdateOne {
+	_u.mutation.ClearShortDescription()
+	return _u
+}
+
+// SetFeatures sets the "features" field.
+func (_u *ProxySubscribeUpdateOne) SetFeatures(v string) *ProxySubscribeUpdateOne {
+	_u.mutation.SetFeatures(v)
+	return _u
+}
+
+// SetNillableFeatures sets the "features" field if the given value is not nil.
+func (_u *ProxySubscribeUpdateOne) SetNillableFeatures(v *string) *ProxySubscribeUpdateOne {
+	if v != nil {
+		_u.SetFeatures(*v)
+	}
+	return _u
+}
+
+// ClearFeatures clears the value of the "features" field.
+func (_u *ProxySubscribeUpdateOne) ClearFeatures() *ProxySubscribeUpdateOne {
+	_u.mutation.ClearFeatures()
+	return _u
+}
+
+// SetDetailFormat sets the "detail_format" field.
+func (_u *ProxySubscribeUpdateOne) SetDetailFormat(v string) *ProxySubscribeUpdateOne {
+	_u.mutation.SetDetailFormat(v)
+	return _u
+}
+
+// SetNillableDetailFormat sets the "detail_format" field if the given value is not nil.
+func (_u *ProxySubscribeUpdateOne) SetNillableDetailFormat(v *string) *ProxySubscribeUpdateOne {
+	if v != nil {
+		_u.SetDetailFormat(*v)
+	}
+	return _u
+}
+
+// SetDetailContent sets the "detail_content" field.
+func (_u *ProxySubscribeUpdateOne) SetDetailContent(v string) *ProxySubscribeUpdateOne {
+	_u.mutation.SetDetailContent(v)
+	return _u
+}
+
+// SetNillableDetailContent sets the "detail_content" field if the given value is not nil.
+func (_u *ProxySubscribeUpdateOne) SetNillableDetailContent(v *string) *ProxySubscribeUpdateOne {
+	if v != nil {
+		_u.SetDetailContent(*v)
+	}
+	return _u
+}
+
+// ClearDetailContent clears the value of the "detail_content" field.
+func (_u *ProxySubscribeUpdateOne) ClearDetailContent() *ProxySubscribeUpdateOne {
+	_u.mutation.ClearDetailContent()
 	return _u
 }
 
@@ -1329,6 +1503,11 @@ func (_u *ProxySubscribeUpdateOne) check() error {
 			return &ValidationError{Name: "language", err: fmt.Errorf(`ent: validator failed for field "ProxySubscribe.language": %w`, err)}
 		}
 	}
+	if v, ok := _u.mutation.DetailFormat(); ok {
+		if err := proxysubscribe.DetailFormatValidator(v); err != nil {
+			return &ValidationError{Name: "detail_format", err: fmt.Errorf(`ent: validator failed for field "ProxySubscribe.detail_format": %w`, err)}
+		}
+	}
 	if v, ok := _u.mutation.UnitTime(); ok {
 		if err := proxysubscribe.UnitTimeValidator(v); err != nil {
 			return &ValidationError{Name: "unit_time", err: fmt.Errorf(`ent: validator failed for field "ProxySubscribe.unit_time": %w`, err)}
@@ -1387,6 +1566,27 @@ func (_u *ProxySubscribeUpdateOne) sqlSave(ctx context.Context) (_node *ProxySub
 	}
 	if _u.mutation.DescriptionCleared() {
 		_spec.ClearField(proxysubscribe.FieldDescription, field.TypeString)
+	}
+	if value, ok := _u.mutation.ShortDescription(); ok {
+		_spec.SetField(proxysubscribe.FieldShortDescription, field.TypeString, value)
+	}
+	if _u.mutation.ShortDescriptionCleared() {
+		_spec.ClearField(proxysubscribe.FieldShortDescription, field.TypeString)
+	}
+	if value, ok := _u.mutation.Features(); ok {
+		_spec.SetField(proxysubscribe.FieldFeatures, field.TypeString, value)
+	}
+	if _u.mutation.FeaturesCleared() {
+		_spec.ClearField(proxysubscribe.FieldFeatures, field.TypeString)
+	}
+	if value, ok := _u.mutation.DetailFormat(); ok {
+		_spec.SetField(proxysubscribe.FieldDetailFormat, field.TypeString, value)
+	}
+	if value, ok := _u.mutation.DetailContent(); ok {
+		_spec.SetField(proxysubscribe.FieldDetailContent, field.TypeString, value)
+	}
+	if _u.mutation.DetailContentCleared() {
+		_spec.ClearField(proxysubscribe.FieldDetailContent, field.TypeString)
 	}
 	if value, ok := _u.mutation.UnitPrice(); ok {
 		_spec.SetField(proxysubscribe.FieldUnitPrice, field.TypeInt64, value)

@@ -1,0 +1,906 @@
+syntax = "proto3";
+
+package api.admin.routing.v1;
+
+import "google/api/annotations.proto";
+
+option go_package = "github.com/npanel-dev/NPanel-backend/api/admin/routing/v1;v1";
+
+service RoutingService {
+  rpc ListRouteProfiles(ListRouteProfilesRequest) returns (ListRouteProfilesReply) {
+    option (google.api.http) = { get: "/v1/admin/routing/profiles" };
+  }
+  rpc CreateRouteProfile(CreateRouteProfileRequest) returns (RouteProfileReply) {
+    option (google.api.http) = {
+      post: "/v1/admin/routing/profile"
+      body: "*"
+    };
+  }
+  rpc UpdateRouteProfile(UpdateRouteProfileRequest) returns (RouteProfileReply) {
+    option (google.api.http) = {
+      put: "/v1/admin/routing/profile"
+      body: "*"
+    };
+  }
+  rpc DeleteRouteProfile(DeleteRouteProfileRequest) returns (DeleteRouteItemReply) {
+    option (google.api.http) = { delete: "/v1/admin/routing/profile" };
+  }
+
+  rpc ListRouteRules(ListRouteRulesRequest) returns (ListRouteRulesReply) {
+    option (google.api.http) = { get: "/v1/admin/routing/rules" };
+  }
+  rpc CreateRouteRule(CreateRouteRuleRequest) returns (RouteRuleReply) {
+    option (google.api.http) = {
+      post: "/v1/admin/routing/rule"
+      body: "*"
+    };
+  }
+  rpc UpdateRouteRule(UpdateRouteRuleRequest) returns (RouteRuleReply) {
+    option (google.api.http) = {
+      put: "/v1/admin/routing/rule"
+      body: "*"
+    };
+  }
+  rpc DeleteRouteRule(DeleteRouteRuleRequest) returns (DeleteRouteItemReply) {
+    option (google.api.http) = { delete: "/v1/admin/routing/rule" };
+  }
+
+  rpc ListDnsResolvers(ListDnsResolversRequest) returns (ListDnsResolversReply) {
+    option (google.api.http) = { get: "/v1/admin/routing/dns_resolvers" };
+  }
+  rpc CreateDnsResolver(CreateDnsResolverRequest) returns (DnsResolverReply) {
+    option (google.api.http) = {
+      post: "/v1/admin/routing/dns_resolver"
+      body: "*"
+    };
+  }
+  rpc UpdateDnsResolver(UpdateDnsResolverRequest) returns (DnsResolverReply) {
+    option (google.api.http) = {
+      put: "/v1/admin/routing/dns_resolver"
+      body: "*"
+    };
+  }
+  rpc DeleteDnsResolver(DeleteDnsResolverRequest) returns (DeleteRouteItemReply) {
+    option (google.api.http) = { delete: "/v1/admin/routing/dns_resolver" };
+  }
+
+  rpc ListRouteOutbounds(ListRouteOutboundsRequest) returns (ListRouteOutboundsReply) {
+    option (google.api.http) = { get: "/v1/admin/routing/outbounds" };
+  }
+  rpc CreateRouteOutbound(CreateRouteOutboundRequest) returns (RouteOutboundReply) {
+    option (google.api.http) = {
+      post: "/v1/admin/routing/outbound"
+      body: "*"
+    };
+  }
+  rpc UpdateRouteOutbound(UpdateRouteOutboundRequest) returns (RouteOutboundReply) {
+    option (google.api.http) = {
+      put: "/v1/admin/routing/outbound"
+      body: "*"
+    };
+  }
+  rpc DeleteRouteOutbound(DeleteRouteOutboundRequest) returns (DeleteRouteItemReply) {
+    option (google.api.http) = { delete: "/v1/admin/routing/outbound" };
+  }
+
+  rpc ListUnlockServices(ListUnlockServicesRequest) returns (ListUnlockServicesReply) {
+    option (google.api.http) = { get: "/v1/admin/routing/unlock_services" };
+  }
+  rpc CreateUnlockService(CreateUnlockServiceRequest) returns (UnlockServiceReply) {
+    option (google.api.http) = {
+      post: "/v1/admin/routing/unlock_service"
+      body: "*"
+    };
+  }
+  rpc UpdateUnlockService(UpdateUnlockServiceRequest) returns (UnlockServiceReply) {
+    option (google.api.http) = {
+      put: "/v1/admin/routing/unlock_service"
+      body: "*"
+    };
+  }
+  rpc DeleteUnlockService(DeleteUnlockServiceRequest) returns (DeleteRouteItemReply) {
+    option (google.api.http) = { delete: "/v1/admin/routing/unlock_service" };
+  }
+
+  rpc PreviewRouteConfig(PreviewRouteConfigRequest) returns (PreviewRouteConfigReply) {
+    option (google.api.http) = {
+      post: "/v1/admin/routing/preview"
+      body: "*"
+    };
+  }
+
+  rpc GetRoutingOverview(GetRoutingOverviewRequest) returns (GetRoutingOverviewReply) {
+    option (google.api.http) = { get: "/v1/admin/routing/overview" };
+  }
+
+  rpc ListRoutingHealthReports(ListRoutingHealthReportsRequest) returns (ListRoutingHealthReportsReply) {
+    option (google.api.http) = { get: "/v1/admin/routing/health_reports" };
+  }
+
+  rpc ListRoutingRouteEvents(ListRoutingRouteEventsRequest) returns (ListRoutingRouteEventsReply) {
+    option (google.api.http) = { get: "/v1/admin/routing/route_events" };
+  }
+
+  rpc GetRoutingAnalytics(GetRoutingAnalyticsRequest) returns (GetRoutingAnalyticsReply) {
+    option (google.api.http) = { get: "/v1/admin/routing/analytics" };
+  }
+
+  rpc ListRoutingGrayReleases(ListRoutingGrayReleasesRequest) returns (ListRoutingGrayReleasesReply) {
+    option (google.api.http) = { get: "/v1/admin/routing/gray_releases" };
+  }
+  rpc CreateRoutingGrayRelease(CreateRoutingGrayReleaseRequest) returns (RoutingGrayReleaseReply) {
+    option (google.api.http) = {
+      post: "/v1/admin/routing/gray_release"
+      body: "*"
+    };
+  }
+  rpc UpdateRoutingGrayRelease(UpdateRoutingGrayReleaseRequest) returns (RoutingGrayReleaseReply) {
+    option (google.api.http) = {
+      put: "/v1/admin/routing/gray_release"
+      body: "*"
+    };
+  }
+  rpc DeleteRoutingGrayRelease(DeleteRoutingGrayReleaseRequest) returns (DeleteRouteItemReply) {
+    option (google.api.http) = { delete: "/v1/admin/routing/gray_release" };
+  }
+  rpc ActRoutingGrayRelease(ActRoutingGrayReleaseRequest) returns (RoutingGrayReleaseReply) {
+    option (google.api.http) = {
+      post: "/v1/admin/routing/gray_release/action"
+      body: "*"
+    };
+  }
+
+  rpc GetRoutingReleaseGate(GetRoutingReleaseGateRequest) returns (GetRoutingReleaseGateReply) {
+    option (google.api.http) = { get: "/v1/admin/routing/release_gate" };
+  }
+
+  rpc GetRoutingE2EChecklist(GetRoutingE2EChecklistRequest) returns (GetRoutingE2EChecklistReply) {
+    option (google.api.http) = { get: "/v1/admin/routing/e2e_checklist" };
+  }
+
+  rpc GetRoutingCapabilityMatrix(GetRoutingCapabilityMatrixRequest) returns (GetRoutingCapabilityMatrixReply) {
+    option (google.api.http) = { get: "/v1/admin/routing/capability_matrix" };
+  }
+
+  rpc GetRoutingReleaseReport(GetRoutingReleaseReportRequest) returns (GetRoutingReleaseReportReply) {
+    option (google.api.http) = { get: "/v1/admin/routing/release_report" };
+  }
+
+  rpc SnapshotRoutingReleaseAudit(SnapshotRoutingReleaseAuditRequest) returns (SnapshotRoutingReleaseAuditReply) {
+    option (google.api.http) = {
+      post: "/v1/admin/routing/release_audit_snapshot"
+      body: "*"
+    };
+  }
+
+  rpc ConfirmRoutingReleaseEnforce(ConfirmRoutingReleaseEnforceRequest) returns (ConfirmRoutingReleaseEnforceReply) {
+    option (google.api.http) = {
+      post: "/v1/admin/routing/release_confirm"
+      body: "*"
+    };
+  }
+
+  rpc RollbackRoutingReleaseAudit(RollbackRoutingReleaseAuditRequest) returns (RollbackRoutingReleaseAuditReply) {
+    option (google.api.http) = {
+      post: "/v1/admin/routing/release_rollback"
+      body: "*"
+    };
+  }
+
+  rpc GetRoutingTrendReport(GetRoutingTrendReportRequest) returns (GetRoutingTrendReportReply) {
+    option (google.api.http) = { get: "/v1/admin/routing/trend_report" };
+  }
+
+  rpc GetRoutingDrilldownReport(GetRoutingDrilldownReportRequest) returns (GetRoutingDrilldownReportReply) {
+    option (google.api.http) = { get: "/v1/admin/routing/drilldown_report" };
+  }
+
+  rpc ListRoutingNotifications(ListRoutingNotificationsRequest) returns (ListRoutingNotificationsReply) {
+    option (google.api.http) = { get: "/v1/admin/routing/notifications" };
+  }
+}
+
+message RouteProfile {
+  int64 id = 1;
+  string code = 2;
+  string name = 3;
+  string description = 4;
+  string scope_type = 5;
+  string scope_id = 6;
+  int32 priority = 7;
+  string mode = 8;
+  bool enabled = 9;
+  string profile_json = 10;
+  int64 created_at = 11;
+  int64 updated_at = 12;
+}
+
+message RouteRule {
+  int64 id = 1;
+  int64 profile_id = 2;
+  string name = 3;
+  int32 priority = 4;
+  bool enabled = 5;
+  string service_code = 6;
+  string matcher_json = 7;
+  string action_json = 8;
+  int64 created_at = 9;
+  int64 updated_at = 10;
+}
+
+message DnsResolver {
+  int64 id = 1;
+  string tag = 2;
+  string name = 3;
+  string proto = 4;
+  string address = 5;
+  int32 port = 6;
+  bool enabled = 7;
+  string resolver_json = 8;
+  int64 created_at = 9;
+  int64 updated_at = 10;
+}
+
+message RouteOutbound {
+  int64 id = 1;
+  string tag = 2;
+  string name = 3;
+  string type = 4;
+  string region = 5;
+  bool enabled = 6;
+  string outbound_json = 7;
+  int64 created_at = 8;
+  int64 updated_at = 9;
+}
+
+message UnlockService {
+  int64 id = 1;
+  string code = 2;
+  string name = 3;
+  string category = 4;
+  bool enabled = 5;
+  string service_json = 6;
+  int64 created_at = 7;
+  int64 updated_at = 8;
+}
+
+message ListRouteProfilesRequest { int64 page = 1; int64 size = 2; string search = 3; }
+message CreateRouteProfileRequest { RouteProfile profile = 1; }
+message UpdateRouteProfileRequest { RouteProfile profile = 1; }
+message DeleteRouteProfileRequest { int64 id = 1; }
+message RouteProfileData { RouteProfile profile = 1; }
+message RouteProfileListData { repeated RouteProfile list = 1; int32 total = 2; }
+message RouteProfileReply { int32 code = 1; string message = 2; RouteProfileData data = 3; }
+message ListRouteProfilesReply { int32 code = 1; string message = 2; RouteProfileListData data = 3; }
+
+message ListRouteRulesRequest { int64 page = 1; int64 size = 2; int64 profile_id = 3; string search = 4; }
+message CreateRouteRuleRequest { RouteRule rule = 1; }
+message UpdateRouteRuleRequest { RouteRule rule = 1; }
+message DeleteRouteRuleRequest { int64 id = 1; }
+message RouteRuleData { RouteRule rule = 1; }
+message RouteRuleListData { repeated RouteRule list = 1; int32 total = 2; }
+message RouteRuleReply { int32 code = 1; string message = 2; RouteRuleData data = 3; }
+message ListRouteRulesReply { int32 code = 1; string message = 2; RouteRuleListData data = 3; }
+
+message ListDnsResolversRequest { int64 page = 1; int64 size = 2; string search = 3; }
+message CreateDnsResolverRequest { DnsResolver resolver = 1; }
+message UpdateDnsResolverRequest { DnsResolver resolver = 1; }
+message DeleteDnsResolverRequest { int64 id = 1; }
+message DnsResolverData { DnsResolver resolver = 1; }
+message DnsResolverListData { repeated DnsResolver list = 1; int32 total = 2; }
+message DnsResolverReply { int32 code = 1; string message = 2; DnsResolverData data = 3; }
+message ListDnsResolversReply { int32 code = 1; string message = 2; DnsResolverListData data = 3; }
+
+message ListRouteOutboundsRequest { int64 page = 1; int64 size = 2; string search = 3; }
+message CreateRouteOutboundRequest { RouteOutbound outbound = 1; }
+message UpdateRouteOutboundRequest { RouteOutbound outbound = 1; }
+message DeleteRouteOutboundRequest { int64 id = 1; }
+message RouteOutboundData { RouteOutbound outbound = 1; }
+message RouteOutboundListData { repeated RouteOutbound list = 1; int32 total = 2; }
+message RouteOutboundReply { int32 code = 1; string message = 2; RouteOutboundData data = 3; }
+message ListRouteOutboundsReply { int32 code = 1; string message = 2; RouteOutboundListData data = 3; }
+
+message ListUnlockServicesRequest { int64 page = 1; int64 size = 2; string search = 3; }
+message CreateUnlockServiceRequest { UnlockService service = 1; }
+message UpdateUnlockServiceRequest { UnlockService service = 1; }
+message DeleteUnlockServiceRequest { int64 id = 1; }
+message UnlockServiceData { UnlockService service = 1; }
+message UnlockServiceListData { repeated UnlockService list = 1; int32 total = 2; }
+message UnlockServiceReply { int32 code = 1; string message = 2; UnlockServiceData data = 3; }
+message ListUnlockServicesReply { int32 code = 1; string message = 2; UnlockServiceListData data = 3; }
+
+message DeleteRouteItemData { bool success = 1; }
+message DeleteRouteItemReply { int32 code = 1; string message = 2; DeleteRouteItemData data = 3; }
+
+message PreviewRouteConfigRequest {
+  string domain = 1;
+  string ip = 2;
+  int32 port = 3;
+  int64 user_id = 4;
+  int64 node_id = 5;
+  repeated string supported_features = 6;
+  int64 subscribe_id = 7;
+  int64 user_subscribe_id = 8;
+  string subscribe_token = 9;
+}
+
+message PreviewRouteResult {
+  string routing_hash = 1;
+  string profile_code = 2;
+  string profile_name = 3;
+  bool matched = 4;
+  string rule_id = 5;
+  string rule_name = 6;
+  string action_type = 7;
+  string dns_resolver_tag = 8;
+  string outbound_tag = 9;
+  string fallback_policy = 10;
+  repeated string unsupported_features = 11;
+  string effective_mode = 12;
+  bool execution_enabled = 13;
+  string scope_type = 14;
+  string scope_id = 15;
+}
+
+message PreviewRouteConfigReply {
+  int32 code = 1;
+  string message = 2;
+  PreviewRouteResult data = 3;
+}
+
+message GetRoutingOverviewRequest {}
+
+message RoutingHealthReport {
+  int64 id = 1;
+  string reporter_type = 2;
+  string reporter_id = 3;
+  string profile_code = 4;
+  string routing_hash = 5;
+  string subject_type = 6;
+  string subject_key = 7;
+  string region = 8;
+  string status = 9;
+  string source = 10;
+  int32 rtt_ms = 11;
+  int32 consecutive_failures = 12;
+  string last_error = 13;
+  string outbound_tag = 14;
+  string dns_resolver_tag = 15;
+  int64 checked_at = 16;
+  string report_json = 17;
+  int64 created_at = 18;
+  int64 updated_at = 19;
+}
+
+message ListRoutingHealthReportsRequest {
+  int64 page = 1;
+  int64 size = 2;
+  string subject_type = 3;
+  string subject_key = 4;
+  string reporter_type = 5;
+}
+
+message RoutingHealthReportListData {
+  repeated RoutingHealthReport list = 1;
+  int32 total = 2;
+}
+
+message ListRoutingHealthReportsReply {
+  int32 code = 1;
+  string message = 2;
+  RoutingHealthReportListData data = 3;
+}
+
+message RoutingRouteEvent {
+  int64 id = 1;
+  string reporter_type = 2;
+  string reporter_id = 3;
+  string profile_code = 4;
+  string routing_hash = 5;
+  string event_type = 6;
+  string subject = 7;
+  string rule_id = 8;
+  string rule_name = 9;
+  string action_type = 10;
+  string outbound_tag = 11;
+  string dns_resolver_tag = 12;
+  string fallback_target = 13;
+  string status = 14;
+  int32 latency_ms = 15;
+  string error = 16;
+  int64 event_at = 17;
+  string event_json = 18;
+  int64 created_at = 19;
+  int64 updated_at = 20;
+}
+
+message ListRoutingRouteEventsRequest {
+  int64 page = 1;
+  int64 size = 2;
+  string event_type = 3;
+  string profile_code = 4;
+  string reporter_type = 5;
+}
+
+message RoutingRouteEventListData {
+  repeated RoutingRouteEvent list = 1;
+  int32 total = 2;
+}
+
+message ListRoutingRouteEventsReply {
+  int32 code = 1;
+  string message = 2;
+  RoutingRouteEventListData data = 3;
+}
+
+message RoutingAnalyticsItem {
+  string profile_code = 1;
+  string routing_hash = 2;
+  string reporter_id = 3;
+  int32 route_events = 4;
+  int32 route_decisions = 5;
+  int32 route_fallbacks = 6;
+  int32 fallback_rate_bp = 7;
+  int32 dns_failures = 8;
+  int32 outbound_failures = 9;
+  int32 affected_reporters = 10;
+  string last_event_type = 11;
+  string last_status = 12;
+  string last_error = 13;
+  int64 last_seen_at = 14;
+}
+
+message RoutingAnalyticsError {
+  string key = 1;
+  string kind = 2;
+  string error = 3;
+  int32 count = 4;
+}
+
+message GetRoutingAnalyticsRequest {
+  string profile_code = 1;
+  string routing_hash = 2;
+  int64 window_minutes = 3;
+}
+
+message RoutingAnalyticsData {
+  repeated RoutingAnalyticsItem items = 1;
+  repeated RoutingAnalyticsError top_errors = 2;
+  int32 total_route_events = 3;
+  int32 total_health_reports = 4;
+  int32 affected_reporters = 5;
+  int32 fallback_rate_bp = 6;
+  int32 dns_fail_rate_bp = 7;
+  int32 outbound_fail_rate_bp = 8;
+  int64 window_started_at = 9;
+}
+
+message GetRoutingAnalyticsReply {
+  int32 code = 1;
+  string message = 2;
+  RoutingAnalyticsData data = 3;
+}
+
+message RoutingGrayRelease {
+  int64 id = 1;
+  string profile_code = 2;
+  string name = 3;
+  string status = 4;
+  int32 batch_no = 5;
+  string target_type = 6;
+  string target_ids_json = 7;
+  string operator = 8;
+  string rollback_reason = 9;
+  int64 started_at = 10;
+  int64 ended_at = 11;
+  string release_json = 12;
+  int32 target_count = 13;
+  int64 created_at = 14;
+  int64 updated_at = 15;
+}
+
+message ListRoutingGrayReleasesRequest {
+  int64 page = 1;
+  int64 size = 2;
+  string profile_code = 3;
+  string status = 4;
+}
+
+message CreateRoutingGrayReleaseRequest { RoutingGrayRelease release = 1; }
+message UpdateRoutingGrayReleaseRequest { RoutingGrayRelease release = 1; }
+message DeleteRoutingGrayReleaseRequest { int64 id = 1; }
+
+message ActRoutingGrayReleaseRequest {
+  int64 id = 1;
+  string action = 2;
+  string operator = 3;
+  string reason = 4;
+}
+
+message RoutingGrayReleaseData { RoutingGrayRelease release = 1; }
+message RoutingGrayReleaseListData { repeated RoutingGrayRelease list = 1; int32 total = 2; }
+message RoutingGrayReleaseReply { int32 code = 1; string message = 2; RoutingGrayReleaseData data = 3; }
+message ListRoutingGrayReleasesReply { int32 code = 1; string message = 2; RoutingGrayReleaseListData data = 3; }
+
+message RoutingReleaseGateCheck {
+  string key = 1;
+  string label = 2;
+  bool passed = 3;
+  string status = 4;
+  string reason = 5;
+}
+
+message RoutingReleaseGate {
+  string profile_code = 1;
+  string routing_hash = 2;
+  bool allowed = 3;
+  bool requires_confirmation = 4;
+  string summary = 5;
+  repeated RoutingReleaseGateCheck checks = 6;
+  RoutingAnalyticsData analytics = 7;
+  int64 generated_at = 8;
+  RoutingReleaseThresholds thresholds = 9;
+}
+
+message GetRoutingReleaseGateRequest {
+  string profile_code = 1;
+  string routing_hash = 2;
+  int64 window_minutes = 3;
+  RoutingReleaseThresholds thresholds = 4;
+  int32 fallback_rate_bp = 5;
+  int32 dns_fail_rate_bp = 6;
+  int32 outbound_fail_rate_bp = 7;
+  int32 top_errors_max = 8;
+  int32 min_route_events = 9;
+  int32 min_health_reports = 10;
+}
+
+message GetRoutingReleaseGateReply {
+  int32 code = 1;
+  string message = 2;
+  RoutingReleaseGate data = 3;
+}
+
+message RoutingE2EChecklistItem {
+  string key = 1;
+  string label = 2;
+  string status = 3;
+  bool passed = 4;
+  string evidence = 5;
+}
+
+message GetRoutingE2EChecklistRequest {
+  string profile_code = 1;
+}
+
+message RoutingE2EChecklistData {
+  repeated RoutingE2EChecklistItem items = 1;
+  bool ready = 2;
+  int64 generated_at = 3;
+}
+
+message GetRoutingE2EChecklistReply {
+  int32 code = 1;
+  string message = 2;
+  RoutingE2EChecklistData data = 3;
+}
+
+message RoutingCapabilityMatrixItem {
+  string client = 1;
+  string panel = 2;
+  string min_version = 3;
+  repeated string supported_features = 4;
+  repeated string missing_features = 5;
+  string execution_mode = 6;
+  bool enforce_candidate = 7;
+  string notes = 8;
+}
+
+message GetRoutingCapabilityMatrixRequest {}
+
+message RoutingCapabilityMatrixData {
+  repeated RoutingCapabilityMatrixItem items = 1;
+  int64 generated_at = 2;
+}
+
+message GetRoutingCapabilityMatrixReply {
+  int32 code = 1;
+  string message = 2;
+  RoutingCapabilityMatrixData data = 3;
+}
+
+message RoutingReleaseThresholds {
+  int32 fallback_rate_bp = 1;
+  int32 dns_fail_rate_bp = 2;
+  int32 outbound_fail_rate_bp = 3;
+  int32 top_errors_max = 4;
+  int32 min_route_events = 5;
+  int32 min_health_reports = 6;
+}
+
+message RoutingReleaseAlert {
+  string key = 1;
+  string severity = 2;
+  string message = 3;
+  string evidence = 4;
+}
+
+message RoutingReleaseAuditSnapshot {
+  string id = 1;
+  int64 release_id = 2;
+  string profile_code = 3;
+  string routing_hash = 4;
+  string operator = 5;
+  bool allowed = 6;
+  string summary = 7;
+  RoutingReleaseThresholds thresholds = 8;
+  RoutingReleaseGate gate = 9;
+  repeated RoutingReleaseAlert alerts = 10;
+  string report_json = 11;
+  int64 created_at = 12;
+}
+
+message RoutingReleaseApproval {
+  string id = 1;
+  int64 release_id = 2;
+  string snapshot_id = 3;
+  string profile_code = 4;
+  string routing_hash = 5;
+  string operator = 6;
+  string reason = 7;
+  int64 confirmed_at = 8;
+}
+
+message RoutingRollbackAudit {
+  string id = 1;
+  int64 release_id = 2;
+  string profile_code = 3;
+  string routing_hash = 4;
+  string operator = 5;
+  string reason = 6;
+  string before_mode = 7;
+  string after_mode = 8;
+  string before_release_status = 9;
+  string after_release_status = 10;
+  string summary = 11;
+  repeated RoutingReleaseAlert alerts = 12;
+  int64 created_at = 13;
+}
+
+message RoutingReleaseReport {
+  string profile_code = 1;
+  string routing_hash = 2;
+  RoutingReleaseThresholds thresholds = 3;
+  RoutingReleaseGate gate = 4;
+  repeated RoutingReleaseAlert alerts = 5;
+  repeated RoutingReleaseAuditSnapshot snapshots = 6;
+  int64 generated_at = 7;
+  repeated RoutingReleaseApproval approvals = 8;
+  repeated RoutingRollbackAudit rollback_audits = 9;
+}
+
+message GetRoutingReleaseReportRequest {
+  int64 release_id = 1;
+  string profile_code = 2;
+  string routing_hash = 3;
+  int64 window_minutes = 4;
+  RoutingReleaseThresholds thresholds = 5;
+  int32 fallback_rate_bp = 6;
+  int32 dns_fail_rate_bp = 7;
+  int32 outbound_fail_rate_bp = 8;
+  int32 top_errors_max = 9;
+  int32 min_route_events = 10;
+  int32 min_health_reports = 11;
+}
+
+message GetRoutingReleaseReportReply {
+  int32 code = 1;
+  string message = 2;
+  RoutingReleaseReport data = 3;
+}
+
+message SnapshotRoutingReleaseAuditRequest {
+  int64 release_id = 1;
+  string profile_code = 2;
+  string routing_hash = 3;
+  int64 window_minutes = 4;
+  string operator = 5;
+  RoutingReleaseThresholds thresholds = 6;
+}
+
+message SnapshotRoutingReleaseAuditReply {
+  int32 code = 1;
+  string message = 2;
+  RoutingReleaseAuditSnapshot data = 3;
+}
+
+message ConfirmRoutingReleaseEnforceRequest {
+  int64 release_id = 1;
+  string snapshot_id = 2;
+  string profile_code = 3;
+  string routing_hash = 4;
+  string operator = 5;
+  string reason = 6;
+}
+
+message ConfirmRoutingReleaseEnforceReply {
+  int32 code = 1;
+  string message = 2;
+  RoutingReleaseApproval data = 3;
+}
+
+message RollbackRoutingReleaseAuditRequest {
+  int64 release_id = 1;
+  string profile_code = 2;
+  string routing_hash = 3;
+  int64 window_minutes = 4;
+  string operator = 5;
+  string reason = 6;
+}
+
+message RollbackRoutingReleaseAuditReply {
+  int32 code = 1;
+  string message = 2;
+  RoutingRollbackAudit data = 3;
+}
+
+message RoutingTrendPoint {
+  int64 bucket_start = 1;
+  int32 route_events = 2;
+  int32 route_fallbacks = 3;
+  int32 fallback_rate_bp = 4;
+  int32 dns_failures = 5;
+  int32 outbound_failures = 6;
+  int32 health_reports = 7;
+  int32 affected_reporters = 8;
+}
+
+message RoutingTrendMarker {
+  int64 at = 1;
+  string type = 2;
+  string label = 3;
+  string operator = 4;
+}
+
+message RoutingTrendReport {
+  string profile_code = 1;
+  string routing_hash = 2;
+  int64 window_minutes = 3;
+  int64 bucket_minutes = 4;
+  repeated RoutingTrendPoint points = 5;
+  repeated RoutingTrendMarker markers = 6;
+  int64 generated_at = 7;
+}
+
+message GetRoutingTrendReportRequest {
+  string profile_code = 1;
+  string routing_hash = 2;
+  int64 window_minutes = 3;
+  int64 bucket_minutes = 4;
+}
+
+message GetRoutingTrendReportReply {
+  int32 code = 1;
+  string message = 2;
+  RoutingTrendReport data = 3;
+}
+
+message RoutingDrilldownItem {
+  string key = 1;
+  string label = 2;
+  int32 route_events = 3;
+  int32 route_fallbacks = 4;
+  int32 fallback_rate_bp = 5;
+  int32 dns_failures = 6;
+  int32 outbound_failures = 7;
+  int32 health_reports = 8;
+  int32 affected_reporters = 9;
+  string last_error = 10;
+  int64 last_seen_at = 11;
+}
+
+message RoutingDrilldownReport {
+  string profile_code = 1;
+  string routing_hash = 2;
+  string group_by = 3;
+  int64 window_minutes = 4;
+  repeated RoutingDrilldownItem items = 5;
+  int64 generated_at = 6;
+}
+
+message GetRoutingDrilldownReportRequest {
+  string profile_code = 1;
+  string routing_hash = 2;
+  string group_by = 3;
+  int64 window_minutes = 4;
+}
+
+message GetRoutingDrilldownReportReply {
+  int32 code = 1;
+  string message = 2;
+  RoutingDrilldownReport data = 3;
+}
+
+message RoutingNotification {
+  string id = 1;
+  string severity = 2;
+  string title = 3;
+  string message = 4;
+  string source = 5;
+  string profile_code = 6;
+  string routing_hash = 7;
+  int64 created_at = 8;
+}
+
+message RoutingNotificationListData {
+  repeated RoutingNotification list = 1;
+  int32 total = 2;
+  int64 generated_at = 3;
+}
+
+message ListRoutingNotificationsRequest {
+  string profile_code = 1;
+  string routing_hash = 2;
+  int64 window_minutes = 3;
+  string severity = 4;
+}
+
+message ListRoutingNotificationsReply {
+  int32 code = 1;
+  string message = 2;
+  RoutingNotificationListData data = 3;
+}
+
+message RoutingHealthItem {
+  string kind = 1;
+  string key = 2;
+  string name = 3;
+  string status = 4;
+  string source = 5;
+  int64 checked_at = 6;
+  int32 rtt_ms = 7;
+  int32 consecutive_failures = 8;
+  string last_error = 9;
+  string outbound_tag = 10;
+  string dns_resolver_tag = 11;
+}
+
+message RoutingEnforceGuard {
+  string key = 1;
+  string label = 2;
+  bool passed = 3;
+  string status = 4;
+  string reason = 5;
+}
+
+message RoutingAuditEvent {
+  string id = 1;
+  string resource_type = 2;
+  string resource_id = 3;
+  string resource_name = 4;
+  string action = 5;
+  string summary = 6;
+  int64 created_at = 7;
+}
+
+message RoutingOverview {
+  string routing_hash = 1;
+  string generated_at = 2;
+  string profile_code = 3;
+  string profile_name = 4;
+  string mode = 5;
+  bool profile_enabled = 6;
+  bool enforce_ready = 7;
+  bool execution_enabled = 8;
+  string rollback_action = 9;
+  string compile_error = 10;
+  repeated RoutingHealthItem health = 11;
+  repeated RoutingEnforceGuard guards = 12;
+  repeated RoutingAuditEvent audit_events = 13;
+}
+
+message GetRoutingOverviewReply {
+  int32 code = 1;
+  string message = 2;
+  RoutingOverview data = 3;
+}

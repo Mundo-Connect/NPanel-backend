@@ -46,6 +46,10 @@ func (r *subscribeRepo) CreateSubscribe(ctx context.Context, sub *model.Subscrib
 		SetName(sub.Name).
 		SetLanguage(sub.Language).
 		SetDescription(sub.Description).
+		SetShortDescription(sub.ShortDescription).
+		SetFeatures(sub.Features).
+		SetDetailFormat(sub.DetailFormat).
+		SetDetailContent(sub.DetailContent).
 		SetUnitPrice(sub.UnitPrice).
 		SetUnitTime(sub.UnitTime).
 		SetDiscount(sub.Discount).
@@ -74,7 +78,7 @@ func (r *subscribeRepo) CreateSubscribe(ctx context.Context, sub *model.Subscrib
 		return rollback(tx, err)
 	}
 
-	if err := r.replaceSubscribePriceOptions(ctx, tx, created.ID, sub.PriceOptions); err != nil {
+	if err := r.syncSubscribePriceOptions(ctx, tx, created.ID, sub.PriceOptions); err != nil {
 		return rollback(tx, err)
 	}
 
@@ -99,6 +103,10 @@ func (r *subscribeRepo) UpdateSubscribe(ctx context.Context, sub *model.Subscrib
 		SetName(sub.Name).
 		SetLanguage(sub.Language).
 		SetDescription(sub.Description).
+		SetShortDescription(sub.ShortDescription).
+		SetFeatures(sub.Features).
+		SetDetailFormat(sub.DetailFormat).
+		SetDetailContent(sub.DetailContent).
 		SetUnitPrice(sub.UnitPrice).
 		SetUnitTime(sub.UnitTime).
 		SetDiscount(sub.Discount).
@@ -125,7 +133,7 @@ func (r *subscribeRepo) UpdateSubscribe(ctx context.Context, sub *model.Subscrib
 		Exec(ctx); err != nil {
 		return rollback(tx, err)
 	}
-	if err := r.replaceSubscribePriceOptions(ctx, tx, sub.ID, sub.PriceOptions); err != nil {
+	if err := r.syncSubscribePriceOptions(ctx, tx, sub.ID, sub.PriceOptions); err != nil {
 		return rollback(tx, err)
 	}
 	return tx.Commit()
@@ -250,15 +258,64 @@ func (r *subscribeRepo) GetSubscribePriceOptionsBySubscribeIDs(ctx context.Conte
 	return result, nil
 }
 
-func (r *subscribeRepo) replaceSubscribePriceOptions(ctx context.Context, tx *ent.Tx, subscribeID int64, options []model.SubscribePriceOption) error {
-	if _, err := tx.ProxySubscribePriceOption.Delete().
+func (r *subscribeRepo) syncSubscribePriceOptions(ctx context.Context, tx *ent.Tx, subscribeID int64, options []model.SubscribePriceOption) error {
+	existing, err := tx.ProxySubscribePriceOption.Query().
 		Where(proxysubscribepriceoption.SubscribeIDEQ(subscribeID)).
-		Exec(ctx); err != nil {
+		All(ctx)
+	if err != nil {
 		return err
 	}
+	existingByID := make(map[int64]*ent.ProxySubscribePriceOption, len(existing))
+	for _, item := range existing {
+		existingByID[item.ID] = item
+	}
 	for _, option := range options {
-		if _, err := tx.ProxySubscribePriceOption.Create().
+		if option.ID > 0 {
+			existingOption, ok := existingByID[option.ID]
+			if !ok {
+				return fmt.Errorf("price option %d does not belong to subscribe %d", option.ID, subscribeID)
+			}
+			if existingOption.SubscribeID != subscribeID {
+				return fmt.Errorf("price option %d does not belong to subscribe %d", option.ID, subscribeID)
+			}
+			if option.UpdatedAt > 0 && existingOption.UpdatedAt.Unix() > option.UpdatedAt {
+				return model.ErrSubscribePriceOptionModified
+			}
+			if !priceOptionChanged(existingOption, option) {
+				continue
+			}
+			affected, err := tx.ProxySubscribePriceOption.Update().
+				Where(
+					proxysubscribepriceoption.IDEQ(option.ID),
+					proxysubscribepriceoption.SubscribeIDEQ(subscribeID),
+					proxysubscribepriceoption.VersionEQ(option.Version),
+				).
+				SetCode(option.Code).
+				SetOptionType(option.Type).
+				SetName(option.Name).
+				SetDurationUnit(option.DurationUnit).
+				SetDurationValue(option.DurationValue).
+				SetPrice(option.Price).
+				SetOriginalPrice(option.OriginalPrice).
+				SetInventory(int32(option.Inventory)).
+				SetShow(option.Show).
+				SetSell(option.Sell).
+				SetIsDefault(option.IsDefault).
+				SetSort(int32(option.Sort)).
+				AddVersion(1).
+				Save(ctx)
+			if err != nil {
+				return err
+			}
+			if affected == 0 {
+				return model.ErrSubscribePriceOptionModified
+			}
+			continue
+		}
+		_, err := tx.ProxySubscribePriceOption.Create().
 			SetSubscribeID(subscribeID).
+			SetCode(option.Code).
+			SetOptionType(option.Type).
 			SetName(option.Name).
 			SetDurationUnit(option.DurationUnit).
 			SetDurationValue(option.DurationValue).
@@ -269,11 +326,28 @@ func (r *subscribeRepo) replaceSubscribePriceOptions(ctx context.Context, tx *en
 			SetSell(option.Sell).
 			SetIsDefault(option.IsDefault).
 			SetSort(int32(option.Sort)).
-			Save(ctx); err != nil {
+			SetVersion(1).
+			Save(ctx)
+		if err != nil {
 			return err
 		}
 	}
 	return nil
+}
+
+func priceOptionChanged(existing *ent.ProxySubscribePriceOption, option model.SubscribePriceOption) bool {
+	return existing.Code != option.Code ||
+		existing.OptionType != option.Type ||
+		existing.Name != option.Name ||
+		existing.DurationUnit != option.DurationUnit ||
+		existing.DurationValue != option.DurationValue ||
+		existing.Price != option.Price ||
+		existing.OriginalPrice != option.OriginalPrice ||
+		existing.Inventory != int32(option.Inventory) ||
+		existing.Show != option.Show ||
+		existing.Sell != option.Sell ||
+		existing.IsDefault != option.IsDefault ||
+		existing.Sort != int32(option.Sort)
 }
 
 // GetSubscribeMinSort get minimum sort value for given IDs

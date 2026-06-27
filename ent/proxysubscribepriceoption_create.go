@@ -26,6 +26,34 @@ func (_c *ProxySubscribePriceOptionCreate) SetSubscribeID(v int64) *ProxySubscri
 	return _c
 }
 
+// SetCode sets the "code" field.
+func (_c *ProxySubscribePriceOptionCreate) SetCode(v string) *ProxySubscribePriceOptionCreate {
+	_c.mutation.SetCode(v)
+	return _c
+}
+
+// SetNillableCode sets the "code" field if the given value is not nil.
+func (_c *ProxySubscribePriceOptionCreate) SetNillableCode(v *string) *ProxySubscribePriceOptionCreate {
+	if v != nil {
+		_c.SetCode(*v)
+	}
+	return _c
+}
+
+// SetOptionType sets the "option_type" field.
+func (_c *ProxySubscribePriceOptionCreate) SetOptionType(v string) *ProxySubscribePriceOptionCreate {
+	_c.mutation.SetOptionType(v)
+	return _c
+}
+
+// SetNillableOptionType sets the "option_type" field if the given value is not nil.
+func (_c *ProxySubscribePriceOptionCreate) SetNillableOptionType(v *string) *ProxySubscribePriceOptionCreate {
+	if v != nil {
+		_c.SetOptionType(*v)
+	}
+	return _c
+}
+
 // SetName sets the "name" field.
 func (_c *ProxySubscribePriceOptionCreate) SetName(v string) *ProxySubscribePriceOptionCreate {
 	_c.mutation.SetName(v)
@@ -166,6 +194,20 @@ func (_c *ProxySubscribePriceOptionCreate) SetNillableSort(v *int32) *ProxySubsc
 	return _c
 }
 
+// SetVersion sets the "version" field.
+func (_c *ProxySubscribePriceOptionCreate) SetVersion(v int32) *ProxySubscribePriceOptionCreate {
+	_c.mutation.SetVersion(v)
+	return _c
+}
+
+// SetNillableVersion sets the "version" field if the given value is not nil.
+func (_c *ProxySubscribePriceOptionCreate) SetNillableVersion(v *int32) *ProxySubscribePriceOptionCreate {
+	if v != nil {
+		_c.SetVersion(*v)
+	}
+	return _c
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (_c *ProxySubscribePriceOptionCreate) SetCreatedAt(v time.Time) *ProxySubscribePriceOptionCreate {
 	_c.mutation.SetCreatedAt(v)
@@ -235,6 +277,14 @@ func (_c *ProxySubscribePriceOptionCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (_c *ProxySubscribePriceOptionCreate) defaults() {
+	if _, ok := _c.mutation.Code(); !ok {
+		v := proxysubscribepriceoption.DefaultCode
+		_c.mutation.SetCode(v)
+	}
+	if _, ok := _c.mutation.OptionType(); !ok {
+		v := proxysubscribepriceoption.DefaultOptionType
+		_c.mutation.SetOptionType(v)
+	}
 	if _, ok := _c.mutation.Name(); !ok {
 		v := proxysubscribepriceoption.DefaultName
 		_c.mutation.SetName(v)
@@ -275,6 +325,10 @@ func (_c *ProxySubscribePriceOptionCreate) defaults() {
 		v := proxysubscribepriceoption.DefaultSort
 		_c.mutation.SetSort(v)
 	}
+	if _, ok := _c.mutation.Version(); !ok {
+		v := proxysubscribepriceoption.DefaultVersion
+		_c.mutation.SetVersion(v)
+	}
 	if _, ok := _c.mutation.CreatedAt(); !ok {
 		v := proxysubscribepriceoption.DefaultCreatedAt()
 		_c.mutation.SetCreatedAt(v)
@@ -289,6 +343,22 @@ func (_c *ProxySubscribePriceOptionCreate) defaults() {
 func (_c *ProxySubscribePriceOptionCreate) check() error {
 	if _, ok := _c.mutation.SubscribeID(); !ok {
 		return &ValidationError{Name: "subscribe_id", err: errors.New(`ent: missing required field "ProxySubscribePriceOption.subscribe_id"`)}
+	}
+	if _, ok := _c.mutation.Code(); !ok {
+		return &ValidationError{Name: "code", err: errors.New(`ent: missing required field "ProxySubscribePriceOption.code"`)}
+	}
+	if v, ok := _c.mutation.Code(); ok {
+		if err := proxysubscribepriceoption.CodeValidator(v); err != nil {
+			return &ValidationError{Name: "code", err: fmt.Errorf(`ent: validator failed for field "ProxySubscribePriceOption.code": %w`, err)}
+		}
+	}
+	if _, ok := _c.mutation.OptionType(); !ok {
+		return &ValidationError{Name: "option_type", err: errors.New(`ent: missing required field "ProxySubscribePriceOption.option_type"`)}
+	}
+	if v, ok := _c.mutation.OptionType(); ok {
+		if err := proxysubscribepriceoption.OptionTypeValidator(v); err != nil {
+			return &ValidationError{Name: "option_type", err: fmt.Errorf(`ent: validator failed for field "ProxySubscribePriceOption.option_type": %w`, err)}
+		}
 	}
 	if _, ok := _c.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "ProxySubscribePriceOption.name"`)}
@@ -329,6 +399,9 @@ func (_c *ProxySubscribePriceOptionCreate) check() error {
 	}
 	if _, ok := _c.mutation.Sort(); !ok {
 		return &ValidationError{Name: "sort", err: errors.New(`ent: missing required field "ProxySubscribePriceOption.sort"`)}
+	}
+	if _, ok := _c.mutation.Version(); !ok {
+		return &ValidationError{Name: "version", err: errors.New(`ent: missing required field "ProxySubscribePriceOption.version"`)}
 	}
 	if _, ok := _c.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "ProxySubscribePriceOption.created_at"`)}
@@ -377,6 +450,14 @@ func (_c *ProxySubscribePriceOptionCreate) createSpec() (*ProxySubscribePriceOpt
 		_spec.SetField(proxysubscribepriceoption.FieldSubscribeID, field.TypeInt64, value)
 		_node.SubscribeID = value
 	}
+	if value, ok := _c.mutation.Code(); ok {
+		_spec.SetField(proxysubscribepriceoption.FieldCode, field.TypeString, value)
+		_node.Code = value
+	}
+	if value, ok := _c.mutation.OptionType(); ok {
+		_spec.SetField(proxysubscribepriceoption.FieldOptionType, field.TypeString, value)
+		_node.OptionType = value
+	}
 	if value, ok := _c.mutation.Name(); ok {
 		_spec.SetField(proxysubscribepriceoption.FieldName, field.TypeString, value)
 		_node.Name = value
@@ -416,6 +497,10 @@ func (_c *ProxySubscribePriceOptionCreate) createSpec() (*ProxySubscribePriceOpt
 	if value, ok := _c.mutation.Sort(); ok {
 		_spec.SetField(proxysubscribepriceoption.FieldSort, field.TypeInt32, value)
 		_node.Sort = value
+	}
+	if value, ok := _c.mutation.Version(); ok {
+		_spec.SetField(proxysubscribepriceoption.FieldVersion, field.TypeInt32, value)
+		_node.Version = value
 	}
 	if value, ok := _c.mutation.CreatedAt(); ok {
 		_spec.SetField(proxysubscribepriceoption.FieldCreatedAt, field.TypeTime, value)
