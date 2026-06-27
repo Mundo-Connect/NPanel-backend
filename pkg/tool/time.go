@@ -1,6 +1,7 @@
 package tool
 
 import (
+	"strings"
 	"time"
 
 	"github.com/npanel-dev/NPanel-backend/pkg/logger"
@@ -11,23 +12,28 @@ func AddTime(unit string, quantity int64, baseTime ...time.Time) time.Time {
 	if len(baseTime) != 0 {
 		basic = baseTime[0]
 	}
-	switch unit {
-	case "Year":
+	normalizedUnit := strings.TrimSpace(unit)
+	switch normalizedUnit {
+	case "Year", "year":
 		return basic.AddDate(int(quantity), 0, 0)
-	case "Month":
+	case "Month", "month":
 		return basic.AddDate(0, int(quantity), 0)
-	case "Day":
+	case "Day", "day":
 		return basic.AddDate(0, 0, int(quantity))
-	case "Week":
+	case "Week", "week":
 		return basic.AddDate(0, 0, int(quantity)*7)
-	case "Hour":
+	case "Hour", "hour":
 		return basic.Add(time.Hour * time.Duration(quantity))
-	case "Minute":
+	case "Minute", "minute":
 		return basic.Add(time.Minute * time.Duration(quantity))
-	case "NoLimit":
+	case "quarter":
+		return basic.AddDate(0, int(quantity)*3, 0)
+	case "half_year":
+		return basic.AddDate(0, int(quantity)*6, 0)
+	case "NoLimit", "nolimit", "no_limit":
 		return time.UnixMilli(0)
 	default:
-		logger.Error("[Tool] Unknown time unit", logger.Field("unit", unit))
+		logger.Error("[Tool] Unknown time unit", logger.Field("unit", normalizedUnit))
 		return basic
 	}
 }
