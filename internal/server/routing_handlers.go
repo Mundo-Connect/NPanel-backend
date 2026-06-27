@@ -40,10 +40,11 @@ func handleRoutingConfig(routing *adminroutingservice.RoutingService, cache *pub
 			return
 		}
 
-		cfg, fallback := loadPublicRoutingConfig(routing, cache, r, publicrouting.PreviewRequest{})
+		cfg, fallback, unsupported := loadPublicRoutingConfig(routing, cache, r, publicrouting.PreviewRequest{})
 		if fallback != "" {
 			w.Header().Set("X-Routing-Fallback", fallback)
 		}
+		writeRoutingCapabilityHeaders(w, unsupported)
 
 		if r.Header.Get("If-None-Match") == cfg.RoutingHash {
 			w.WriteHeader(nethttp.StatusNotModified)
@@ -76,10 +77,11 @@ func handleRoutingPreview(routing *adminroutingservice.RoutingService, cache *pu
 		}
 
 		fillPreviewScopeFromRequest(r, &req)
-		cfg, fallback := loadPublicRoutingConfig(routing, cache, r, req)
+		cfg, fallback, unsupported := loadPublicRoutingConfig(routing, cache, r, req)
 		if fallback != "" {
 			w.Header().Set("X-Routing-Fallback", fallback)
 		}
+		writeRoutingCapabilityHeaders(w, unsupported)
 		result := publicrouting.PreviewRouteConfig(cfg, req)
 		writeRoutingOK(w, result)
 	}
@@ -137,18 +139,18 @@ func handleRoutingRouteEvent(routing *adminroutingservice.RoutingService) nethtt
 	}
 }
 
-func loadPublicRoutingConfig(routing *adminroutingservice.RoutingService, cache *publicRoutingCache, r *nethttp.Request, req publicrouting.PreviewRequest) (publicrouting.Envelope, string) {
+func loadPublicRoutingConfig(routing *adminroutingservice.RoutingService, cache *publicRoutingCache, r *nethttp.Request, req publicrouting.PreviewRequest) (publicrouting.Envelope, string, []string) {
 	now := time.Now()
 	scopeOpts := routingConfigOptionsFromRequest(r, req)
-	cacheKey := publicRoutingCacheKey(scopeOpts)
-	if cfg, ok := cache.get(cacheKey, now); ok {
-		return cfg, ""
-	}
-
 	features := publicrouting.ParseFeatureList(r.Header.Get("X-Routing-Features"))
 	if len(scopeOpts.SupportedFeatures) == 0 {
 		scopeOpts.SupportedFeatures = features
 	}
+	cacheKey := publicRoutingCacheKey(scopeOpts)
+	if cfg, ok := cache.get(cacheKey, now); ok {
+		return cfg, "", publicrouting.MissingRequiredFeatures(cfg.CapabilityRequirements.RequiredFeatures, scopeOpts.SupportedFeatures)
+	}
+
 	cfg, err := routing.BuildPublicConfig(r.Context(), now, publicrouting.ConfigOptions{
 		UserID:            scopeOpts.UserID,
 		SubscribeID:       scopeOpts.SubscribeID,
@@ -159,7 +161,7 @@ func loadPublicRoutingConfig(routing *adminroutingservice.RoutingService, cache 
 		SupportedFeatures: scopeOpts.SupportedFeatures,
 	})
 	if err != nil {
-		return publicrouting.BuildPreviewConfig(now, publicrouting.ConfigOptions{
+		fallback := publicrouting.ApplyClientCapabilities(publicrouting.BuildPreviewConfig(now, publicrouting.ConfigOptions{
 			UserID:            scopeOpts.UserID,
 			SubscribeID:       scopeOpts.SubscribeID,
 			UserSubscribeID:   scopeOpts.UserSubscribeID,
@@ -167,10 +169,11 @@ func loadPublicRoutingConfig(routing *adminroutingservice.RoutingService, cache 
 			NodeID:            scopeOpts.NodeID,
 			UserAgent:         r.UserAgent(),
 			SupportedFeatures: scopeOpts.SupportedFeatures,
-		}), "fixture"
+		}), scopeOpts.SupportedFeatures)
+		return fallback, "fixture", publicrouting.MissingRequiredFeatures(fallback.CapabilityRequirements.RequiredFeatures, scopeOpts.SupportedFeatures)
 	}
 	cache.set(cacheKey, cfg, now.Add(15*time.Second))
-	return cfg, ""
+	return cfg, "", publicrouting.MissingRequiredFeatures(cfg.CapabilityRequirements.RequiredFeatures, scopeOpts.SupportedFeatures)
 }
 
 func routingConfigOptionsFromRequest(r *nethttp.Request, req publicrouting.PreviewRequest) publicrouting.ConfigOptions {
@@ -221,6 +224,15 @@ func firstNonEmptyString(values ...string) string {
 		}
 	}
 	return ""
+}
+
+func writeRoutingCapabilityHeaders(w nethttp.ResponseWriter, unsupported []string) {
+	if len(unsupported) == 0 {
+		w.Header().Set("X-Routing-Execution", "eligible")
+		return
+	}
+	w.Header().Set("X-Routing-Execution", "blocked")
+	w.Header().Set("X-Routing-Unsupported-Features", strings.Join(unsupported, ","))
 }
 
 func (c *publicRoutingCache) get(key string, now time.Time) (publicrouting.Envelope, bool) {

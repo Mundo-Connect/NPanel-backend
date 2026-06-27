@@ -723,6 +723,200 @@ func TestBuildConfigGeneratesExternalCapabilityAndPreservesConfig(t *testing.T) 
 	}
 }
 
+func TestBuildPublicConfigKeepsDotResolverWhenClientSupportsDot(t *testing.T) {
+	now := time.Date(2026, 6, 27, 10, 0, 0, 0, time.UTC)
+	uc := NewRoutingUsecase(fakeRoutingRepo{
+		profiles: []*RouteProfile{
+			{
+				ID:          1,
+				Code:        "dot_profile",
+				Name:        "DoT Profile",
+				ScopeType:   "user",
+				ScopeID:     "10001",
+				Mode:        "enforce",
+				Enabled:     true,
+				ProfileJSON: `{"default_action":{"type":"proxy"},"default_dns_resolver_tag":"dns:cloudflare-dot","default_fallback_policy":"fallback_default"}`,
+			},
+		},
+		dnsResolvers: []*DNSResolver{
+			{
+				ID:           1,
+				Tag:          "dns:cloudflare-dot",
+				Name:         "Cloudflare DoT",
+				Proto:        "dot",
+				Address:      "1.1.1.1",
+				Port:         853,
+				Enabled:      true,
+				ResolverJSON: `{"server_name":"cloudflare-dns.com","detour":{"type":"proxy"},"health_check":{"enabled":true,"domain":"www.cloudflare.com","interval_seconds":60}}`,
+			},
+		},
+	}, log.DefaultLogger)
+
+	cfg, err := uc.BuildPublicConfig(context.Background(), now, publicrouting.ConfigOptions{
+		UserID:            10001,
+		SupportedFeatures: supportedRoutingFeatures("dot"),
+	})
+	if err != nil {
+		t.Fatalf("BuildPublicConfig() error = %v", err)
+	}
+	if cfg.Mode != "enforce" {
+		t.Fatalf("Mode = %q, want enforce", cfg.Mode)
+	}
+	if len(cfg.DNSResolvers) != 1 || cfg.DNSResolvers[0].Tag != "dns:cloudflare-dot" {
+		t.Fatalf("DNSResolvers = %#v, want dot resolver", cfg.DNSResolvers)
+	}
+	if missing := publicrouting.MissingRequiredFeatures(cfg.CapabilityRequirements.RequiredFeatures, supportedRoutingFeatures("dot")); len(missing) != 0 {
+		t.Fatalf("MissingRequiredFeatures = %#v, want none", missing)
+	}
+}
+
+func TestBuildPublicConfigBlocksAndPrunesDotWhenUnsupported(t *testing.T) {
+	now := time.Date(2026, 6, 27, 10, 0, 0, 0, time.UTC)
+	uc := NewRoutingUsecase(fakeRoutingRepo{
+		profiles: []*RouteProfile{
+			{
+				ID:          1,
+				Code:        "dot_profile",
+				Name:        "DoT Profile",
+				ScopeType:   "user",
+				ScopeID:     "10001",
+				Mode:        "enforce",
+				Enabled:     true,
+				ProfileJSON: `{"default_action":{"type":"proxy"},"default_dns_resolver_tag":"dns:cloudflare-dot","default_fallback_policy":"fallback_default"}`,
+			},
+		},
+		dnsResolvers: []*DNSResolver{
+			{
+				ID:           1,
+				Tag:          "dns:cloudflare-dot",
+				Name:         "Cloudflare DoT",
+				Proto:        "dot",
+				Address:      "1.1.1.1",
+				Port:         853,
+				Enabled:      true,
+				ResolverJSON: `{"server_name":"cloudflare-dns.com","detour":{"type":"proxy"},"health_check":{"enabled":true,"domain":"www.cloudflare.com","interval_seconds":60}}`,
+			},
+		},
+	}, log.DefaultLogger)
+
+	features := supportedRoutingFeatures()
+	cfg, err := uc.BuildPublicConfig(context.Background(), now, publicrouting.ConfigOptions{
+		UserID:            10001,
+		SupportedFeatures: features,
+	})
+	if err != nil {
+		t.Fatalf("BuildPublicConfig() error = %v", err)
+	}
+	if cfg.Mode != publicrouting.ModeObserve {
+		t.Fatalf("Mode = %q, want observe", cfg.Mode)
+	}
+	if len(cfg.DNSResolvers) != 0 {
+		t.Fatalf("DNSResolvers = %#v, want unsupported dot resolver pruned", cfg.DNSResolvers)
+	}
+	if cfg.Profile.DefaultDNSResolverTag != "dns:system" {
+		t.Fatalf("DefaultDNSResolverTag = %q, want dns:system", cfg.Profile.DefaultDNSResolverTag)
+	}
+	if missing := publicrouting.MissingRequiredFeatures(cfg.CapabilityRequirements.RequiredFeatures, features); !featureListContains(missing, "dot") {
+		t.Fatalf("MissingRequiredFeatures = %#v, want dot", missing)
+	}
+}
+
+func TestBuildPublicConfigBlocksAndPrunesExternalOutboundWhenUnsupported(t *testing.T) {
+	now := time.Date(2026, 6, 27, 10, 0, 0, 0, time.UTC)
+	uc := NewRoutingUsecase(fakeRoutingRepo{
+		profiles: []*RouteProfile{
+			{
+				ID:          1,
+				Code:        "external_profile",
+				Name:        "External Profile",
+				ScopeType:   "user",
+				ScopeID:     "10001",
+				Mode:        "enforce",
+				Enabled:     true,
+				ProfileJSON: `{"default_action":{"type":"outbound","outbound_tag":"external:socks:sg"},"default_dns_resolver_tag":"dns:system","default_fallback_policy":"fallback_default"}`,
+			},
+		},
+		outbounds: []*RouteOutbound{
+			{
+				ID:           1,
+				Tag:          "external:socks:sg",
+				Name:         "External SOCKS SG",
+				Type:         "external",
+				Region:       "SG",
+				Enabled:      true,
+				OutboundJSON: `{"selection_policy":"fixed","fail_policy":"fallback_default","external":{"protocol":"socks","host":"127.0.0.1","port":1080,"password":"secret"}}`,
+			},
+		},
+		rules: []*RouteRule{
+			{
+				ID:          1,
+				ProfileID:   1,
+				Name:        "External OpenAI",
+				Priority:    100,
+				Enabled:     true,
+				MatcherJSON: `{"type":"domain_suffix","value":"openai.com"}`,
+				ActionJSON:  `{"type":"outbound","outbound_tag":"external:socks:sg","fail_policy":"fallback_default"}`,
+			},
+		},
+	}, log.DefaultLogger)
+
+	features := supportedRoutingFeatures()
+	cfg, err := uc.BuildPublicConfig(context.Background(), now, publicrouting.ConfigOptions{
+		UserID:            10001,
+		SupportedFeatures: features,
+	})
+	if err != nil {
+		t.Fatalf("BuildPublicConfig() error = %v", err)
+	}
+	if cfg.Mode != publicrouting.ModeObserve {
+		t.Fatalf("Mode = %q, want observe", cfg.Mode)
+	}
+	if len(cfg.Outbounds) != 0 {
+		t.Fatalf("Outbounds = %#v, want unsupported external outbound pruned", cfg.Outbounds)
+	}
+	if len(cfg.Rules) != 0 {
+		t.Fatalf("Rules = %#v, want rules referencing pruned external outbound removed", cfg.Rules)
+	}
+	if cfg.Profile.DefaultAction.Type != "proxy" {
+		t.Fatalf("DefaultAction = %#v, want proxy fallback", cfg.Profile.DefaultAction)
+	}
+	if missing := publicrouting.MissingRequiredFeatures(cfg.CapabilityRequirements.RequiredFeatures, features); !featureListContains(missing, "external_socks") {
+		t.Fatalf("MissingRequiredFeatures = %#v, want external_socks", missing)
+	}
+}
+
+func TestBuildPublicConfigEmptyFeaturesReturnsObserveOnlySafeConfig(t *testing.T) {
+	now := time.Date(2026, 6, 27, 10, 0, 0, 0, time.UTC)
+	uc := NewRoutingUsecase(fakeRoutingRepo{
+		profiles: []*RouteProfile{
+			{
+				ID:          1,
+				Code:        "user_profile",
+				Name:        "User Profile",
+				ScopeType:   "user",
+				ScopeID:     "10001",
+				Mode:        "enforce",
+				Enabled:     true,
+				ProfileJSON: `{"default_action":{"type":"proxy"},"default_dns_resolver_tag":"dns:cloudflare-doh","default_fallback_policy":"fallback_default"}`,
+			},
+		},
+	}, log.DefaultLogger)
+
+	cfg, err := uc.BuildPublicConfig(context.Background(), now, publicrouting.ConfigOptions{UserID: 10001})
+	if err != nil {
+		t.Fatalf("BuildPublicConfig() error = %v", err)
+	}
+	if cfg.Mode != publicrouting.ModeObserve {
+		t.Fatalf("Mode = %q, want observe", cfg.Mode)
+	}
+	if len(cfg.Outbounds) != 0 || len(cfg.Rules) != 0 {
+		t.Fatalf("Outbounds=%#v Rules=%#v, want non-executable config for empty capabilities", cfg.Outbounds, cfg.Rules)
+	}
+	if missing := publicrouting.MissingRequiredFeatures(cfg.CapabilityRequirements.RequiredFeatures, nil); len(missing) == 0 {
+		t.Fatal("MissingRequiredFeatures is empty, want old/unknown clients blocked")
+	}
+}
+
 func hasGateCheck(checks []RoutingReleaseGateCheck, key string, passed bool) bool {
 	for _, check := range checks {
 		if check.Key == key && check.Passed == passed {
@@ -739,6 +933,21 @@ func featureListContains(features []string, expected string) bool {
 		}
 	}
 	return false
+}
+
+func supportedRoutingFeatures(extra ...string) []string {
+	features := []string{
+		"routing_profile_v1",
+		"route_dns_resolver",
+		"route_outbound",
+		"route_fail_policy",
+		"route_fallback",
+		"doh",
+		"route_events",
+		"client_health_report",
+	}
+	features = append(features, extra...)
+	return features
 }
 
 func TestBuildConfigFallsBackToFixtureWhenStoreIsEmpty(t *testing.T) {

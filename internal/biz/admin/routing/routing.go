@@ -1560,6 +1560,14 @@ func (uc *RoutingUsecase) ResolveCurrentProfile(ctx context.Context, opts public
 	return uc.BuildConfig(ctx, time.Now(), opts)
 }
 
+func (uc *RoutingUsecase) BuildPublicConfig(ctx context.Context, now time.Time, opts publicrouting.ConfigOptions) (publicrouting.Envelope, error) {
+	envelope, err := uc.BuildConfig(ctx, now, opts)
+	if err != nil {
+		return envelope, err
+	}
+	return publicrouting.ApplyClientCapabilities(envelope, opts.SupportedFeatures), nil
+}
+
 func (uc *RoutingUsecase) resolveScopeContext(ctx context.Context, opts publicrouting.ConfigOptions) (ScopeContext, error) {
 	scope := ScopeContext{
 		UserID:          opts.UserID,

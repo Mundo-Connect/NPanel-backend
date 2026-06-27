@@ -26,7 +26,7 @@ func NewRoutingService(uc *routingbiz.RoutingUsecase, logger log.Logger) *Routin
 }
 
 func (s *RoutingService) BuildPublicConfig(ctx context.Context, now time.Time, opts publicrouting.ConfigOptions) (publicrouting.Envelope, error) {
-	return s.uc.BuildConfig(ctx, now, opts)
+	return s.uc.BuildPublicConfig(ctx, now, opts)
 }
 
 func (s *RoutingService) RecordHealthReport(ctx context.Context, req publicrouting.HealthReportRequest) error {
