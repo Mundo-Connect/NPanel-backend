@@ -476,6 +476,8 @@ message SubscribePriceOption {
   int32 sort = 12;
   int64 created_at = 13;
   int64 updated_at = 14;
+  string code = 15;
+  string type = 16;
 }
 
 message SubscribeDiscount {
@@ -768,5 +770,4 @@ message GetUserTrafficStatsReply {
   int64 total_download = 3;
   int64 total_traffic = 4;
 }
-
 

@@ -182,7 +182,7 @@ func (l *CloseOrderLogic) restoreReservedInventory(tx *ent.Tx, orderInfo *ent.Pr
 			}
 		} else if subscribeInfo.Inventory != -1 {
 			if err := tx.ProxySubscribe.UpdateOneID(subscribeInfo.ID).
-				SetInventory(subscribeInfo.Inventory + 1).
+				AddInventory(1).
 				Exec(l.ctx); err != nil {
 				l.logger.Errorw("[CloseOrder] Restore subscribe inventory failed", "error", err.Error(), "subscribeID", subscribeInfo.ID)
 				return err
@@ -204,7 +204,7 @@ func (l *CloseOrderLogic) restoreReservedInventory(tx *ent.Tx, orderInfo *ent.Pr
 		}
 		if optionInfo.Inventory != -1 {
 			if err := tx.ProxySubscribePriceOption.UpdateOneID(optionInfo.ID).
-				SetInventory(optionInfo.Inventory + 1).
+				AddInventory(1).
 				Exec(l.ctx); err != nil {
 				l.logger.Errorw("[CloseOrder] Restore price option inventory failed", "error", err.Error(), "priceOptionID", optionInfo.ID)
 				return err

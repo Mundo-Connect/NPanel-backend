@@ -308,6 +308,7 @@ func (r *publicSubscribeRepo) publicSubscribePriceOptions(ctx context.Context, s
 	items, err := r.data.db.ProxySubscribePriceOption.Query().
 		Where(
 			proxysubscribepriceoption.SubscribeIDIn(ids...),
+			proxysubscribepriceoption.OptionTypeEQ("duration"),
 			proxysubscribepriceoption.ShowEQ(true),
 			proxysubscribepriceoption.SellEQ(true),
 		).
@@ -320,6 +321,8 @@ func (r *publicSubscribeRepo) publicSubscribePriceOptions(ctx context.Context, s
 		result[item.SubscribeID] = append(result[item.SubscribeID], subscribeBiz.SubscribePriceOption{
 			ID:            item.ID,
 			SubscribeID:   item.SubscribeID,
+			Code:          item.Code,
+			Type:          item.OptionType,
 			Name:          item.Name,
 			DurationUnit:  item.DurationUnit,
 			DurationValue: item.DurationValue,

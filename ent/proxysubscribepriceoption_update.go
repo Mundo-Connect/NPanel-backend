@@ -49,6 +49,34 @@ func (_u *ProxySubscribePriceOptionUpdate) AddSubscribeID(v int64) *ProxySubscri
 	return _u
 }
 
+// SetCode sets the "code" field.
+func (_u *ProxySubscribePriceOptionUpdate) SetCode(v string) *ProxySubscribePriceOptionUpdate {
+	_u.mutation.SetCode(v)
+	return _u
+}
+
+// SetNillableCode sets the "code" field if the given value is not nil.
+func (_u *ProxySubscribePriceOptionUpdate) SetNillableCode(v *string) *ProxySubscribePriceOptionUpdate {
+	if v != nil {
+		_u.SetCode(*v)
+	}
+	return _u
+}
+
+// SetOptionType sets the "option_type" field.
+func (_u *ProxySubscribePriceOptionUpdate) SetOptionType(v string) *ProxySubscribePriceOptionUpdate {
+	_u.mutation.SetOptionType(v)
+	return _u
+}
+
+// SetNillableOptionType sets the "option_type" field if the given value is not nil.
+func (_u *ProxySubscribePriceOptionUpdate) SetNillableOptionType(v *string) *ProxySubscribePriceOptionUpdate {
+	if v != nil {
+		_u.SetOptionType(*v)
+	}
+	return _u
+}
+
 // SetName sets the "name" field.
 func (_u *ProxySubscribePriceOptionUpdate) SetName(v string) *ProxySubscribePriceOptionUpdate {
 	_u.mutation.SetName(v)
@@ -224,6 +252,27 @@ func (_u *ProxySubscribePriceOptionUpdate) AddSort(v int32) *ProxySubscribePrice
 	return _u
 }
 
+// SetVersion sets the "version" field.
+func (_u *ProxySubscribePriceOptionUpdate) SetVersion(v int32) *ProxySubscribePriceOptionUpdate {
+	_u.mutation.ResetVersion()
+	_u.mutation.SetVersion(v)
+	return _u
+}
+
+// SetNillableVersion sets the "version" field if the given value is not nil.
+func (_u *ProxySubscribePriceOptionUpdate) SetNillableVersion(v *int32) *ProxySubscribePriceOptionUpdate {
+	if v != nil {
+		_u.SetVersion(*v)
+	}
+	return _u
+}
+
+// AddVersion adds value to the "version" field.
+func (_u *ProxySubscribePriceOptionUpdate) AddVersion(v int32) *ProxySubscribePriceOptionUpdate {
+	_u.mutation.AddVersion(v)
+	return _u
+}
+
 // SetUpdatedAt sets the "updated_at" field.
 func (_u *ProxySubscribePriceOptionUpdate) SetUpdatedAt(v time.Time) *ProxySubscribePriceOptionUpdate {
 	_u.mutation.SetUpdatedAt(v)
@@ -273,6 +322,16 @@ func (_u *ProxySubscribePriceOptionUpdate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (_u *ProxySubscribePriceOptionUpdate) check() error {
+	if v, ok := _u.mutation.Code(); ok {
+		if err := proxysubscribepriceoption.CodeValidator(v); err != nil {
+			return &ValidationError{Name: "code", err: fmt.Errorf(`ent: validator failed for field "ProxySubscribePriceOption.code": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.OptionType(); ok {
+		if err := proxysubscribepriceoption.OptionTypeValidator(v); err != nil {
+			return &ValidationError{Name: "option_type", err: fmt.Errorf(`ent: validator failed for field "ProxySubscribePriceOption.option_type": %w`, err)}
+		}
+	}
 	if v, ok := _u.mutation.Name(); ok {
 		if err := proxysubscribepriceoption.NameValidator(v); err != nil {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "ProxySubscribePriceOption.name": %w`, err)}
@@ -303,6 +362,12 @@ func (_u *ProxySubscribePriceOptionUpdate) sqlSave(ctx context.Context) (_node i
 	}
 	if value, ok := _u.mutation.AddedSubscribeID(); ok {
 		_spec.AddField(proxysubscribepriceoption.FieldSubscribeID, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.Code(); ok {
+		_spec.SetField(proxysubscribepriceoption.FieldCode, field.TypeString, value)
+	}
+	if value, ok := _u.mutation.OptionType(); ok {
+		_spec.SetField(proxysubscribepriceoption.FieldOptionType, field.TypeString, value)
 	}
 	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(proxysubscribepriceoption.FieldName, field.TypeString, value)
@@ -349,6 +414,12 @@ func (_u *ProxySubscribePriceOptionUpdate) sqlSave(ctx context.Context) (_node i
 	if value, ok := _u.mutation.AddedSort(); ok {
 		_spec.AddField(proxysubscribepriceoption.FieldSort, field.TypeInt32, value)
 	}
+	if value, ok := _u.mutation.Version(); ok {
+		_spec.SetField(proxysubscribepriceoption.FieldVersion, field.TypeInt32, value)
+	}
+	if value, ok := _u.mutation.AddedVersion(); ok {
+		_spec.AddField(proxysubscribepriceoption.FieldVersion, field.TypeInt32, value)
+	}
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(proxysubscribepriceoption.FieldUpdatedAt, field.TypeTime, value)
 	}
@@ -390,6 +461,34 @@ func (_u *ProxySubscribePriceOptionUpdateOne) SetNillableSubscribeID(v *int64) *
 // AddSubscribeID adds value to the "subscribe_id" field.
 func (_u *ProxySubscribePriceOptionUpdateOne) AddSubscribeID(v int64) *ProxySubscribePriceOptionUpdateOne {
 	_u.mutation.AddSubscribeID(v)
+	return _u
+}
+
+// SetCode sets the "code" field.
+func (_u *ProxySubscribePriceOptionUpdateOne) SetCode(v string) *ProxySubscribePriceOptionUpdateOne {
+	_u.mutation.SetCode(v)
+	return _u
+}
+
+// SetNillableCode sets the "code" field if the given value is not nil.
+func (_u *ProxySubscribePriceOptionUpdateOne) SetNillableCode(v *string) *ProxySubscribePriceOptionUpdateOne {
+	if v != nil {
+		_u.SetCode(*v)
+	}
+	return _u
+}
+
+// SetOptionType sets the "option_type" field.
+func (_u *ProxySubscribePriceOptionUpdateOne) SetOptionType(v string) *ProxySubscribePriceOptionUpdateOne {
+	_u.mutation.SetOptionType(v)
+	return _u
+}
+
+// SetNillableOptionType sets the "option_type" field if the given value is not nil.
+func (_u *ProxySubscribePriceOptionUpdateOne) SetNillableOptionType(v *string) *ProxySubscribePriceOptionUpdateOne {
+	if v != nil {
+		_u.SetOptionType(*v)
+	}
 	return _u
 }
 
@@ -568,6 +667,27 @@ func (_u *ProxySubscribePriceOptionUpdateOne) AddSort(v int32) *ProxySubscribePr
 	return _u
 }
 
+// SetVersion sets the "version" field.
+func (_u *ProxySubscribePriceOptionUpdateOne) SetVersion(v int32) *ProxySubscribePriceOptionUpdateOne {
+	_u.mutation.ResetVersion()
+	_u.mutation.SetVersion(v)
+	return _u
+}
+
+// SetNillableVersion sets the "version" field if the given value is not nil.
+func (_u *ProxySubscribePriceOptionUpdateOne) SetNillableVersion(v *int32) *ProxySubscribePriceOptionUpdateOne {
+	if v != nil {
+		_u.SetVersion(*v)
+	}
+	return _u
+}
+
+// AddVersion adds value to the "version" field.
+func (_u *ProxySubscribePriceOptionUpdateOne) AddVersion(v int32) *ProxySubscribePriceOptionUpdateOne {
+	_u.mutation.AddVersion(v)
+	return _u
+}
+
 // SetUpdatedAt sets the "updated_at" field.
 func (_u *ProxySubscribePriceOptionUpdateOne) SetUpdatedAt(v time.Time) *ProxySubscribePriceOptionUpdateOne {
 	_u.mutation.SetUpdatedAt(v)
@@ -630,6 +750,16 @@ func (_u *ProxySubscribePriceOptionUpdateOne) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (_u *ProxySubscribePriceOptionUpdateOne) check() error {
+	if v, ok := _u.mutation.Code(); ok {
+		if err := proxysubscribepriceoption.CodeValidator(v); err != nil {
+			return &ValidationError{Name: "code", err: fmt.Errorf(`ent: validator failed for field "ProxySubscribePriceOption.code": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.OptionType(); ok {
+		if err := proxysubscribepriceoption.OptionTypeValidator(v); err != nil {
+			return &ValidationError{Name: "option_type", err: fmt.Errorf(`ent: validator failed for field "ProxySubscribePriceOption.option_type": %w`, err)}
+		}
+	}
 	if v, ok := _u.mutation.Name(); ok {
 		if err := proxysubscribepriceoption.NameValidator(v); err != nil {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "ProxySubscribePriceOption.name": %w`, err)}
@@ -678,6 +808,12 @@ func (_u *ProxySubscribePriceOptionUpdateOne) sqlSave(ctx context.Context) (_nod
 	if value, ok := _u.mutation.AddedSubscribeID(); ok {
 		_spec.AddField(proxysubscribepriceoption.FieldSubscribeID, field.TypeInt64, value)
 	}
+	if value, ok := _u.mutation.Code(); ok {
+		_spec.SetField(proxysubscribepriceoption.FieldCode, field.TypeString, value)
+	}
+	if value, ok := _u.mutation.OptionType(); ok {
+		_spec.SetField(proxysubscribepriceoption.FieldOptionType, field.TypeString, value)
+	}
 	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(proxysubscribepriceoption.FieldName, field.TypeString, value)
 	}
@@ -722,6 +858,12 @@ func (_u *ProxySubscribePriceOptionUpdateOne) sqlSave(ctx context.Context) (_nod
 	}
 	if value, ok := _u.mutation.AddedSort(); ok {
 		_spec.AddField(proxysubscribepriceoption.FieldSort, field.TypeInt32, value)
+	}
+	if value, ok := _u.mutation.Version(); ok {
+		_spec.SetField(proxysubscribepriceoption.FieldVersion, field.TypeInt32, value)
+	}
+	if value, ok := _u.mutation.AddedVersion(); ok {
+		_spec.AddField(proxysubscribepriceoption.FieldVersion, field.TypeInt32, value)
 	}
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(proxysubscribepriceoption.FieldUpdatedAt, field.TypeTime, value)

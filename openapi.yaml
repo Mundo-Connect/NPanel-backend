@@ -12331,6 +12331,13 @@ components:
                     type: string
                 updatedAt:
                     type: string
+                code:
+                    type: string
+                type:
+                    type: string
+                version:
+                    type: integer
+                    format: int32
             description: SubscribePriceOption 商品价格档位
         api.admin.subscribe.v1.SubscribeSortData:
             type: object
@@ -15569,6 +15576,10 @@ components:
                     type: string
                 updatedAt:
                     type: string
+                code:
+                    type: string
+                type:
+                    type: string
         api.public.order.v1.TrafficLimit:
             type: object
             properties:
@@ -15950,6 +15961,10 @@ components:
                     type: string
                 updatedAt:
                     type: string
+                code:
+                    type: string
+                type:
+                    type: string
         api.public.portal.v1.TrafficLimit:
             type: object
             properties:
@@ -16163,6 +16178,10 @@ components:
                 createdAt:
                     type: string
                 updatedAt:
+                    type: string
+                code:
+                    type: string
+                type:
                     type: string
         api.public.subscribe.v1.TrafficLimit:
             type: object
@@ -16726,6 +16745,10 @@ components:
                 createdAt:
                     type: string
                 updatedAt:
+                    type: string
+                code:
+                    type: string
+                type:
                     type: string
         api.public.user.v1.TrafficLimit:
             type: object

@@ -182,6 +182,9 @@ message SubscribePriceOption {
   int32 sort = 12;               // 排序
   int64 created_at = 13;         // 创建时间
   int64 updated_at = 14;         // 更新时间
+  string code = 15;              // 稳定档位编码
+  string type = 16;              // 档位类型: duration/traffic_pack/reset_pack
+  int32 version = 17;            // 乐观锁版本
 }
 
 // SubscribeInfo 订阅套餐信息

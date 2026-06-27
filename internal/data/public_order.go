@@ -111,6 +111,7 @@ func (r *publicOrderRepo) getSellablePriceOption(ctx context.Context, subscribeI
 		Where(
 			proxysubscribepriceoption.IDEQ(optionID),
 			proxysubscribepriceoption.SubscribeIDEQ(subscribeID),
+			proxysubscribepriceoption.OptionTypeEQ("duration"),
 			proxysubscribepriceoption.SellEQ(true),
 		).
 		Only(ctx)
@@ -141,6 +142,73 @@ func orderDurationQuantity(option *ent.ProxySubscribePriceOption) int32 {
 		return 1<<31 - 1
 	}
 	return int32(option.DurationValue)
+}
+
+func decrementSubscribeInventory(ctx context.Context, tx *ent.Tx, subscribeID int64) error {
+	affected, err := tx.ProxySubscribe.Update().
+		Where(
+			proxysubscribe.IDEQ(subscribeID),
+			proxysubscribe.SellEQ(true),
+			proxysubscribe.InventoryGT(0),
+		).
+		AddInventory(-1).
+		Save(ctx)
+	if err != nil {
+		return errors.InternalServer("SUBSCRIBE_UPDATE_FAILED", "更新订阅库存失败")
+	}
+	if affected > 0 {
+		return nil
+	}
+
+	latestSub, err := tx.ProxySubscribe.Query().
+		Where(proxysubscribe.IDEQ(subscribeID)).
+		Only(ctx)
+	if err != nil {
+		return errors.InternalServer("SUBSCRIBE_QUERY_FAILED", "查询订阅失败")
+	}
+	if !latestSub.Sell {
+		return errors.BadRequest("SUBSCRIBE_NOT_FOR_SALE", "此订阅计划不可购买")
+	}
+	if latestSub.Inventory == -1 {
+		return nil
+	}
+	return responsecode.NewKratosError(responsecode.ErrSubscribeOutOfStock)
+}
+
+func decrementDurationPriceOptionInventory(ctx context.Context, tx *ent.Tx, subscribeID, optionID int64) error {
+	affected, err := tx.ProxySubscribePriceOption.Update().
+		Where(
+			proxysubscribepriceoption.IDEQ(optionID),
+			proxysubscribepriceoption.SubscribeIDEQ(subscribeID),
+			proxysubscribepriceoption.OptionTypeEQ("duration"),
+			proxysubscribepriceoption.SellEQ(true),
+			proxysubscribepriceoption.InventoryGT(0),
+		).
+		AddInventory(-1).
+		Save(ctx)
+	if err != nil {
+		return errors.InternalServer("PRICE_OPTION_UPDATE_FAILED", "更新价格档位库存失败")
+	}
+	if affected > 0 {
+		return nil
+	}
+
+	latestOption, err := tx.ProxySubscribePriceOption.Query().
+		Where(
+			proxysubscribepriceoption.IDEQ(optionID),
+			proxysubscribepriceoption.SubscribeIDEQ(subscribeID),
+		).
+		Only(ctx)
+	if err != nil {
+		return responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+	}
+	if latestOption.OptionType != "duration" || !latestOption.Sell {
+		return responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+	}
+	if latestOption.Inventory == -1 {
+		return nil
+	}
+	return responsecode.NewKratosError(responsecode.ErrSubscribeOutOfStock)
 }
 
 // CloseOrder 关闭订单，包含完整的业务逻辑（含赠金退回）
@@ -186,7 +254,7 @@ func (r *publicOrderRepo) CloseOrder(ctx context.Context, userID int, orderNo st
 
 		if orderInfo.Type == 1 && subscribeInfo.Inventory != -1 {
 			err = tx.ProxySubscribe.UpdateOneID(subscribeInfo.ID).
-				SetInventory(subscribeInfo.Inventory + 1).
+				AddInventory(1).
 				Exec(ctx)
 			if err != nil {
 				r.logger.Errorf("[CloseOrder] Restore subscribe inventory failed: %v, subscribeID: %d", err, subscribeInfo.ID)
@@ -200,7 +268,7 @@ func (r *publicOrderRepo) CloseOrder(ctx context.Context, userID int, orderNo st
 				Only(ctx)
 			if err == nil && optionInfo.Inventory != -1 {
 				if err := tx.ProxySubscribePriceOption.UpdateOneID(optionInfo.ID).
-					SetInventory(optionInfo.Inventory + 1).
+					AddInventory(1).
 					Exec(ctx); err != nil {
 					r.logger.Errorf("[CloseOrder] Restore price option inventory failed: %v, optionID: %d", err, optionInfo.ID)
 					return err
@@ -767,39 +835,13 @@ func (r *publicOrderRepo) Purchase(ctx context.Context, req *publicBiz.PurchaseP
 		}
 
 		if sub.Inventory != -1 {
-			latestSub, err := tx.ProxySubscribe.Query().
-				Where(proxysubscribe.IDEQ(req.SubscribeID)).
-				Only(ctx)
-			if err != nil {
-				return errors.InternalServer("SUBSCRIBE_QUERY_FAILED", "查询订阅失败")
-			}
-			if latestSub.Inventory == 0 {
-				return responsecode.NewKratosError(responsecode.ErrSubscribeOutOfStock)
-			}
-			if err := tx.ProxySubscribe.UpdateOneID(latestSub.ID).
-				SetInventory(latestSub.Inventory - 1).
-				Exec(ctx); err != nil {
-				return errors.InternalServer("SUBSCRIBE_UPDATE_FAILED", "更新订阅库存失败")
+			if err := decrementSubscribeInventory(ctx, tx, req.SubscribeID); err != nil {
+				return err
 			}
 		}
 		if option.Inventory != -1 {
-			latestOption, err := tx.ProxySubscribePriceOption.Query().
-				Where(
-					proxysubscribepriceoption.IDEQ(option.ID),
-					proxysubscribepriceoption.SubscribeIDEQ(req.SubscribeID),
-					proxysubscribepriceoption.SellEQ(true),
-				).
-				Only(ctx)
-			if err != nil {
-				return errors.InternalServer("PRICE_OPTION_QUERY_FAILED", "查询价格档位失败")
-			}
-			if latestOption.Inventory == 0 {
-				return responsecode.NewKratosError(responsecode.ErrSubscribeOutOfStock)
-			}
-			if err := tx.ProxySubscribePriceOption.UpdateOneID(latestOption.ID).
-				SetInventory(latestOption.Inventory - 1).
-				Exec(ctx); err != nil {
-				return errors.InternalServer("PRICE_OPTION_UPDATE_FAILED", "更新价格档位库存失败")
+			if err := decrementDurationPriceOptionInventory(ctx, tx, req.SubscribeID, option.ID); err != nil {
+				return err
 			}
 		}
 
@@ -1095,23 +1137,8 @@ func (r *publicOrderRepo) Renewal(ctx context.Context, req *publicBiz.RenewalPar
 	var createdOrder *ent.ProxyOrder
 	err = r.data.db.TX(ctx, func(tx *ent.Tx) error {
 		if option.Inventory != -1 {
-			latestOption, err := tx.ProxySubscribePriceOption.Query().
-				Where(
-					proxysubscribepriceoption.IDEQ(option.ID),
-					proxysubscribepriceoption.SubscribeIDEQ(userSubscribe.SubscribeID),
-					proxysubscribepriceoption.SellEQ(true),
-				).
-				Only(ctx)
-			if err != nil {
-				return errors.InternalServer("PRICE_OPTION_QUERY_FAILED", "查询价格档位失败")
-			}
-			if latestOption.Inventory == 0 {
-				return responsecode.NewKratosError(responsecode.ErrSubscribeOutOfStock)
-			}
-			if err := tx.ProxySubscribePriceOption.UpdateOneID(latestOption.ID).
-				SetInventory(latestOption.Inventory - 1).
-				Exec(ctx); err != nil {
-				return errors.InternalServer("PRICE_OPTION_UPDATE_FAILED", "更新价格档位库存失败")
+			if err := decrementDurationPriceOptionInventory(ctx, tx, userSubscribe.SubscribeID, option.ID); err != nil {
+				return err
 			}
 		}
 
@@ -1595,6 +1622,7 @@ func (r *publicOrderRepo) convertToPublicPriceOptions(ctx context.Context, subsc
 	items, err := r.data.db.ProxySubscribePriceOption.Query().
 		Where(
 			proxysubscribepriceoption.SubscribeIDEQ(subscribeID),
+			proxysubscribepriceoption.OptionTypeEQ("duration"),
 			proxysubscribepriceoption.ShowEQ(true),
 			proxysubscribepriceoption.SellEQ(true),
 		).
@@ -1608,6 +1636,8 @@ func (r *publicOrderRepo) convertToPublicPriceOptions(ctx context.Context, subsc
 		result = append(result, publicBiz.SubscribePriceOption{
 			ID:            item.ID,
 			SubscribeID:   item.SubscribeID,
+			Code:          item.Code,
+			Type:          item.OptionType,
 			Name:          item.Name,
 			DurationUnit:  item.DurationUnit,
 			DurationValue: item.DurationValue,

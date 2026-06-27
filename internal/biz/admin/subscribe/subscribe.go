@@ -3,6 +3,7 @@ package subscribe
 import (
 	"context"
 	"encoding/json"
+	stderrors "errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -260,6 +261,9 @@ func (uc *SubscribeUseCase) UpdateSubscribe(ctx context.Context, req *v1.UpdateS
 
 	if err := uc.repo.UpdateSubscribe(ctx, sub); err != nil {
 		uc.log.WithContext(ctx).Errorw("msg", "UpdateSubscribe failed", "error", err, "id", req.Id)
+		if stderrors.Is(err, model.ErrSubscribePriceOptionModified) {
+			return responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+		}
 		return responsecode.NewKratosError(responsecode.ErrInternalError)
 	}
 
@@ -981,14 +985,49 @@ var validPriceOptionDurationUnits = map[string]struct{}{
 	"NoLimit": {},
 }
 
+var validPriceOptionTypes = map[string]struct{}{
+	"duration":     {},
+	"traffic_pack": {},
+	"reset_pack":   {},
+}
+
+func defaultPriceOptionCode(optionType, unit string, durationValue int64) string {
+	if optionType == "" {
+		optionType = "duration"
+	}
+	if optionType != "duration" {
+		return optionType
+	}
+	unit = strings.ToLower(strings.TrimSpace(unit))
+	if unit == "" {
+		unit = "month"
+	}
+	if unit == "nolimit" {
+		return "duration_no_limit"
+	}
+	if durationValue <= 0 {
+		durationValue = 1
+	}
+	return fmt.Sprintf("duration_%d_%s", durationValue, unit)
+}
+
 func convertPriceOptionsToModel(items []*v1.SubscribePriceOption) ([]model.SubscribePriceOption, error) {
 	if len(items) == 0 {
 		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
 	result := make([]model.SubscribePriceOption, 0, len(items))
 	hasDefault := false
+	firstSellableIndex := -1
+	seenCodes := make(map[string]struct{}, len(items))
 	for i, item := range items {
 		if item == nil {
+			return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+		}
+		optionType := strings.TrimSpace(item.Type)
+		if optionType == "" {
+			optionType = "duration"
+		}
+		if _, ok := validPriceOptionTypes[optionType]; !ok {
 			return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 		}
 		unit := strings.TrimSpace(item.DurationUnit)
@@ -1004,8 +1043,21 @@ func convertPriceOptionsToModel(items []*v1.SubscribePriceOption) ([]model.Subsc
 		if item.Price < 0 || item.OriginalPrice < 0 || item.Inventory < -1 {
 			return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 		}
+		if item.Id > 0 && item.Version <= 0 {
+			return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+		}
+		code := strings.TrimSpace(item.Code)
+		if code == "" {
+			code = defaultPriceOptionCode(optionType, unit, durationValue)
+		}
+		if _, ok := seenCodes[code]; ok {
+			return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+		}
+		seenCodes[code] = struct{}{}
 		option := model.SubscribePriceOption{
 			ID:            item.Id,
+			Code:          code,
+			Type:          optionType,
 			Name:          strings.TrimSpace(item.Name),
 			DurationUnit:  unit,
 			DurationValue: durationValue,
@@ -1016,7 +1068,11 @@ func convertPriceOptionsToModel(items []*v1.SubscribePriceOption) ([]model.Subsc
 			Sell:          item.Sell,
 			IsDefault:     item.IsDefault,
 			Sort:          int64(item.Sort),
+			Version:       item.Version,
+			CreatedAt:     item.CreatedAt,
+			UpdatedAt:     item.UpdatedAt,
 		}
+		isSellableDuration := option.Type == "duration" && option.Sell
 		if option.Name == "" {
 			if unit == "NoLimit" {
 				option.Name = "NoLimit"
@@ -1024,20 +1080,28 @@ func convertPriceOptionsToModel(items []*v1.SubscribePriceOption) ([]model.Subsc
 				option.Name = fmt.Sprintf("%d %s", durationValue, unit)
 			}
 		}
-		if option.IsDefault {
+		if isSellableDuration && firstSellableIndex < 0 {
+			firstSellableIndex = len(result)
+		}
+		if option.IsDefault && isSellableDuration {
 			if hasDefault {
 				option.IsDefault = false
 			} else {
 				hasDefault = true
 			}
+		} else if option.IsDefault {
+			option.IsDefault = false
 		}
 		if option.Sort == 0 {
 			option.Sort = int64(len(items) - i)
 		}
 		result = append(result, option)
 	}
+	if firstSellableIndex < 0 {
+		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+	}
 	if !hasDefault {
-		result[0].IsDefault = true
+		result[firstSellableIndex].IsDefault = true
 	}
 	return result, nil
 }
@@ -1051,6 +1115,8 @@ func convertPriceOptionsToProto(items []*ent.ProxySubscribePriceOption) []*v1.Su
 		result = append(result, &v1.SubscribePriceOption{
 			Id:            item.ID,
 			SubscribeId:   item.SubscribeID,
+			Code:          item.Code,
+			Type:          item.OptionType,
 			Name:          item.Name,
 			DurationUnit:  item.DurationUnit,
 			DurationValue: item.DurationValue,
@@ -1061,6 +1127,7 @@ func convertPriceOptionsToProto(items []*ent.ProxySubscribePriceOption) []*v1.Su
 			Sell:          item.Sell,
 			IsDefault:     item.IsDefault,
 			Sort:          item.Sort,
+			Version:       item.Version,
 			CreatedAt:     item.CreatedAt.Unix(),
 			UpdatedAt:     item.UpdatedAt.Unix(),
 		})

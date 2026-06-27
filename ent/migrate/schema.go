@@ -630,6 +630,8 @@ var (
 	SubscribePriceOptionColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "价格档位ID"},
 		{Name: "subscribe_id", Type: field.TypeInt64, Comment: "订阅套餐ID"},
+		{Name: "code", Type: field.TypeString, Size: 64, Comment: "稳定价格档位编码", Default: ""},
+		{Name: "option_type", Type: field.TypeString, Size: 32, Comment: "价格档位类型", Default: "duration"},
 		{Name: "name", Type: field.TypeString, Size: 255, Comment: "价格档位名称", Default: ""},
 		{Name: "duration_unit", Type: field.TypeString, Size: 32, Comment: "时长单位", Default: "Month"},
 		{Name: "duration_value", Type: field.TypeInt64, Comment: "时长数值", Default: 1},
@@ -640,6 +642,7 @@ var (
 		{Name: "sell", Type: field.TypeBool, Comment: "是否售卖", Default: true},
 		{Name: "is_default", Type: field.TypeBool, Comment: "默认档位", Default: false},
 		{Name: "sort", Type: field.TypeInt32, Comment: "排序", Default: 0},
+		{Name: "version", Type: field.TypeInt32, Comment: "乐观锁版本", Default: 1},
 		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间"},
 		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间"},
 	}
@@ -648,6 +651,23 @@ var (
 		Name:       "subscribe_price_option",
 		Columns:    SubscribePriceOptionColumns,
 		PrimaryKey: []*schema.Column{SubscribePriceOptionColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "proxysubscribepriceoption_subscribe_id_code",
+				Unique:  false,
+				Columns: []*schema.Column{SubscribePriceOptionColumns[1], SubscribePriceOptionColumns[2]},
+			},
+			{
+				Name:    "proxysubscribepriceoption_subscribe_id_option_type_sell_sort",
+				Unique:  false,
+				Columns: []*schema.Column{SubscribePriceOptionColumns[1], SubscribePriceOptionColumns[3], SubscribePriceOptionColumns[11], SubscribePriceOptionColumns[13]},
+			},
+			{
+				Name:    "proxysubscribepriceoption_subscribe_id_option_type_show_sort",
+				Unique:  false,
+				Columns: []*schema.Column{SubscribePriceOptionColumns[1], SubscribePriceOptionColumns[3], SubscribePriceOptionColumns[10], SubscribePriceOptionColumns[13]},
+			},
+		},
 	}
 	// SystemColumns holds the columns for the "system" table.
 	SystemColumns = []*schema.Column{

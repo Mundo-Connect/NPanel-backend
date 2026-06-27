@@ -1833,56 +1833,72 @@ func init() {
 	proxysubscribegroup.IDValidator = proxysubscribegroupDescID.Validators[0].(func(int64) error)
 	proxysubscribepriceoptionFields := schema.ProxySubscribePriceOption{}.Fields()
 	_ = proxysubscribepriceoptionFields
+	// proxysubscribepriceoptionDescCode is the schema descriptor for code field.
+	proxysubscribepriceoptionDescCode := proxysubscribepriceoptionFields[2].Descriptor()
+	// proxysubscribepriceoption.DefaultCode holds the default value on creation for the code field.
+	proxysubscribepriceoption.DefaultCode = proxysubscribepriceoptionDescCode.Default.(string)
+	// proxysubscribepriceoption.CodeValidator is a validator for the "code" field. It is called by the builders before save.
+	proxysubscribepriceoption.CodeValidator = proxysubscribepriceoptionDescCode.Validators[0].(func(string) error)
+	// proxysubscribepriceoptionDescOptionType is the schema descriptor for option_type field.
+	proxysubscribepriceoptionDescOptionType := proxysubscribepriceoptionFields[3].Descriptor()
+	// proxysubscribepriceoption.DefaultOptionType holds the default value on creation for the option_type field.
+	proxysubscribepriceoption.DefaultOptionType = proxysubscribepriceoptionDescOptionType.Default.(string)
+	// proxysubscribepriceoption.OptionTypeValidator is a validator for the "option_type" field. It is called by the builders before save.
+	proxysubscribepriceoption.OptionTypeValidator = proxysubscribepriceoptionDescOptionType.Validators[0].(func(string) error)
 	// proxysubscribepriceoptionDescName is the schema descriptor for name field.
-	proxysubscribepriceoptionDescName := proxysubscribepriceoptionFields[2].Descriptor()
+	proxysubscribepriceoptionDescName := proxysubscribepriceoptionFields[4].Descriptor()
 	// proxysubscribepriceoption.DefaultName holds the default value on creation for the name field.
 	proxysubscribepriceoption.DefaultName = proxysubscribepriceoptionDescName.Default.(string)
 	// proxysubscribepriceoption.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	proxysubscribepriceoption.NameValidator = proxysubscribepriceoptionDescName.Validators[0].(func(string) error)
 	// proxysubscribepriceoptionDescDurationUnit is the schema descriptor for duration_unit field.
-	proxysubscribepriceoptionDescDurationUnit := proxysubscribepriceoptionFields[3].Descriptor()
+	proxysubscribepriceoptionDescDurationUnit := proxysubscribepriceoptionFields[5].Descriptor()
 	// proxysubscribepriceoption.DefaultDurationUnit holds the default value on creation for the duration_unit field.
 	proxysubscribepriceoption.DefaultDurationUnit = proxysubscribepriceoptionDescDurationUnit.Default.(string)
 	// proxysubscribepriceoption.DurationUnitValidator is a validator for the "duration_unit" field. It is called by the builders before save.
 	proxysubscribepriceoption.DurationUnitValidator = proxysubscribepriceoptionDescDurationUnit.Validators[0].(func(string) error)
 	// proxysubscribepriceoptionDescDurationValue is the schema descriptor for duration_value field.
-	proxysubscribepriceoptionDescDurationValue := proxysubscribepriceoptionFields[4].Descriptor()
+	proxysubscribepriceoptionDescDurationValue := proxysubscribepriceoptionFields[6].Descriptor()
 	// proxysubscribepriceoption.DefaultDurationValue holds the default value on creation for the duration_value field.
 	proxysubscribepriceoption.DefaultDurationValue = proxysubscribepriceoptionDescDurationValue.Default.(int64)
 	// proxysubscribepriceoptionDescPrice is the schema descriptor for price field.
-	proxysubscribepriceoptionDescPrice := proxysubscribepriceoptionFields[5].Descriptor()
+	proxysubscribepriceoptionDescPrice := proxysubscribepriceoptionFields[7].Descriptor()
 	// proxysubscribepriceoption.DefaultPrice holds the default value on creation for the price field.
 	proxysubscribepriceoption.DefaultPrice = proxysubscribepriceoptionDescPrice.Default.(int64)
 	// proxysubscribepriceoptionDescOriginalPrice is the schema descriptor for original_price field.
-	proxysubscribepriceoptionDescOriginalPrice := proxysubscribepriceoptionFields[6].Descriptor()
+	proxysubscribepriceoptionDescOriginalPrice := proxysubscribepriceoptionFields[8].Descriptor()
 	// proxysubscribepriceoption.DefaultOriginalPrice holds the default value on creation for the original_price field.
 	proxysubscribepriceoption.DefaultOriginalPrice = proxysubscribepriceoptionDescOriginalPrice.Default.(int64)
 	// proxysubscribepriceoptionDescInventory is the schema descriptor for inventory field.
-	proxysubscribepriceoptionDescInventory := proxysubscribepriceoptionFields[7].Descriptor()
+	proxysubscribepriceoptionDescInventory := proxysubscribepriceoptionFields[9].Descriptor()
 	// proxysubscribepriceoption.DefaultInventory holds the default value on creation for the inventory field.
 	proxysubscribepriceoption.DefaultInventory = proxysubscribepriceoptionDescInventory.Default.(int32)
 	// proxysubscribepriceoptionDescShow is the schema descriptor for show field.
-	proxysubscribepriceoptionDescShow := proxysubscribepriceoptionFields[8].Descriptor()
+	proxysubscribepriceoptionDescShow := proxysubscribepriceoptionFields[10].Descriptor()
 	// proxysubscribepriceoption.DefaultShow holds the default value on creation for the show field.
 	proxysubscribepriceoption.DefaultShow = proxysubscribepriceoptionDescShow.Default.(bool)
 	// proxysubscribepriceoptionDescSell is the schema descriptor for sell field.
-	proxysubscribepriceoptionDescSell := proxysubscribepriceoptionFields[9].Descriptor()
+	proxysubscribepriceoptionDescSell := proxysubscribepriceoptionFields[11].Descriptor()
 	// proxysubscribepriceoption.DefaultSell holds the default value on creation for the sell field.
 	proxysubscribepriceoption.DefaultSell = proxysubscribepriceoptionDescSell.Default.(bool)
 	// proxysubscribepriceoptionDescIsDefault is the schema descriptor for is_default field.
-	proxysubscribepriceoptionDescIsDefault := proxysubscribepriceoptionFields[10].Descriptor()
+	proxysubscribepriceoptionDescIsDefault := proxysubscribepriceoptionFields[12].Descriptor()
 	// proxysubscribepriceoption.DefaultIsDefault holds the default value on creation for the is_default field.
 	proxysubscribepriceoption.DefaultIsDefault = proxysubscribepriceoptionDescIsDefault.Default.(bool)
 	// proxysubscribepriceoptionDescSort is the schema descriptor for sort field.
-	proxysubscribepriceoptionDescSort := proxysubscribepriceoptionFields[11].Descriptor()
+	proxysubscribepriceoptionDescSort := proxysubscribepriceoptionFields[13].Descriptor()
 	// proxysubscribepriceoption.DefaultSort holds the default value on creation for the sort field.
 	proxysubscribepriceoption.DefaultSort = proxysubscribepriceoptionDescSort.Default.(int32)
+	// proxysubscribepriceoptionDescVersion is the schema descriptor for version field.
+	proxysubscribepriceoptionDescVersion := proxysubscribepriceoptionFields[14].Descriptor()
+	// proxysubscribepriceoption.DefaultVersion holds the default value on creation for the version field.
+	proxysubscribepriceoption.DefaultVersion = proxysubscribepriceoptionDescVersion.Default.(int32)
 	// proxysubscribepriceoptionDescCreatedAt is the schema descriptor for created_at field.
-	proxysubscribepriceoptionDescCreatedAt := proxysubscribepriceoptionFields[12].Descriptor()
+	proxysubscribepriceoptionDescCreatedAt := proxysubscribepriceoptionFields[15].Descriptor()
 	// proxysubscribepriceoption.DefaultCreatedAt holds the default value on creation for the created_at field.
 	proxysubscribepriceoption.DefaultCreatedAt = proxysubscribepriceoptionDescCreatedAt.Default.(func() time.Time)
 	// proxysubscribepriceoptionDescUpdatedAt is the schema descriptor for updated_at field.
-	proxysubscribepriceoptionDescUpdatedAt := proxysubscribepriceoptionFields[13].Descriptor()
+	proxysubscribepriceoptionDescUpdatedAt := proxysubscribepriceoptionFields[16].Descriptor()
 	// proxysubscribepriceoption.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	proxysubscribepriceoption.DefaultUpdatedAt = proxysubscribepriceoptionDescUpdatedAt.Default.(func() time.Time)
 	// proxysubscribepriceoption.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.

@@ -28078,6 +28078,8 @@ type ProxySubscribePriceOptionMutation struct {
 	id                *int64
 	subscribe_id      *int64
 	addsubscribe_id   *int64
+	code              *string
+	option_type       *string
 	name              *string
 	duration_unit     *string
 	duration_value    *int64
@@ -28093,6 +28095,8 @@ type ProxySubscribePriceOptionMutation struct {
 	is_default        *bool
 	sort              *int32
 	addsort           *int32
+	version           *int32
+	addversion        *int32
 	created_at        *time.Time
 	updated_at        *time.Time
 	clearedFields     map[string]struct{}
@@ -28259,6 +28263,78 @@ func (m *ProxySubscribePriceOptionMutation) AddedSubscribeID() (r int64, exists 
 func (m *ProxySubscribePriceOptionMutation) ResetSubscribeID() {
 	m.subscribe_id = nil
 	m.addsubscribe_id = nil
+}
+
+// SetCode sets the "code" field.
+func (m *ProxySubscribePriceOptionMutation) SetCode(s string) {
+	m.code = &s
+}
+
+// Code returns the value of the "code" field in the mutation.
+func (m *ProxySubscribePriceOptionMutation) Code() (r string, exists bool) {
+	v := m.code
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCode returns the old "code" field's value of the ProxySubscribePriceOption entity.
+// If the ProxySubscribePriceOption object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProxySubscribePriceOptionMutation) OldCode(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCode is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCode requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCode: %w", err)
+	}
+	return oldValue.Code, nil
+}
+
+// ResetCode resets all changes to the "code" field.
+func (m *ProxySubscribePriceOptionMutation) ResetCode() {
+	m.code = nil
+}
+
+// SetOptionType sets the "option_type" field.
+func (m *ProxySubscribePriceOptionMutation) SetOptionType(s string) {
+	m.option_type = &s
+}
+
+// OptionType returns the value of the "option_type" field in the mutation.
+func (m *ProxySubscribePriceOptionMutation) OptionType() (r string, exists bool) {
+	v := m.option_type
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldOptionType returns the old "option_type" field's value of the ProxySubscribePriceOption entity.
+// If the ProxySubscribePriceOption object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProxySubscribePriceOptionMutation) OldOptionType(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldOptionType is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldOptionType requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldOptionType: %w", err)
+	}
+	return oldValue.OptionType, nil
+}
+
+// ResetOptionType resets all changes to the "option_type" field.
+func (m *ProxySubscribePriceOptionMutation) ResetOptionType() {
+	m.option_type = nil
 }
 
 // SetName sets the "name" field.
@@ -28721,6 +28797,62 @@ func (m *ProxySubscribePriceOptionMutation) ResetSort() {
 	m.addsort = nil
 }
 
+// SetVersion sets the "version" field.
+func (m *ProxySubscribePriceOptionMutation) SetVersion(i int32) {
+	m.version = &i
+	m.addversion = nil
+}
+
+// Version returns the value of the "version" field in the mutation.
+func (m *ProxySubscribePriceOptionMutation) Version() (r int32, exists bool) {
+	v := m.version
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldVersion returns the old "version" field's value of the ProxySubscribePriceOption entity.
+// If the ProxySubscribePriceOption object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProxySubscribePriceOptionMutation) OldVersion(ctx context.Context) (v int32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldVersion is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldVersion requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldVersion: %w", err)
+	}
+	return oldValue.Version, nil
+}
+
+// AddVersion adds i to the "version" field.
+func (m *ProxySubscribePriceOptionMutation) AddVersion(i int32) {
+	if m.addversion != nil {
+		*m.addversion += i
+	} else {
+		m.addversion = &i
+	}
+}
+
+// AddedVersion returns the value that was added to the "version" field in this mutation.
+func (m *ProxySubscribePriceOptionMutation) AddedVersion() (r int32, exists bool) {
+	v := m.addversion
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetVersion resets all changes to the "version" field.
+func (m *ProxySubscribePriceOptionMutation) ResetVersion() {
+	m.version = nil
+	m.addversion = nil
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (m *ProxySubscribePriceOptionMutation) SetCreatedAt(t time.Time) {
 	m.created_at = &t
@@ -28827,9 +28959,15 @@ func (m *ProxySubscribePriceOptionMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ProxySubscribePriceOptionMutation) Fields() []string {
-	fields := make([]string, 0, 13)
+	fields := make([]string, 0, 16)
 	if m.subscribe_id != nil {
 		fields = append(fields, proxysubscribepriceoption.FieldSubscribeID)
+	}
+	if m.code != nil {
+		fields = append(fields, proxysubscribepriceoption.FieldCode)
+	}
+	if m.option_type != nil {
+		fields = append(fields, proxysubscribepriceoption.FieldOptionType)
 	}
 	if m.name != nil {
 		fields = append(fields, proxysubscribepriceoption.FieldName)
@@ -28861,6 +28999,9 @@ func (m *ProxySubscribePriceOptionMutation) Fields() []string {
 	if m.sort != nil {
 		fields = append(fields, proxysubscribepriceoption.FieldSort)
 	}
+	if m.version != nil {
+		fields = append(fields, proxysubscribepriceoption.FieldVersion)
+	}
 	if m.created_at != nil {
 		fields = append(fields, proxysubscribepriceoption.FieldCreatedAt)
 	}
@@ -28877,6 +29018,10 @@ func (m *ProxySubscribePriceOptionMutation) Field(name string) (ent.Value, bool)
 	switch name {
 	case proxysubscribepriceoption.FieldSubscribeID:
 		return m.SubscribeID()
+	case proxysubscribepriceoption.FieldCode:
+		return m.Code()
+	case proxysubscribepriceoption.FieldOptionType:
+		return m.OptionType()
 	case proxysubscribepriceoption.FieldName:
 		return m.Name()
 	case proxysubscribepriceoption.FieldDurationUnit:
@@ -28897,6 +29042,8 @@ func (m *ProxySubscribePriceOptionMutation) Field(name string) (ent.Value, bool)
 		return m.IsDefault()
 	case proxysubscribepriceoption.FieldSort:
 		return m.Sort()
+	case proxysubscribepriceoption.FieldVersion:
+		return m.Version()
 	case proxysubscribepriceoption.FieldCreatedAt:
 		return m.CreatedAt()
 	case proxysubscribepriceoption.FieldUpdatedAt:
@@ -28912,6 +29059,10 @@ func (m *ProxySubscribePriceOptionMutation) OldField(ctx context.Context, name s
 	switch name {
 	case proxysubscribepriceoption.FieldSubscribeID:
 		return m.OldSubscribeID(ctx)
+	case proxysubscribepriceoption.FieldCode:
+		return m.OldCode(ctx)
+	case proxysubscribepriceoption.FieldOptionType:
+		return m.OldOptionType(ctx)
 	case proxysubscribepriceoption.FieldName:
 		return m.OldName(ctx)
 	case proxysubscribepriceoption.FieldDurationUnit:
@@ -28932,6 +29083,8 @@ func (m *ProxySubscribePriceOptionMutation) OldField(ctx context.Context, name s
 		return m.OldIsDefault(ctx)
 	case proxysubscribepriceoption.FieldSort:
 		return m.OldSort(ctx)
+	case proxysubscribepriceoption.FieldVersion:
+		return m.OldVersion(ctx)
 	case proxysubscribepriceoption.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
 	case proxysubscribepriceoption.FieldUpdatedAt:
@@ -28951,6 +29104,20 @@ func (m *ProxySubscribePriceOptionMutation) SetField(name string, value ent.Valu
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetSubscribeID(v)
+		return nil
+	case proxysubscribepriceoption.FieldCode:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCode(v)
+		return nil
+	case proxysubscribepriceoption.FieldOptionType:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetOptionType(v)
 		return nil
 	case proxysubscribepriceoption.FieldName:
 		v, ok := value.(string)
@@ -29022,6 +29189,13 @@ func (m *ProxySubscribePriceOptionMutation) SetField(name string, value ent.Valu
 		}
 		m.SetSort(v)
 		return nil
+	case proxysubscribepriceoption.FieldVersion:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetVersion(v)
+		return nil
 	case proxysubscribepriceoption.FieldCreatedAt:
 		v, ok := value.(time.Time)
 		if !ok {
@@ -29062,6 +29236,9 @@ func (m *ProxySubscribePriceOptionMutation) AddedFields() []string {
 	if m.addsort != nil {
 		fields = append(fields, proxysubscribepriceoption.FieldSort)
 	}
+	if m.addversion != nil {
+		fields = append(fields, proxysubscribepriceoption.FieldVersion)
+	}
 	return fields
 }
 
@@ -29082,6 +29259,8 @@ func (m *ProxySubscribePriceOptionMutation) AddedField(name string) (ent.Value, 
 		return m.AddedInventory()
 	case proxysubscribepriceoption.FieldSort:
 		return m.AddedSort()
+	case proxysubscribepriceoption.FieldVersion:
+		return m.AddedVersion()
 	}
 	return nil, false
 }
@@ -29133,6 +29312,13 @@ func (m *ProxySubscribePriceOptionMutation) AddField(name string, value ent.Valu
 		}
 		m.AddSort(v)
 		return nil
+	case proxysubscribepriceoption.FieldVersion:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddVersion(v)
+		return nil
 	}
 	return fmt.Errorf("unknown ProxySubscribePriceOption numeric field %s", name)
 }
@@ -29163,6 +29349,12 @@ func (m *ProxySubscribePriceOptionMutation) ResetField(name string) error {
 	case proxysubscribepriceoption.FieldSubscribeID:
 		m.ResetSubscribeID()
 		return nil
+	case proxysubscribepriceoption.FieldCode:
+		m.ResetCode()
+		return nil
+	case proxysubscribepriceoption.FieldOptionType:
+		m.ResetOptionType()
+		return nil
 	case proxysubscribepriceoption.FieldName:
 		m.ResetName()
 		return nil
@@ -29192,6 +29384,9 @@ func (m *ProxySubscribePriceOptionMutation) ResetField(name string) error {
 		return nil
 	case proxysubscribepriceoption.FieldSort:
 		m.ResetSort()
+		return nil
+	case proxysubscribepriceoption.FieldVersion:
+		m.ResetVersion()
 		return nil
 	case proxysubscribepriceoption.FieldCreatedAt:
 		m.ResetCreatedAt()

@@ -741,6 +741,7 @@ func (r *publicUserRepo) userSubscribePriceOptions(ctx context.Context, subscrip
 	items, err := r.data.db.ProxySubscribePriceOption.Query().
 		Where(
 			proxysubscribepriceoption.SubscribeIDIn(subscribeIDs...),
+			proxysubscribepriceoption.OptionTypeEQ("duration"),
 			proxysubscribepriceoption.ShowEQ(true),
 			proxysubscribepriceoption.SellEQ(true),
 		).
@@ -755,6 +756,8 @@ func (r *publicUserRepo) userSubscribePriceOptions(ctx context.Context, subscrip
 		result[item.SubscribeID] = append(result[item.SubscribeID], userBiz.SubscribePriceOption{
 			ID:            item.ID,
 			SubscribeID:   item.SubscribeID,
+			Code:          item.Code,
+			Type:          item.OptionType,
 			Name:          item.Name,
 			DurationUnit:  item.DurationUnit,
 			DurationValue: item.DurationValue,
