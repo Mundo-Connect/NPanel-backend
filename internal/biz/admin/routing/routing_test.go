@@ -238,6 +238,97 @@ func TestRoutingAnalyticsAggregatesFallbackAndHealthFailures(t *testing.T) {
 	}
 }
 
+func TestRoutingReportsProvideTrendDrilldownAndNotifications(t *testing.T) {
+	now := time.Now()
+	uc := NewRoutingUsecase(fakeRoutingRepo{
+		profiles: []*RouteProfile{
+			{ID: 1, Code: "p_user_1", Name: "User Profile", ScopeType: "user", ScopeID: "1", Enabled: true, ProfileJSON: `{}`},
+		},
+		grayReleases: []*RoutingGrayRelease{
+			{
+				ID:            1,
+				ProfileCode:   "p_user_1",
+				Name:          "user gray",
+				Status:        "running",
+				BatchNo:       1,
+				TargetType:    "user",
+				TargetIDsJSON: `[1]`,
+				ReleaseJSON:   `{}`,
+			},
+		},
+		routeEvents: []*RoutingRouteEvent{
+			{
+				ReporterID:  "device-1",
+				ProfileCode: "p_user_1",
+				RoutingHash: "hash-1",
+				EventType:   "route_decision",
+				Status:      "matched",
+				OutboundTag: "unlock:openai:us",
+				EventAt:     now.Add(-30 * time.Minute),
+			},
+			{
+				ReporterID:  "device-1",
+				ProfileCode: "p_user_1",
+				RoutingHash: "hash-1",
+				EventType:   "route_fallback",
+				Status:      "fallback",
+				OutboundTag: "unlock:openai:us",
+				Error:       "outbound failed",
+				EventAt:     now.Add(-20 * time.Minute),
+			},
+		},
+		healthReports: []*RoutingHealthReport{
+			{
+				ReporterID:  "device-1",
+				ProfileCode: "p_user_1",
+				RoutingHash: "hash-1",
+				SubjectType: "outbound",
+				SubjectKey:  "unlock:openai:us",
+				Status:      "failed",
+				LastError:   "outbound failed",
+				CheckedAt:   now.Add(-10 * time.Minute),
+			},
+		},
+	}, log.DefaultLogger)
+
+	trend, err := uc.TrendReport(context.Background(), "p_user_1", "hash-1", 120, 60)
+	if err != nil {
+		t.Fatalf("TrendReport() error = %v", err)
+	}
+	if len(trend.Points) == 0 {
+		t.Fatal("TrendReport() points is empty")
+	}
+	totalEvents := 0
+	for _, point := range trend.Points {
+		totalEvents += point.RouteEvents
+	}
+	if totalEvents != 2 {
+		t.Fatalf("TrendReport() total events = %d, want 2", totalEvents)
+	}
+
+	drilldown, err := uc.DrilldownReport(context.Background(), "p_user_1", "hash-1", "outbound", 120)
+	if err != nil {
+		t.Fatalf("DrilldownReport() error = %v", err)
+	}
+	if len(drilldown.Items) == 0 || drilldown.Items[0].Key != "unlock:openai:us" {
+		t.Fatalf("DrilldownReport() items = %+v, want outbound row", drilldown.Items)
+	}
+	if drilldown.Items[0].RouteFallbacks != 1 {
+		t.Fatalf("RouteFallbacks = %d, want 1", drilldown.Items[0].RouteFallbacks)
+	}
+
+	notifications, err := uc.Notifications(context.Background(), "p_user_1", "hash-1", 120, "warning")
+	if err != nil {
+		t.Fatalf("Notifications() error = %v", err)
+	}
+	if len(notifications) == 0 {
+		t.Fatal("Notifications() is empty, want top error warning")
+	}
+	if notifications[0].Severity != "warning" {
+		t.Fatalf("notification severity = %q, want warning", notifications[0].Severity)
+	}
+}
+
 func TestReleaseGateBlocksGlobalProfileAndHighFallback(t *testing.T) {
 	now := time.Now()
 	uc := NewRoutingUsecase(fakeRoutingRepo{

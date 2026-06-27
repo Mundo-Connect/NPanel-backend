@@ -410,6 +410,38 @@ func (s *RoutingService) RollbackRoutingReleaseAudit(ctx context.Context, req *v
 	return &v1.RollbackRoutingReleaseAuditReply{Code: successCode, Message: "success", Data: rollbackAuditToProto(item)}, nil
 }
 
+func (s *RoutingService) GetRoutingTrendReport(ctx context.Context, req *v1.GetRoutingTrendReportRequest) (*v1.GetRoutingTrendReportReply, error) {
+	item, err := s.uc.TrendReport(ctx, req.ProfileCode, req.RoutingHash, int(req.WindowMinutes), int(req.BucketMinutes))
+	if err != nil {
+		return nil, err
+	}
+	return &v1.GetRoutingTrendReportReply{Code: successCode, Message: "success", Data: trendReportToProto(item)}, nil
+}
+
+func (s *RoutingService) GetRoutingDrilldownReport(ctx context.Context, req *v1.GetRoutingDrilldownReportRequest) (*v1.GetRoutingDrilldownReportReply, error) {
+	item, err := s.uc.DrilldownReport(ctx, req.ProfileCode, req.RoutingHash, req.GroupBy, int(req.WindowMinutes))
+	if err != nil {
+		return nil, err
+	}
+	return &v1.GetRoutingDrilldownReportReply{Code: successCode, Message: "success", Data: drilldownReportToProto(item)}, nil
+}
+
+func (s *RoutingService) ListRoutingNotifications(ctx context.Context, req *v1.ListRoutingNotificationsRequest) (*v1.ListRoutingNotificationsReply, error) {
+	items, err := s.uc.Notifications(ctx, req.ProfileCode, req.RoutingHash, int(req.WindowMinutes), req.Severity)
+	if err != nil {
+		return nil, err
+	}
+	list := make([]*v1.RoutingNotification, 0, len(items))
+	for _, item := range items {
+		list = append(list, notificationToProto(item))
+	}
+	return &v1.ListRoutingNotificationsReply{
+		Code:    successCode,
+		Message: "success",
+		Data:    &v1.RoutingNotificationListData{List: list, Total: int32(len(list)), GeneratedAt: time.Now().Unix()},
+	}, nil
+}
+
 func routeProfileFromProto(item *v1.RouteProfile) *routingbiz.RouteProfile {
 	if item == nil {
 		return &routingbiz.RouteProfile{}
@@ -697,6 +729,86 @@ func rollbackAuditToProto(item *routingbiz.RoutingRollbackAudit) *v1.RoutingRoll
 		Summary:             item.Summary,
 		Alerts:              releaseAlertsToProto(item.Alerts),
 		CreatedAt:           unixOrZero(item.CreatedAt),
+	}
+}
+
+func trendReportToProto(item *routingbiz.RoutingTrendReport) *v1.RoutingTrendReport {
+	if item == nil {
+		return nil
+	}
+	points := make([]*v1.RoutingTrendPoint, 0, len(item.Points))
+	for _, point := range item.Points {
+		points = append(points, &v1.RoutingTrendPoint{
+			BucketStart:       unixOrZero(point.BucketStart),
+			RouteEvents:       int32(point.RouteEvents),
+			RouteFallbacks:    int32(point.RouteFallbacks),
+			FallbackRateBp:    int32(point.FallbackRateBP),
+			DnsFailures:       int32(point.DNSFailures),
+			OutboundFailures:  int32(point.OutboundFailures),
+			HealthReports:     int32(point.HealthReports),
+			AffectedReporters: int32(point.AffectedReporters),
+		})
+	}
+	markers := make([]*v1.RoutingTrendMarker, 0, len(item.Markers))
+	for _, marker := range item.Markers {
+		markers = append(markers, &v1.RoutingTrendMarker{
+			At:       unixOrZero(marker.At),
+			Type:     marker.Type,
+			Label:    marker.Label,
+			Operator: marker.Operator,
+		})
+	}
+	return &v1.RoutingTrendReport{
+		ProfileCode:   item.ProfileCode,
+		RoutingHash:   item.RoutingHash,
+		WindowMinutes: int64(item.WindowMinutes),
+		BucketMinutes: int64(item.BucketMinutes),
+		Points:        points,
+		Markers:       markers,
+		GeneratedAt:   unixOrZero(item.GeneratedAt),
+	}
+}
+
+func drilldownReportToProto(item *routingbiz.RoutingDrilldownReport) *v1.RoutingDrilldownReport {
+	if item == nil {
+		return nil
+	}
+	items := make([]*v1.RoutingDrilldownItem, 0, len(item.Items))
+	for _, row := range item.Items {
+		items = append(items, &v1.RoutingDrilldownItem{
+			Key:               row.Key,
+			Label:             row.Label,
+			RouteEvents:       int32(row.RouteEvents),
+			RouteFallbacks:    int32(row.RouteFallbacks),
+			FallbackRateBp:    int32(row.FallbackRateBP),
+			DnsFailures:       int32(row.DNSFailures),
+			OutboundFailures:  int32(row.OutboundFailures),
+			HealthReports:     int32(row.HealthReports),
+			AffectedReporters: int32(row.AffectedReporters),
+			LastError:         row.LastError,
+			LastSeenAt:        unixOrZero(row.LastSeenAt),
+		})
+	}
+	return &v1.RoutingDrilldownReport{
+		ProfileCode:   item.ProfileCode,
+		RoutingHash:   item.RoutingHash,
+		GroupBy:       item.GroupBy,
+		WindowMinutes: int64(item.WindowMinutes),
+		Items:         items,
+		GeneratedAt:   unixOrZero(item.GeneratedAt),
+	}
+}
+
+func notificationToProto(item routingbiz.RoutingNotification) *v1.RoutingNotification {
+	return &v1.RoutingNotification{
+		Id:          item.ID,
+		Severity:    item.Severity,
+		Title:       item.Title,
+		Message:     item.Message,
+		Source:      item.Source,
+		ProfileCode: item.ProfileCode,
+		RoutingHash: item.RoutingHash,
+		CreatedAt:   unixOrZero(item.CreatedAt),
 	}
 }
 

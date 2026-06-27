@@ -315,6 +315,70 @@ type RoutingReleaseReport struct {
 	GeneratedAt time.Time
 }
 
+type RoutingTrendPoint struct {
+	BucketStart       time.Time
+	RouteEvents       int
+	RouteFallbacks    int
+	FallbackRateBP    int
+	DNSFailures       int
+	OutboundFailures  int
+	HealthReports     int
+	AffectedReporters int
+}
+
+type RoutingTrendMarker struct {
+	At       time.Time
+	Type     string
+	Label    string
+	Operator string
+}
+
+type RoutingTrendReport struct {
+	ProfileCode   string
+	RoutingHash   string
+	WindowMinutes int
+	BucketMinutes int
+	Points        []RoutingTrendPoint
+	Markers       []RoutingTrendMarker
+	GeneratedAt   time.Time
+}
+
+type RoutingDrilldownItem struct {
+	Key               string
+	Label             string
+	RouteEvents       int
+	RouteFallbacks    int
+	FallbackRateBP    int
+	DNSFailures       int
+	OutboundFailures  int
+	HealthReports     int
+	AffectedReporters int
+	LastError         string
+	LastSeenAt        time.Time
+	reporters         map[string]struct{}
+	routeDecisions    int
+}
+
+type RoutingDrilldownReport struct {
+	ProfileCode   string
+	RoutingHash   string
+	GroupBy       string
+	WindowMinutes int
+	Items         []RoutingDrilldownItem
+	GeneratedAt   time.Time
+}
+
+type RoutingNotification struct {
+	ID          string
+	Severity    string
+	Title       string
+	Message     string
+	Source      string
+	ProfileCode string
+	RoutingHash string
+	CreatedAt   time.Time
+}
+
 type routingGrayReleaseMetadata struct {
 	Basis          string                        `json:"basis,omitempty"`
 	Thresholds     *RoutingReleaseThresholds     `json:"thresholds,omitempty"`
@@ -976,6 +1040,102 @@ func (uc *RoutingUsecase) RollbackReleaseAudit(ctx context.Context, releaseID in
 		return nil, err
 	}
 	return &audit, nil
+}
+
+func (uc *RoutingUsecase) TrendReport(ctx context.Context, profileCode, routingHash string, windowMinutes, bucketMinutes int) (*RoutingTrendReport, error) {
+	now := time.Now()
+	windowMinutes = normalizeWindowMinutes(windowMinutes)
+	bucketMinutes = normalizeBucketMinutes(bucketMinutes, windowMinutes)
+	startedAt := now.Add(-time.Duration(windowMinutes) * time.Minute)
+	events, reports, err := uc.routingEvidence(ctx, profileCode, routingHash, windowMinutes)
+	if err != nil {
+		return nil, err
+	}
+	points := buildTrendPoints(events, reports, strings.TrimSpace(routingHash), startedAt, now, bucketMinutes)
+	markers := uc.releaseMarkers(ctx, strings.TrimSpace(profileCode), startedAt)
+	return &RoutingTrendReport{
+		ProfileCode:   strings.TrimSpace(profileCode),
+		RoutingHash:   strings.TrimSpace(routingHash),
+		WindowMinutes: windowMinutes,
+		BucketMinutes: bucketMinutes,
+		Points:        points,
+		Markers:       markers,
+		GeneratedAt:   now,
+	}, nil
+}
+
+func (uc *RoutingUsecase) DrilldownReport(ctx context.Context, profileCode, routingHash, groupBy string, windowMinutes int) (*RoutingDrilldownReport, error) {
+	now := time.Now()
+	windowMinutes = normalizeWindowMinutes(windowMinutes)
+	groupBy = normalizeDrilldownGroup(groupBy)
+	events, reports, err := uc.routingEvidence(ctx, profileCode, routingHash, windowMinutes)
+	if err != nil {
+		return nil, err
+	}
+	items := buildDrilldownItems(events, reports, strings.TrimSpace(routingHash), groupBy)
+	return &RoutingDrilldownReport{
+		ProfileCode:   strings.TrimSpace(profileCode),
+		RoutingHash:   strings.TrimSpace(routingHash),
+		GroupBy:       groupBy,
+		WindowMinutes: windowMinutes,
+		Items:         items,
+		GeneratedAt:   now,
+	}, nil
+}
+
+func (uc *RoutingUsecase) Notifications(ctx context.Context, profileCode, routingHash string, windowMinutes int, severity string) ([]RoutingNotification, error) {
+	now := time.Now()
+	windowMinutes = normalizeWindowMinutes(windowMinutes)
+	analytics, err := uc.Analytics(ctx, profileCode, routingHash, windowMinutes)
+	if err != nil {
+		return nil, err
+	}
+	report, err := uc.ReleaseReport(ctx, 0, profileCode, routingHash, windowMinutes, RoutingReleaseThresholds{})
+	if err != nil {
+		return nil, err
+	}
+	notifications := make([]RoutingNotification, 0)
+	for _, alert := range report.Alerts {
+		notifications = append(notifications, RoutingNotification{
+			ID:          "release:" + alert.Key,
+			Severity:    alert.Severity,
+			Title:       alert.Message,
+			Message:     alert.Evidence,
+			Source:      "release_gate",
+			ProfileCode: report.ProfileCode,
+			RoutingHash: report.RoutingHash,
+			CreatedAt:   now,
+		})
+	}
+	for _, top := range analytics.TopErrors {
+		notifications = append(notifications, RoutingNotification{
+			ID:          "top_error:" + top.Kind + ":" + top.Key,
+			Severity:    "warning",
+			Title:       firstNonEmpty(top.Key, top.Kind),
+			Message:     top.Error,
+			Source:      "top_error",
+			ProfileCode: strings.TrimSpace(profileCode),
+			RoutingHash: strings.TrimSpace(routingHash),
+			CreatedAt:   now,
+		})
+	}
+	severity = strings.ToLower(strings.TrimSpace(severity))
+	if severity != "" {
+		filtered := notifications[:0]
+		for _, item := range notifications {
+			if item.Severity == severity {
+				filtered = append(filtered, item)
+			}
+		}
+		notifications = filtered
+	}
+	sort.SliceStable(notifications, func(i, j int) bool {
+		return severityRank(notifications[i].Severity) < severityRank(notifications[j].Severity)
+	})
+	if len(notifications) > 50 {
+		notifications = notifications[:50]
+	}
+	return notifications, nil
 }
 
 func (uc *RoutingUsecase) E2EChecklist(ctx context.Context, profileCode string) (*RoutingE2EChecklist, error) {
@@ -2091,6 +2251,277 @@ func rollbackSummary(report *RoutingReleaseReport) string {
 		return "rollback requested; no active release alerts"
 	}
 	return fmt.Sprintf("rollback requested with %d release alerts", len(report.Alerts))
+}
+
+func normalizeWindowMinutes(value int) int {
+	if value <= 0 {
+		return 60
+	}
+	if value > 10080 {
+		return 10080
+	}
+	return value
+}
+
+func normalizeBucketMinutes(value, windowMinutes int) int {
+	if value <= 0 {
+		switch {
+		case windowMinutes <= 60:
+			return 5
+		case windowMinutes <= 24*60:
+			return 60
+		default:
+			return 6 * 60
+		}
+	}
+	if value > windowMinutes {
+		return windowMinutes
+	}
+	return value
+}
+
+func normalizeDrilldownGroup(value string) string {
+	switch strings.ToLower(strings.TrimSpace(value)) {
+	case "rule", "outbound", "dns_resolver", "subject", "status":
+		return strings.ToLower(strings.TrimSpace(value))
+	default:
+		return "reporter"
+	}
+}
+
+func (uc *RoutingUsecase) routingEvidence(ctx context.Context, profileCode, routingHash string, windowMinutes int) ([]*RoutingRouteEvent, []*RoutingHealthReport, error) {
+	windowMinutes = normalizeWindowMinutes(windowMinutes)
+	startedAt := time.Now().Add(-time.Duration(windowMinutes) * time.Minute)
+	events, _, err := uc.repo.ListRouteEvents(ctx, 1, 1000, "", strings.TrimSpace(profileCode), "")
+	if err != nil {
+		return nil, nil, err
+	}
+	reports, _, err := uc.repo.ListHealthReports(ctx, 1, 1000, "", "", "")
+	if err != nil {
+		return nil, nil, err
+	}
+	routingHash = strings.TrimSpace(routingHash)
+	filteredEvents := make([]*RoutingRouteEvent, 0, len(events))
+	for _, event := range events {
+		if event == nil || event.EventAt.Before(startedAt) || !matchesRoutingHash(event.RoutingHash, routingHash) {
+			continue
+		}
+		filteredEvents = append(filteredEvents, event)
+	}
+	filteredReports := make([]*RoutingHealthReport, 0, len(reports))
+	for _, report := range reports {
+		if report == nil || report.CheckedAt.Before(startedAt) || !matchesRoutingHash(report.RoutingHash, routingHash) {
+			continue
+		}
+		if profileCode != "" && report.ProfileCode != "" && report.ProfileCode != profileCode {
+			continue
+		}
+		filteredReports = append(filteredReports, report)
+	}
+	return filteredEvents, filteredReports, nil
+}
+
+func buildTrendPoints(events []*RoutingRouteEvent, reports []*RoutingHealthReport, routingHash string, startedAt, now time.Time, bucketMinutes int) []RoutingTrendPoint {
+	bucketDuration := time.Duration(bucketMinutes) * time.Minute
+	bucketCount := int(now.Sub(startedAt)/bucketDuration) + 1
+	if bucketCount < 1 {
+		bucketCount = 1
+	}
+	points := make([]RoutingTrendPoint, bucketCount)
+	reporters := make([]map[string]struct{}, bucketCount)
+	decisions := make([]int, bucketCount)
+	for i := range points {
+		points[i].BucketStart = startedAt.Add(time.Duration(i) * bucketDuration)
+		reporters[i] = map[string]struct{}{}
+	}
+	bucketIndex := func(ts time.Time) int {
+		idx := int(ts.Sub(startedAt) / bucketDuration)
+		if idx < 0 {
+			return 0
+		}
+		if idx >= len(points) {
+			return len(points) - 1
+		}
+		return idx
+	}
+	for _, event := range events {
+		if event == nil || !matchesRoutingHash(event.RoutingHash, routingHash) {
+			continue
+		}
+		idx := bucketIndex(event.EventAt)
+		points[idx].RouteEvents++
+		reporters[idx][firstNonEmpty(event.ReporterID, "unknown")] = struct{}{}
+		if event.EventType == "route_decision" {
+			decisions[idx]++
+		}
+		if event.EventType == "route_fallback" || event.Status == "fallback" {
+			points[idx].RouteFallbacks++
+		}
+		if strings.Contains(event.EventType, "dns_resolver") && isFailingStatus(event.Status) {
+			points[idx].DNSFailures++
+		}
+		if strings.Contains(event.EventType, "outbound") && isFailingStatus(event.Status) {
+			points[idx].OutboundFailures++
+		}
+	}
+	for _, report := range reports {
+		if report == nil || !matchesRoutingHash(report.RoutingHash, routingHash) {
+			continue
+		}
+		idx := bucketIndex(report.CheckedAt)
+		points[idx].HealthReports++
+		reporters[idx][firstNonEmpty(report.ReporterID, "unknown")] = struct{}{}
+		if report.SubjectType == "dns_resolver" && isFailingStatus(report.Status) {
+			points[idx].DNSFailures++
+		}
+		if report.SubjectType == "outbound" && isFailingStatus(report.Status) {
+			points[idx].OutboundFailures++
+		}
+	}
+	for i := range points {
+		points[i].AffectedReporters = len(reporters[i])
+		points[i].FallbackRateBP = rateBP(points[i].RouteFallbacks, decisions[i])
+	}
+	return points
+}
+
+func buildDrilldownItems(events []*RoutingRouteEvent, reports []*RoutingHealthReport, routingHash, groupBy string) []RoutingDrilldownItem {
+	groups := map[string]*RoutingDrilldownItem{}
+	itemFor := func(key, label string) *RoutingDrilldownItem {
+		key = firstNonEmpty(key, "unknown")
+		if groups[key] == nil {
+			groups[key] = &RoutingDrilldownItem{Key: key, Label: firstNonEmpty(label, key), reporters: map[string]struct{}{}}
+		}
+		return groups[key]
+	}
+	for _, event := range events {
+		if event == nil || !matchesRoutingHash(event.RoutingHash, routingHash) {
+			continue
+		}
+		key, label := drilldownEventKey(event, groupBy)
+		item := itemFor(key, label)
+		item.RouteEvents++
+		item.reporters[firstNonEmpty(event.ReporterID, "unknown")] = struct{}{}
+		if event.EventType == "route_decision" {
+			item.routeDecisions++
+		}
+		if event.EventType == "route_fallback" || event.Status == "fallback" {
+			item.RouteFallbacks++
+		}
+		if strings.Contains(event.EventType, "dns_resolver") && isFailingStatus(event.Status) {
+			item.DNSFailures++
+		}
+		if strings.Contains(event.EventType, "outbound") && isFailingStatus(event.Status) {
+			item.OutboundFailures++
+		}
+		if event.EventAt.After(item.LastSeenAt) {
+			item.LastSeenAt = event.EventAt
+			item.LastError = event.Error
+		}
+	}
+	for _, report := range reports {
+		if report == nil || !matchesRoutingHash(report.RoutingHash, routingHash) {
+			continue
+		}
+		key, label := drilldownReportKey(report, groupBy)
+		item := itemFor(key, label)
+		item.HealthReports++
+		item.reporters[firstNonEmpty(report.ReporterID, "unknown")] = struct{}{}
+		if report.SubjectType == "dns_resolver" && isFailingStatus(report.Status) {
+			item.DNSFailures++
+		}
+		if report.SubjectType == "outbound" && isFailingStatus(report.Status) {
+			item.OutboundFailures++
+		}
+		if report.CheckedAt.After(item.LastSeenAt) {
+			item.LastSeenAt = report.CheckedAt
+			item.LastError = report.LastError
+		}
+	}
+	items := make([]RoutingDrilldownItem, 0, len(groups))
+	for _, item := range groups {
+		item.AffectedReporters = len(item.reporters)
+		item.FallbackRateBP = rateBP(item.RouteFallbacks, item.routeDecisions)
+		items = append(items, *item)
+	}
+	sort.SliceStable(items, func(i, j int) bool {
+		return items[i].RouteFallbacks+items[i].DNSFailures+items[i].OutboundFailures > items[j].RouteFallbacks+items[j].DNSFailures+items[j].OutboundFailures
+	})
+	if len(items) > 50 {
+		items = items[:50]
+	}
+	return items
+}
+
+func drilldownEventKey(event *RoutingRouteEvent, groupBy string) (string, string) {
+	switch groupBy {
+	case "rule":
+		return firstNonEmpty(event.RuleID, event.RuleName), event.RuleName
+	case "outbound":
+		return event.OutboundTag, event.OutboundTag
+	case "dns_resolver":
+		return event.DNSResolverTag, event.DNSResolverTag
+	case "subject":
+		return event.Subject, event.Subject
+	case "status":
+		return event.Status, event.Status
+	default:
+		return event.ReporterID, event.ReporterID
+	}
+}
+
+func drilldownReportKey(report *RoutingHealthReport, groupBy string) (string, string) {
+	switch groupBy {
+	case "outbound":
+		return firstNonEmpty(report.OutboundTag, report.SubjectKey), firstNonEmpty(report.OutboundTag, report.SubjectKey)
+	case "dns_resolver":
+		return firstNonEmpty(report.DNSResolverTag, report.SubjectKey), firstNonEmpty(report.DNSResolverTag, report.SubjectKey)
+	case "subject", "rule":
+		return report.SubjectKey, report.SubjectKey
+	case "status":
+		return report.Status, report.Status
+	default:
+		return report.ReporterID, report.ReporterID
+	}
+}
+
+func (uc *RoutingUsecase) releaseMarkers(ctx context.Context, profileCode string, startedAt time.Time) []RoutingTrendMarker {
+	releases, _, err := uc.repo.ListGrayReleases(ctx, 1, 100, profileCode, "")
+	if err != nil {
+		return nil
+	}
+	markers := make([]RoutingTrendMarker, 0)
+	for _, release := range releases {
+		if release == nil {
+			continue
+		}
+		metadata := parseGrayReleaseMetadata(release.ReleaseJSON)
+		for _, approval := range metadata.Approvals {
+			if approval.ConfirmedAt.Before(startedAt) {
+				continue
+			}
+			markers = append(markers, RoutingTrendMarker{At: approval.ConfirmedAt, Type: "release_confirm", Label: approval.ID, Operator: approval.Operator})
+		}
+		for _, rollback := range metadata.RollbackAudits {
+			if rollback.CreatedAt.Before(startedAt) {
+				continue
+			}
+			markers = append(markers, RoutingTrendMarker{At: rollback.CreatedAt, Type: "rollback", Label: rollback.ID, Operator: rollback.Operator})
+		}
+	}
+	sort.SliceStable(markers, func(i, j int) bool { return markers[i].At.Before(markers[j].At) })
+	return markers
+}
+
+func severityRank(value string) int {
+	switch value {
+	case "critical":
+		return 0
+	case "warning":
+		return 1
+	default:
+		return 2
+	}
 }
 
 func matchesRoutingHash(value, expected string) bool {

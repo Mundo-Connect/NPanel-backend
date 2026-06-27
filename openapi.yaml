@@ -2090,6 +2090,35 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/api.admin.routing.v1.ListDnsResolversReply'
+    /v1/admin/routing/drilldown_report:
+        get:
+            tags:
+                - RoutingService
+            operationId: RoutingService_GetRoutingDrilldownReport
+            parameters:
+                - name: profileCode
+                  in: query
+                  schema:
+                    type: string
+                - name: routingHash
+                  in: query
+                  schema:
+                    type: string
+                - name: groupBy
+                  in: query
+                  schema:
+                    type: string
+                - name: windowMinutes
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.admin.routing.v1.GetRoutingDrilldownReportReply'
     /v1/admin/routing/e2e_checklist:
         get:
             tags:
@@ -2238,6 +2267,35 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/api.admin.routing.v1.ListRoutingHealthReportsReply'
+    /v1/admin/routing/notifications:
+        get:
+            tags:
+                - RoutingService
+            operationId: RoutingService_ListRoutingNotifications
+            parameters:
+                - name: profileCode
+                  in: query
+                  schema:
+                    type: string
+                - name: routingHash
+                  in: query
+                  schema:
+                    type: string
+                - name: windowMinutes
+                  in: query
+                  schema:
+                    type: string
+                - name: severity
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.admin.routing.v1.ListRoutingNotificationsReply'
     /v1/admin/routing/outbound:
         put:
             tags:
@@ -2761,6 +2819,35 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/api.admin.routing.v1.ListRouteRulesReply'
+    /v1/admin/routing/trend_report:
+        get:
+            tags:
+                - RoutingService
+            operationId: RoutingService_GetRoutingTrendReport
+            parameters:
+                - name: profileCode
+                  in: query
+                  schema:
+                    type: string
+                - name: routingHash
+                  in: query
+                  schema:
+                    type: string
+                - name: windowMinutes
+                  in: query
+                  schema:
+                    type: string
+                - name: bucketMinutes
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.admin.routing.v1.GetRoutingTrendReportReply'
     /v1/admin/routing/unlock_service:
         put:
             tags:
@@ -9546,6 +9633,16 @@ components:
                     type: string
                 data:
                     $ref: '#/components/schemas/api.admin.routing.v1.RoutingCapabilityMatrixData'
+        api.admin.routing.v1.GetRoutingDrilldownReportReply:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/api.admin.routing.v1.RoutingDrilldownReport'
         api.admin.routing.v1.GetRoutingE2EChecklistReply:
             type: object
             properties:
@@ -9586,6 +9683,16 @@ components:
                     type: string
                 data:
                     $ref: '#/components/schemas/api.admin.routing.v1.RoutingReleaseReport'
+        api.admin.routing.v1.GetRoutingTrendReportReply:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/api.admin.routing.v1.RoutingTrendReport'
         api.admin.routing.v1.ListDnsResolversReply:
             type: object
             properties:
@@ -9646,6 +9753,16 @@ components:
                     type: string
                 data:
                     $ref: '#/components/schemas/api.admin.routing.v1.RoutingHealthReportListData'
+        api.admin.routing.v1.ListRoutingNotificationsReply:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/api.admin.routing.v1.RoutingNotificationListData'
         api.admin.routing.v1.ListRoutingRouteEventsReply:
             type: object
             properties:
@@ -10038,6 +10155,55 @@ components:
                     type: boolean
                 notes:
                     type: string
+        api.admin.routing.v1.RoutingDrilldownItem:
+            type: object
+            properties:
+                key:
+                    type: string
+                label:
+                    type: string
+                routeEvents:
+                    type: integer
+                    format: int32
+                routeFallbacks:
+                    type: integer
+                    format: int32
+                fallbackRateBp:
+                    type: integer
+                    format: int32
+                dnsFailures:
+                    type: integer
+                    format: int32
+                outboundFailures:
+                    type: integer
+                    format: int32
+                healthReports:
+                    type: integer
+                    format: int32
+                affectedReporters:
+                    type: integer
+                    format: int32
+                lastError:
+                    type: string
+                lastSeenAt:
+                    type: string
+        api.admin.routing.v1.RoutingDrilldownReport:
+            type: object
+            properties:
+                profileCode:
+                    type: string
+                routingHash:
+                    type: string
+                groupBy:
+                    type: string
+                windowMinutes:
+                    type: string
+                items:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.admin.routing.v1.RoutingDrilldownItem'
+                generatedAt:
+                    type: string
         api.admin.routing.v1.RoutingE2EChecklistData:
             type: object
             properties:
@@ -10215,6 +10381,37 @@ components:
                 total:
                     type: integer
                     format: int32
+        api.admin.routing.v1.RoutingNotification:
+            type: object
+            properties:
+                id:
+                    type: string
+                severity:
+                    type: string
+                title:
+                    type: string
+                message:
+                    type: string
+                source:
+                    type: string
+                profileCode:
+                    type: string
+                routingHash:
+                    type: string
+                createdAt:
+                    type: string
+        api.admin.routing.v1.RoutingNotificationListData:
+            type: object
+            properties:
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.admin.routing.v1.RoutingNotification'
+                total:
+                    type: integer
+                    format: int32
+                generatedAt:
+                    type: string
         api.admin.routing.v1.RoutingOverview:
             type: object
             properties:
@@ -10480,6 +10677,64 @@ components:
                 total:
                     type: integer
                     format: int32
+        api.admin.routing.v1.RoutingTrendMarker:
+            type: object
+            properties:
+                at:
+                    type: string
+                type:
+                    type: string
+                label:
+                    type: string
+                operator:
+                    type: string
+        api.admin.routing.v1.RoutingTrendPoint:
+            type: object
+            properties:
+                bucketStart:
+                    type: string
+                routeEvents:
+                    type: integer
+                    format: int32
+                routeFallbacks:
+                    type: integer
+                    format: int32
+                fallbackRateBp:
+                    type: integer
+                    format: int32
+                dnsFailures:
+                    type: integer
+                    format: int32
+                outboundFailures:
+                    type: integer
+                    format: int32
+                healthReports:
+                    type: integer
+                    format: int32
+                affectedReporters:
+                    type: integer
+                    format: int32
+        api.admin.routing.v1.RoutingTrendReport:
+            type: object
+            properties:
+                profileCode:
+                    type: string
+                routingHash:
+                    type: string
+                windowMinutes:
+                    type: string
+                bucketMinutes:
+                    type: string
+                points:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.admin.routing.v1.RoutingTrendPoint'
+                markers:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.admin.routing.v1.RoutingTrendMarker'
+                generatedAt:
+                    type: string
         api.admin.routing.v1.SnapshotRoutingReleaseAuditReply:
             type: object
             properties:

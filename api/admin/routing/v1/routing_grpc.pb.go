@@ -56,6 +56,9 @@ const (
 	RoutingService_SnapshotRoutingReleaseAudit_FullMethodName  = "/api.admin.routing.v1.RoutingService/SnapshotRoutingReleaseAudit"
 	RoutingService_ConfirmRoutingReleaseEnforce_FullMethodName = "/api.admin.routing.v1.RoutingService/ConfirmRoutingReleaseEnforce"
 	RoutingService_RollbackRoutingReleaseAudit_FullMethodName  = "/api.admin.routing.v1.RoutingService/RollbackRoutingReleaseAudit"
+	RoutingService_GetRoutingTrendReport_FullMethodName        = "/api.admin.routing.v1.RoutingService/GetRoutingTrendReport"
+	RoutingService_GetRoutingDrilldownReport_FullMethodName    = "/api.admin.routing.v1.RoutingService/GetRoutingDrilldownReport"
+	RoutingService_ListRoutingNotifications_FullMethodName     = "/api.admin.routing.v1.RoutingService/ListRoutingNotifications"
 )
 
 // RoutingServiceClient is the client API for RoutingService service.
@@ -99,6 +102,9 @@ type RoutingServiceClient interface {
 	SnapshotRoutingReleaseAudit(ctx context.Context, in *SnapshotRoutingReleaseAuditRequest, opts ...grpc.CallOption) (*SnapshotRoutingReleaseAuditReply, error)
 	ConfirmRoutingReleaseEnforce(ctx context.Context, in *ConfirmRoutingReleaseEnforceRequest, opts ...grpc.CallOption) (*ConfirmRoutingReleaseEnforceReply, error)
 	RollbackRoutingReleaseAudit(ctx context.Context, in *RollbackRoutingReleaseAuditRequest, opts ...grpc.CallOption) (*RollbackRoutingReleaseAuditReply, error)
+	GetRoutingTrendReport(ctx context.Context, in *GetRoutingTrendReportRequest, opts ...grpc.CallOption) (*GetRoutingTrendReportReply, error)
+	GetRoutingDrilldownReport(ctx context.Context, in *GetRoutingDrilldownReportRequest, opts ...grpc.CallOption) (*GetRoutingDrilldownReportReply, error)
+	ListRoutingNotifications(ctx context.Context, in *ListRoutingNotificationsRequest, opts ...grpc.CallOption) (*ListRoutingNotificationsReply, error)
 }
 
 type routingServiceClient struct {
@@ -479,6 +485,36 @@ func (c *routingServiceClient) RollbackRoutingReleaseAudit(ctx context.Context, 
 	return out, nil
 }
 
+func (c *routingServiceClient) GetRoutingTrendReport(ctx context.Context, in *GetRoutingTrendReportRequest, opts ...grpc.CallOption) (*GetRoutingTrendReportReply, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetRoutingTrendReportReply)
+	err := c.cc.Invoke(ctx, RoutingService_GetRoutingTrendReport_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *routingServiceClient) GetRoutingDrilldownReport(ctx context.Context, in *GetRoutingDrilldownReportRequest, opts ...grpc.CallOption) (*GetRoutingDrilldownReportReply, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetRoutingDrilldownReportReply)
+	err := c.cc.Invoke(ctx, RoutingService_GetRoutingDrilldownReport_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *routingServiceClient) ListRoutingNotifications(ctx context.Context, in *ListRoutingNotificationsRequest, opts ...grpc.CallOption) (*ListRoutingNotificationsReply, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListRoutingNotificationsReply)
+	err := c.cc.Invoke(ctx, RoutingService_ListRoutingNotifications_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // RoutingServiceServer is the server API for RoutingService service.
 // All implementations must embed UnimplementedRoutingServiceServer
 // for forward compatibility.
@@ -520,6 +556,9 @@ type RoutingServiceServer interface {
 	SnapshotRoutingReleaseAudit(context.Context, *SnapshotRoutingReleaseAuditRequest) (*SnapshotRoutingReleaseAuditReply, error)
 	ConfirmRoutingReleaseEnforce(context.Context, *ConfirmRoutingReleaseEnforceRequest) (*ConfirmRoutingReleaseEnforceReply, error)
 	RollbackRoutingReleaseAudit(context.Context, *RollbackRoutingReleaseAuditRequest) (*RollbackRoutingReleaseAuditReply, error)
+	GetRoutingTrendReport(context.Context, *GetRoutingTrendReportRequest) (*GetRoutingTrendReportReply, error)
+	GetRoutingDrilldownReport(context.Context, *GetRoutingDrilldownReportRequest) (*GetRoutingDrilldownReportReply, error)
+	ListRoutingNotifications(context.Context, *ListRoutingNotificationsRequest) (*ListRoutingNotificationsReply, error)
 	mustEmbedUnimplementedRoutingServiceServer()
 }
 
@@ -640,6 +679,15 @@ func (UnimplementedRoutingServiceServer) ConfirmRoutingReleaseEnforce(context.Co
 }
 func (UnimplementedRoutingServiceServer) RollbackRoutingReleaseAudit(context.Context, *RollbackRoutingReleaseAuditRequest) (*RollbackRoutingReleaseAuditReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RollbackRoutingReleaseAudit not implemented")
+}
+func (UnimplementedRoutingServiceServer) GetRoutingTrendReport(context.Context, *GetRoutingTrendReportRequest) (*GetRoutingTrendReportReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetRoutingTrendReport not implemented")
+}
+func (UnimplementedRoutingServiceServer) GetRoutingDrilldownReport(context.Context, *GetRoutingDrilldownReportRequest) (*GetRoutingDrilldownReportReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetRoutingDrilldownReport not implemented")
+}
+func (UnimplementedRoutingServiceServer) ListRoutingNotifications(context.Context, *ListRoutingNotificationsRequest) (*ListRoutingNotificationsReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListRoutingNotifications not implemented")
 }
 func (UnimplementedRoutingServiceServer) mustEmbedUnimplementedRoutingServiceServer() {}
 func (UnimplementedRoutingServiceServer) testEmbeddedByValue()                        {}
@@ -1328,6 +1376,60 @@ func _RoutingService_RollbackRoutingReleaseAudit_Handler(srv interface{}, ctx co
 	return interceptor(ctx, in, info, handler)
 }
 
+func _RoutingService_GetRoutingTrendReport_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetRoutingTrendReportRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RoutingServiceServer).GetRoutingTrendReport(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: RoutingService_GetRoutingTrendReport_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RoutingServiceServer).GetRoutingTrendReport(ctx, req.(*GetRoutingTrendReportRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _RoutingService_GetRoutingDrilldownReport_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetRoutingDrilldownReportRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RoutingServiceServer).GetRoutingDrilldownReport(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: RoutingService_GetRoutingDrilldownReport_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RoutingServiceServer).GetRoutingDrilldownReport(ctx, req.(*GetRoutingDrilldownReportRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _RoutingService_ListRoutingNotifications_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListRoutingNotificationsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RoutingServiceServer).ListRoutingNotifications(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: RoutingService_ListRoutingNotifications_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RoutingServiceServer).ListRoutingNotifications(ctx, req.(*ListRoutingNotificationsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // RoutingService_ServiceDesc is the grpc.ServiceDesc for RoutingService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -1482,6 +1584,18 @@ var RoutingService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "RollbackRoutingReleaseAudit",
 			Handler:    _RoutingService_RollbackRoutingReleaseAudit_Handler,
+		},
+		{
+			MethodName: "GetRoutingTrendReport",
+			Handler:    _RoutingService_GetRoutingTrendReport_Handler,
+		},
+		{
+			MethodName: "GetRoutingDrilldownReport",
+			Handler:    _RoutingService_GetRoutingDrilldownReport_Handler,
+		},
+		{
+			MethodName: "ListRoutingNotifications",
+			Handler:    _RoutingService_ListRoutingNotifications_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

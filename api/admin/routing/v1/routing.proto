@@ -186,6 +186,18 @@ service RoutingService {
       body: "*"
     };
   }
+
+  rpc GetRoutingTrendReport(GetRoutingTrendReportRequest) returns (GetRoutingTrendReportReply) {
+    option (google.api.http) = { get: "/v1/admin/routing/trend_report" };
+  }
+
+  rpc GetRoutingDrilldownReport(GetRoutingDrilldownReportRequest) returns (GetRoutingDrilldownReportReply) {
+    option (google.api.http) = { get: "/v1/admin/routing/drilldown_report" };
+  }
+
+  rpc ListRoutingNotifications(ListRoutingNotificationsRequest) returns (ListRoutingNotificationsReply) {
+    option (google.api.http) = { get: "/v1/admin/routing/notifications" };
+  }
 }
 
 message RouteProfile {
@@ -730,6 +742,113 @@ message RollbackRoutingReleaseAuditReply {
   int32 code = 1;
   string message = 2;
   RoutingRollbackAudit data = 3;
+}
+
+message RoutingTrendPoint {
+  int64 bucket_start = 1;
+  int32 route_events = 2;
+  int32 route_fallbacks = 3;
+  int32 fallback_rate_bp = 4;
+  int32 dns_failures = 5;
+  int32 outbound_failures = 6;
+  int32 health_reports = 7;
+  int32 affected_reporters = 8;
+}
+
+message RoutingTrendMarker {
+  int64 at = 1;
+  string type = 2;
+  string label = 3;
+  string operator = 4;
+}
+
+message RoutingTrendReport {
+  string profile_code = 1;
+  string routing_hash = 2;
+  int64 window_minutes = 3;
+  int64 bucket_minutes = 4;
+  repeated RoutingTrendPoint points = 5;
+  repeated RoutingTrendMarker markers = 6;
+  int64 generated_at = 7;
+}
+
+message GetRoutingTrendReportRequest {
+  string profile_code = 1;
+  string routing_hash = 2;
+  int64 window_minutes = 3;
+  int64 bucket_minutes = 4;
+}
+
+message GetRoutingTrendReportReply {
+  int32 code = 1;
+  string message = 2;
+  RoutingTrendReport data = 3;
+}
+
+message RoutingDrilldownItem {
+  string key = 1;
+  string label = 2;
+  int32 route_events = 3;
+  int32 route_fallbacks = 4;
+  int32 fallback_rate_bp = 5;
+  int32 dns_failures = 6;
+  int32 outbound_failures = 7;
+  int32 health_reports = 8;
+  int32 affected_reporters = 9;
+  string last_error = 10;
+  int64 last_seen_at = 11;
+}
+
+message RoutingDrilldownReport {
+  string profile_code = 1;
+  string routing_hash = 2;
+  string group_by = 3;
+  int64 window_minutes = 4;
+  repeated RoutingDrilldownItem items = 5;
+  int64 generated_at = 6;
+}
+
+message GetRoutingDrilldownReportRequest {
+  string profile_code = 1;
+  string routing_hash = 2;
+  string group_by = 3;
+  int64 window_minutes = 4;
+}
+
+message GetRoutingDrilldownReportReply {
+  int32 code = 1;
+  string message = 2;
+  RoutingDrilldownReport data = 3;
+}
+
+message RoutingNotification {
+  string id = 1;
+  string severity = 2;
+  string title = 3;
+  string message = 4;
+  string source = 5;
+  string profile_code = 6;
+  string routing_hash = 7;
+  int64 created_at = 8;
+}
+
+message RoutingNotificationListData {
+  repeated RoutingNotification list = 1;
+  int32 total = 2;
+  int64 generated_at = 3;
+}
+
+message ListRoutingNotificationsRequest {
+  string profile_code = 1;
+  string routing_hash = 2;
+  int64 window_minutes = 3;
+  string severity = 4;
+}
+
+message ListRoutingNotificationsReply {
+  int32 code = 1;
+  string message = 2;
+  RoutingNotificationListData data = 3;
 }
 
 message RoutingHealthItem {
