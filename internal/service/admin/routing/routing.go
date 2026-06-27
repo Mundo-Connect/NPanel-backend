@@ -358,6 +358,26 @@ func (s *RoutingService) ActRoutingGrayRelease(ctx context.Context, req *v1.ActR
 	return &v1.RoutingGrayReleaseReply{Code: successCode, Message: "success", Data: &v1.RoutingGrayReleaseData{Release: grayReleaseToProto(item)}}, nil
 }
 
+func (s *RoutingService) GetRoutingReleaseGate(ctx context.Context, req *v1.GetRoutingReleaseGateRequest) (*v1.GetRoutingReleaseGateReply, error) {
+	item, err := s.uc.ReleaseGate(ctx, req.ProfileCode, req.RoutingHash, int(req.WindowMinutes))
+	if err != nil {
+		return nil, err
+	}
+	return &v1.GetRoutingReleaseGateReply{Code: successCode, Message: "success", Data: releaseGateToProto(item)}, nil
+}
+
+func (s *RoutingService) GetRoutingE2EChecklist(ctx context.Context, req *v1.GetRoutingE2EChecklistRequest) (*v1.GetRoutingE2EChecklistReply, error) {
+	item, err := s.uc.E2EChecklist(ctx, req.ProfileCode)
+	if err != nil {
+		return nil, err
+	}
+	return &v1.GetRoutingE2EChecklistReply{Code: successCode, Message: "success", Data: e2eChecklistToProto(item)}, nil
+}
+
+func (s *RoutingService) GetRoutingCapabilityMatrix(ctx context.Context, req *v1.GetRoutingCapabilityMatrixRequest) (*v1.GetRoutingCapabilityMatrixReply, error) {
+	return &v1.GetRoutingCapabilityMatrixReply{Code: successCode, Message: "success", Data: capabilityMatrixToProto(s.uc.CapabilityMatrix(ctx))}, nil
+}
+
 func routeProfileFromProto(item *v1.RouteProfile) *routingbiz.RouteProfile {
 	if item == nil {
 		return &routingbiz.RouteProfile{}
@@ -517,6 +537,73 @@ func routingAnalyticsToProto(item *routingbiz.RoutingAnalytics) *v1.RoutingAnaly
 		OutboundFailRateBp: int32(item.OutboundFailRateBP),
 		WindowStartedAt:    unixOrZero(item.WindowStartedAt),
 	}
+}
+
+func releaseGateToProto(item *routingbiz.RoutingReleaseGate) *v1.RoutingReleaseGate {
+	if item == nil {
+		return nil
+	}
+	checks := make([]*v1.RoutingReleaseGateCheck, 0, len(item.Checks))
+	for _, check := range item.Checks {
+		checks = append(checks, &v1.RoutingReleaseGateCheck{
+			Key:    check.Key,
+			Label:  check.Label,
+			Passed: check.Passed,
+			Status: check.Status,
+			Reason: check.Reason,
+		})
+	}
+	return &v1.RoutingReleaseGate{
+		ProfileCode:          item.ProfileCode,
+		RoutingHash:          item.RoutingHash,
+		Allowed:              item.Allowed,
+		RequiresConfirmation: item.RequiresConfirmation,
+		Summary:              item.Summary,
+		Checks:               checks,
+		Analytics:            routingAnalyticsToProto(item.Analytics),
+		GeneratedAt:          unixOrZero(item.GeneratedAt),
+	}
+}
+
+func e2eChecklistToProto(item *routingbiz.RoutingE2EChecklist) *v1.RoutingE2EChecklistData {
+	if item == nil {
+		return nil
+	}
+	items := make([]*v1.RoutingE2EChecklistItem, 0, len(item.Items))
+	for _, row := range item.Items {
+		items = append(items, &v1.RoutingE2EChecklistItem{
+			Key:      row.Key,
+			Label:    row.Label,
+			Status:   row.Status,
+			Passed:   row.Passed,
+			Evidence: row.Evidence,
+		})
+	}
+	return &v1.RoutingE2EChecklistData{
+		Items:       items,
+		Ready:       item.Ready,
+		GeneratedAt: unixOrZero(item.GeneratedAt),
+	}
+}
+
+func capabilityMatrixToProto(item *routingbiz.RoutingCapabilityMatrix) *v1.RoutingCapabilityMatrixData {
+	if item == nil {
+		return nil
+	}
+	items := make([]*v1.RoutingCapabilityMatrixItem, 0, len(item.Items))
+	for _, row := range item.Items {
+		items = append(items, &v1.RoutingCapabilityMatrixItem{
+			Client:            row.Client,
+			Panel:             row.Panel,
+			MinVersion:        row.MinVersion,
+			SupportedFeatures: row.SupportedFeatures,
+			MissingFeatures:   row.MissingFeatures,
+			ExecutionMode:     row.ExecutionMode,
+			EnforceCandidate:  row.EnforceCandidate,
+			Notes:             row.Notes,
+		})
+	}
+	return &v1.RoutingCapabilityMatrixData{Items: items, GeneratedAt: unixOrZero(item.GeneratedAt)}
 }
 
 func routeProfileToProto(item *routingbiz.RouteProfile) *v1.RouteProfile {

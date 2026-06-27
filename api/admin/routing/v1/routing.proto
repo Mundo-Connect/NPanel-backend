@@ -149,6 +149,18 @@ service RoutingService {
       body: "*"
     };
   }
+
+  rpc GetRoutingReleaseGate(GetRoutingReleaseGateRequest) returns (GetRoutingReleaseGateReply) {
+    option (google.api.http) = { get: "/v1/admin/routing/release_gate" };
+  }
+
+  rpc GetRoutingE2EChecklist(GetRoutingE2EChecklistRequest) returns (GetRoutingE2EChecklistReply) {
+    option (google.api.http) = { get: "/v1/admin/routing/e2e_checklist" };
+  }
+
+  rpc GetRoutingCapabilityMatrix(GetRoutingCapabilityMatrixRequest) returns (GetRoutingCapabilityMatrixReply) {
+    option (google.api.http) = { get: "/v1/admin/routing/capability_matrix" };
+  }
 }
 
 message RouteProfile {
@@ -472,6 +484,85 @@ message RoutingGrayReleaseData { RoutingGrayRelease release = 1; }
 message RoutingGrayReleaseListData { repeated RoutingGrayRelease list = 1; int32 total = 2; }
 message RoutingGrayReleaseReply { int32 code = 1; string message = 2; RoutingGrayReleaseData data = 3; }
 message ListRoutingGrayReleasesReply { int32 code = 1; string message = 2; RoutingGrayReleaseListData data = 3; }
+
+message RoutingReleaseGateCheck {
+  string key = 1;
+  string label = 2;
+  bool passed = 3;
+  string status = 4;
+  string reason = 5;
+}
+
+message RoutingReleaseGate {
+  string profile_code = 1;
+  string routing_hash = 2;
+  bool allowed = 3;
+  bool requires_confirmation = 4;
+  string summary = 5;
+  repeated RoutingReleaseGateCheck checks = 6;
+  RoutingAnalyticsData analytics = 7;
+  int64 generated_at = 8;
+}
+
+message GetRoutingReleaseGateRequest {
+  string profile_code = 1;
+  string routing_hash = 2;
+  int64 window_minutes = 3;
+}
+
+message GetRoutingReleaseGateReply {
+  int32 code = 1;
+  string message = 2;
+  RoutingReleaseGate data = 3;
+}
+
+message RoutingE2EChecklistItem {
+  string key = 1;
+  string label = 2;
+  string status = 3;
+  bool passed = 4;
+  string evidence = 5;
+}
+
+message GetRoutingE2EChecklistRequest {
+  string profile_code = 1;
+}
+
+message RoutingE2EChecklistData {
+  repeated RoutingE2EChecklistItem items = 1;
+  bool ready = 2;
+  int64 generated_at = 3;
+}
+
+message GetRoutingE2EChecklistReply {
+  int32 code = 1;
+  string message = 2;
+  RoutingE2EChecklistData data = 3;
+}
+
+message RoutingCapabilityMatrixItem {
+  string client = 1;
+  string panel = 2;
+  string min_version = 3;
+  repeated string supported_features = 4;
+  repeated string missing_features = 5;
+  string execution_mode = 6;
+  bool enforce_candidate = 7;
+  string notes = 8;
+}
+
+message GetRoutingCapabilityMatrixRequest {}
+
+message RoutingCapabilityMatrixData {
+  repeated RoutingCapabilityMatrixItem items = 1;
+  int64 generated_at = 2;
+}
+
+message GetRoutingCapabilityMatrixReply {
+  int32 code = 1;
+  string message = 2;
+  RoutingCapabilityMatrixData data = 3;
+}
 
 message RoutingHealthItem {
   string kind = 1;

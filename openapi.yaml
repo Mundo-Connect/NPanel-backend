@@ -2002,6 +2002,18 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/api.admin.routing.v1.GetRoutingAnalyticsReply'
+    /v1/admin/routing/capability_matrix:
+        get:
+            tags:
+                - RoutingService
+            operationId: RoutingService_GetRoutingCapabilityMatrix
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.admin.routing.v1.GetRoutingCapabilityMatrixReply'
     /v1/admin/routing/dns_resolver:
         put:
             tags:
@@ -2078,6 +2090,23 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/api.admin.routing.v1.ListDnsResolversReply'
+    /v1/admin/routing/e2e_checklist:
+        get:
+            tags:
+                - RoutingService
+            operationId: RoutingService_GetRoutingE2EChecklist
+            parameters:
+                - name: profileCode
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.admin.routing.v1.GetRoutingE2EChecklistReply'
     /v1/admin/routing/gray_release:
         put:
             tags:
@@ -2391,6 +2420,31 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/api.admin.routing.v1.ListRouteProfilesReply'
+    /v1/admin/routing/release_gate:
+        get:
+            tags:
+                - RoutingService
+            operationId: RoutingService_GetRoutingReleaseGate
+            parameters:
+                - name: profileCode
+                  in: query
+                  schema:
+                    type: string
+                - name: routingHash
+                  in: query
+                  schema:
+                    type: string
+                - name: windowMinutes
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.admin.routing.v1.GetRoutingReleaseGateReply'
     /v1/admin/routing/route_events:
         get:
             tags:
@@ -9254,6 +9308,26 @@ components:
                     type: string
                 data:
                     $ref: '#/components/schemas/api.admin.routing.v1.RoutingAnalyticsData'
+        api.admin.routing.v1.GetRoutingCapabilityMatrixReply:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/api.admin.routing.v1.RoutingCapabilityMatrixData'
+        api.admin.routing.v1.GetRoutingE2EChecklistReply:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/api.admin.routing.v1.RoutingE2EChecklistData'
         api.admin.routing.v1.GetRoutingOverviewReply:
             type: object
             properties:
@@ -9264,6 +9338,16 @@ components:
                     type: string
                 data:
                     $ref: '#/components/schemas/api.admin.routing.v1.RoutingOverview'
+        api.admin.routing.v1.GetRoutingReleaseGateReply:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/api.admin.routing.v1.RoutingReleaseGate'
         api.admin.routing.v1.ListDnsResolversReply:
             type: object
             properties:
@@ -9659,6 +9743,62 @@ components:
                     type: string
                 createdAt:
                     type: string
+        api.admin.routing.v1.RoutingCapabilityMatrixData:
+            type: object
+            properties:
+                items:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.admin.routing.v1.RoutingCapabilityMatrixItem'
+                generatedAt:
+                    type: string
+        api.admin.routing.v1.RoutingCapabilityMatrixItem:
+            type: object
+            properties:
+                client:
+                    type: string
+                panel:
+                    type: string
+                minVersion:
+                    type: string
+                supportedFeatures:
+                    type: array
+                    items:
+                        type: string
+                missingFeatures:
+                    type: array
+                    items:
+                        type: string
+                executionMode:
+                    type: string
+                enforceCandidate:
+                    type: boolean
+                notes:
+                    type: string
+        api.admin.routing.v1.RoutingE2EChecklistData:
+            type: object
+            properties:
+                items:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.admin.routing.v1.RoutingE2EChecklistItem'
+                ready:
+                    type: boolean
+                generatedAt:
+                    type: string
+        api.admin.routing.v1.RoutingE2EChecklistItem:
+            type: object
+            properties:
+                key:
+                    type: string
+                label:
+                    type: string
+                status:
+                    type: string
+                passed:
+                    type: boolean
+                evidence:
+                    type: string
         api.admin.routing.v1.RoutingEnforceGuard:
             type: object
             properties:
@@ -9847,6 +9987,40 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/api.admin.routing.v1.RoutingAuditEvent'
+        api.admin.routing.v1.RoutingReleaseGate:
+            type: object
+            properties:
+                profileCode:
+                    type: string
+                routingHash:
+                    type: string
+                allowed:
+                    type: boolean
+                requiresConfirmation:
+                    type: boolean
+                summary:
+                    type: string
+                checks:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.admin.routing.v1.RoutingReleaseGateCheck'
+                analytics:
+                    $ref: '#/components/schemas/api.admin.routing.v1.RoutingAnalyticsData'
+                generatedAt:
+                    type: string
+        api.admin.routing.v1.RoutingReleaseGateCheck:
+            type: object
+            properties:
+                key:
+                    type: string
+                label:
+                    type: string
+                passed:
+                    type: boolean
+                status:
+                    type: string
+                reason:
+                    type: string
         api.admin.routing.v1.RoutingRouteEvent:
             type: object
             properties:

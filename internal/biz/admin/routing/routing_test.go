@@ -226,6 +226,93 @@ func TestRoutingAnalyticsAggregatesFallbackAndHealthFailures(t *testing.T) {
 	}
 }
 
+func TestReleaseGateBlocksGlobalProfileAndHighFallback(t *testing.T) {
+	now := time.Now()
+	uc := NewRoutingUsecase(fakeRoutingRepo{
+		profiles: []*RouteProfile{
+			{
+				ID:          1,
+				Code:        "global_profile",
+				Name:        "Global Profile",
+				ScopeType:   "global",
+				ScopeID:     "default",
+				Enabled:     true,
+				ProfileJSON: `{}`,
+			},
+		},
+		grayReleases: []*RoutingGrayRelease{
+			{
+				ID:            1,
+				ProfileCode:   "global_profile",
+				Name:          "global gray",
+				Status:        "running",
+				BatchNo:       1,
+				TargetType:    "user",
+				TargetIDsJSON: `[1]`,
+				ReleaseJSON:   `{}`,
+			},
+		},
+		routeEvents: []*RoutingRouteEvent{
+			{
+				ReporterID:  "device-1",
+				ProfileCode: "global_profile",
+				RoutingHash: "hash-1",
+				EventType:   "route_decision",
+				Status:      "matched",
+				EventAt:     now.Add(-time.Minute),
+			},
+			{
+				ReporterID:  "device-1",
+				ProfileCode: "global_profile",
+				RoutingHash: "hash-1",
+				EventType:   "route_fallback",
+				Status:      "fallback",
+				EventAt:     now.Add(-30 * time.Second),
+			},
+		},
+	}, log.DefaultLogger)
+
+	gate, err := uc.ReleaseGate(context.Background(), "global_profile", "hash-1", 60)
+	if err != nil {
+		t.Fatalf("ReleaseGate() error = %v", err)
+	}
+	if gate.Allowed {
+		t.Fatal("Allowed = true, want blocked for global/high fallback")
+	}
+	if !hasGateCheck(gate.Checks, "profile_not_global", false) {
+		t.Fatal("profile_not_global check did not block")
+	}
+	if !hasGateCheck(gate.Checks, "fallback_rate_ok", false) {
+		t.Fatal("fallback_rate_ok check did not block")
+	}
+}
+
+func TestCapabilityMatrixKeepsNonPpanelOutOfEnforce(t *testing.T) {
+	uc := NewRoutingUsecase(fakeRoutingRepo{}, log.DefaultLogger)
+	matrix := uc.CapabilityMatrix(context.Background())
+	foundLegacyPanel := false
+	for _, item := range matrix.Items {
+		if item.Panel == "xboard/xiaov2board/v2board/sspanel" {
+			foundLegacyPanel = true
+			if item.EnforceCandidate {
+				t.Fatal("non-ppanel matrix item is enforce candidate")
+			}
+		}
+	}
+	if !foundLegacyPanel {
+		t.Fatal("non-ppanel capability matrix item not found")
+	}
+}
+
+func hasGateCheck(checks []RoutingReleaseGateCheck, key string, passed bool) bool {
+	for _, check := range checks {
+		if check.Key == key && check.Passed == passed {
+			return true
+		}
+	}
+	return false
+}
+
 func TestBuildConfigFallsBackToFixtureWhenStoreIsEmpty(t *testing.T) {
 	now := time.Date(2026, 6, 27, 10, 0, 0, 0, time.UTC)
 	uc := NewRoutingUsecase(fakeRoutingRepo{}, log.DefaultLogger)

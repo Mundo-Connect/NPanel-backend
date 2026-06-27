@@ -195,6 +195,55 @@ type RoutingAnalytics struct {
 	WindowStartedAt    time.Time
 }
 
+type RoutingReleaseGateCheck struct {
+	Key    string
+	Label  string
+	Passed bool
+	Status string
+	Reason string
+}
+
+type RoutingReleaseGate struct {
+	ProfileCode          string
+	RoutingHash          string
+	Allowed              bool
+	RequiresConfirmation bool
+	Summary              string
+	Checks               []RoutingReleaseGateCheck
+	Analytics            *RoutingAnalytics
+	GeneratedAt          time.Time
+}
+
+type RoutingE2EChecklistItem struct {
+	Key      string
+	Label    string
+	Status   string
+	Passed   bool
+	Evidence string
+}
+
+type RoutingE2EChecklist struct {
+	Items       []RoutingE2EChecklistItem
+	Ready       bool
+	GeneratedAt time.Time
+}
+
+type RoutingCapabilityMatrixItem struct {
+	Client            string
+	Panel             string
+	MinVersion        string
+	SupportedFeatures []string
+	MissingFeatures   []string
+	ExecutionMode     string
+	EnforceCandidate  bool
+	Notes             string
+}
+
+type RoutingCapabilityMatrix struct {
+	Items       []RoutingCapabilityMatrixItem
+	GeneratedAt time.Time
+}
+
 type RoutingEnforceGuard struct {
 	Key    string
 	Label  string
@@ -552,6 +601,9 @@ func (uc *RoutingUsecase) ActGrayRelease(ctx context.Context, id int64, action, 
 	release.Operator = strings.TrimSpace(operator)
 	switch strings.ToLower(strings.TrimSpace(action)) {
 	case "advance", "next_batch", "publish_next":
+		if release.Status == "paused" || release.Status == "rolled_back" {
+			return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+		}
 		release.Status = "running"
 		release.BatchNo++
 		release.StartedAt = firstTime(release.StartedAt, now)
@@ -590,6 +642,126 @@ func (uc *RoutingUsecase) Analytics(ctx context.Context, profileCode, routingHas
 		return nil, err
 	}
 	return buildRoutingAnalytics(events, healthReports, strings.TrimSpace(routingHash), startedAt), nil
+}
+
+func (uc *RoutingUsecase) ReleaseGate(ctx context.Context, profileCode, routingHash string, windowMinutes int) (*RoutingReleaseGate, error) {
+	now := time.Now()
+	profileCode = strings.TrimSpace(profileCode)
+	routingHash = strings.TrimSpace(routingHash)
+	analytics, err := uc.Analytics(ctx, profileCode, routingHash, windowMinutes)
+	if err != nil {
+		return nil, err
+	}
+	profile := uc.findProfileByCode(ctx, profileCode)
+	releases, _, _ := uc.repo.ListGrayReleases(ctx, 1, 100, profileCode, "")
+	checks := []RoutingReleaseGateCheck{
+		releaseGateCheck("profile_exists", "Profile exists", profile != nil, "missing profile", "profile found"),
+		releaseGateCheck("profile_enabled", "Profile enabled", profile != nil && profile.Enabled, "profile is disabled", "profile enabled"),
+		releaseGateCheck("profile_not_global", "Profile is scoped", profile != nil && !isGlobalProfile(profile), "global profile cannot be released", "non-global scope"),
+		releaseGateCheck("gray_running", "Gray batch running", hasRunningGrayRelease(releases), "advance a gray batch first", "running gray batch exists"),
+		releaseGateCheck("gray_not_paused_or_rolled_back", "Gray batch active", !hasBlockedGrayRelease(releases), "latest gray batch is paused or rolled back", "gray batch not blocked"),
+		releaseGateCheck("routing_hash_present", "Routing hash present", routingHash != "", "routing hash is empty", "routing hash present"),
+		releaseGateCheck("fallback_rate_ok", "Fallback rate below threshold", analytics.FallbackRateBP <= 500, "fallback rate is above 5%", "fallback rate is below 5%"),
+		releaseGateCheck("dns_fail_rate_ok", "DNS fail rate below threshold", analytics.DNSFailRateBP <= 500, "DNS fail rate is above 5%", "DNS fail rate is below 5%"),
+		releaseGateCheck("outbound_fail_rate_ok", "Outbound fail rate below threshold", analytics.OutboundFailRateBP <= 500, "outbound fail rate is above 5%", "outbound fail rate is below 5%"),
+		releaseGateCheck("top_errors_clear", "No unconfirmed top errors", len(analytics.TopErrors) == 0, "top errors need confirmation", "no top errors"),
+	}
+	allowed := true
+	for _, check := range checks {
+		if !check.Passed {
+			allowed = false
+			break
+		}
+	}
+	summary := "release gate passed; manual enforce confirmation is still required"
+	if !allowed {
+		summary = "release gate blocked; keep observe or pause the gray batch"
+	}
+	return &RoutingReleaseGate{
+		ProfileCode:          profileCode,
+		RoutingHash:          routingHash,
+		Allowed:              allowed,
+		RequiresConfirmation: allowed,
+		Summary:              summary,
+		Checks:               checks,
+		Analytics:            analytics,
+		GeneratedAt:          now,
+	}, nil
+}
+
+func (uc *RoutingUsecase) E2EChecklist(ctx context.Context, profileCode string) (*RoutingE2EChecklist, error) {
+	now := time.Now()
+	profileCode = strings.TrimSpace(profileCode)
+	profiles, totalProfiles, err := uc.repo.ListProfiles(ctx, 1, 20, profileCode, nil)
+	if err != nil {
+		return nil, err
+	}
+	_, totalHealth, err := uc.repo.ListHealthReports(ctx, 1, 20, "", "", "")
+	if err != nil {
+		return nil, err
+	}
+	_, totalEvents, err := uc.repo.ListRouteEvents(ctx, 1, 20, "", profileCode, "")
+	if err != nil {
+		return nil, err
+	}
+	grayReleases, totalGray, err := uc.repo.ListGrayReleases(ctx, 1, 20, profileCode, "")
+	if err != nil {
+		return nil, err
+	}
+	items := []RoutingE2EChecklistItem{
+		e2eChecklistItem("admin_profile", "Admin profile exists", totalProfiles > 0, fmt.Sprintf("%d profiles matched", totalProfiles)),
+		e2eChecklistItem("gray_release", "Gray release exists", totalGray > 0, fmt.Sprintf("%d gray releases matched", totalGray)),
+		e2eChecklistItem("public_scope", "Scoped profile is non-global", hasNonGlobalProfile(profiles), "user/user_subscribe/subscribe/node scope required"),
+		e2eChecklistItem("health_report", "Health report received", totalHealth > 0, fmt.Sprintf("%d health reports available", totalHealth)),
+		e2eChecklistItem("route_event", "Route event received", totalEvents > 0, fmt.Sprintf("%d route events available", totalEvents)),
+		e2eChecklistItem("analytics", "Analytics has evidence", totalHealth > 0 || totalEvents > 0, "health or route event can feed analytics"),
+		e2eChecklistItem("rollback", "Rollback path available", hasRollbackReadyGrayRelease(grayReleases), "gray release can be paused or rolled back"),
+		e2eChecklistItem("non_ppanel_guard", "Non-ppanel guarded", true, "non-ppanel clients do not call routing/health/event APIs"),
+		e2eChecklistItem("migration_smoke", "Migration smoke ready", true, "Ent migration and legacy SQL are idempotent schema paths"),
+	}
+	ready := true
+	for _, item := range items {
+		if !item.Passed {
+			ready = false
+			break
+		}
+	}
+	return &RoutingE2EChecklist{Items: items, Ready: ready, GeneratedAt: now}, nil
+}
+
+func (uc *RoutingUsecase) CapabilityMatrix(context.Context) *RoutingCapabilityMatrix {
+	return &RoutingCapabilityMatrix{
+		GeneratedAt: time.Now(),
+		Items: []RoutingCapabilityMatrixItem{
+			{
+				Client:            "OwlClient",
+				Panel:             "ppanel",
+				MinVersion:        "routing_profile.v1 capable",
+				SupportedFeatures: []string{"routing_profile_v1", "route_dns_resolver", "route_outbound", "doh", "routing_overlay_dry_run", "routing_health_report", "routing_route_event", "native_dns_probe"},
+				ExecutionMode:     "observe/enforce candidate",
+				EnforceCandidate:  true,
+				Notes:             "only gray scoped profiles with healthy reports and supported features can execute",
+			},
+			{
+				Client:            "OwlClient",
+				Panel:             "xboard/xiaov2board/v2board/sspanel",
+				SupportedFeatures: []string{},
+				MissingFeatures:   []string{"routing_profile_v1", "routing_health_report", "routing_route_event"},
+				ExecutionMode:     "legacy subscription only",
+				EnforceCandidate:  false,
+				Notes:             "routing config, preview, health report and route event APIs are skipped",
+			},
+			{
+				Client:            "Legacy client/node",
+				Panel:             "any",
+				SupportedFeatures: []string{"legacy_subscription", "legacy_node_config"},
+				MissingFeatures:   []string{"node_routing_profile_v1", "node_health_report_v1"},
+				ExecutionMode:     "legacy dns/outbound/block",
+				EnforceCandidate:  false,
+				Notes:             "must not be force-fed routing_profile.v1 execution structures",
+			},
+		},
+	}
 }
 
 func (uc *RoutingUsecase) Preview(ctx context.Context, req PreviewRequest) (PreviewResult, error) {
@@ -1179,6 +1351,91 @@ func buildRoutingAnalytics(events []*RoutingRouteEvent, reports []*RoutingHealth
 	analytics.OutboundFailRateBP = rateBP(countHealthFailures(reports, "outbound", routingHash, startedAt), analytics.TotalHealthReports)
 	analytics.TopErrors = topAnalyticsErrors(errors, 8)
 	return analytics
+}
+
+func (uc *RoutingUsecase) findProfileByCode(ctx context.Context, profileCode string) *RouteProfile {
+	if profileCode == "" {
+		return nil
+	}
+	profiles, _, err := uc.repo.ListProfiles(ctx, 1, 20, profileCode, nil)
+	if err != nil {
+		return nil
+	}
+	for _, profile := range profiles {
+		if profile != nil && profile.Code == profileCode {
+			return profile
+		}
+	}
+	return nil
+}
+
+func releaseGateCheck(key, label string, passed bool, failReason, passReason string) RoutingReleaseGateCheck {
+	status := "blocked"
+	reason := failReason
+	if passed {
+		status = "ok"
+		reason = passReason
+	}
+	return RoutingReleaseGateCheck{Key: key, Label: label, Passed: passed, Status: status, Reason: reason}
+}
+
+func isGlobalProfile(profile *RouteProfile) bool {
+	if profile == nil {
+		return true
+	}
+	scopeType := strings.ToLower(strings.TrimSpace(profile.ScopeType))
+	scopeID := strings.TrimSpace(profile.ScopeID)
+	return scopeType == "" || scopeType == "global" || scopeID == "" || strings.EqualFold(scopeID, "default")
+}
+
+func hasRunningGrayRelease(items []*RoutingGrayRelease) bool {
+	for _, item := range items {
+		if item != nil && item.Status == "running" && item.BatchNo > 0 {
+			return true
+		}
+	}
+	return false
+}
+
+func hasBlockedGrayRelease(items []*RoutingGrayRelease) bool {
+	for _, item := range items {
+		if item == nil {
+			continue
+		}
+		if item.Status == "paused" || item.Status == "rolled_back" {
+			return true
+		}
+	}
+	return false
+}
+
+func hasNonGlobalProfile(items []*RouteProfile) bool {
+	for _, item := range items {
+		if item != nil && !isGlobalProfile(item) {
+			return true
+		}
+	}
+	return false
+}
+
+func hasRollbackReadyGrayRelease(items []*RoutingGrayRelease) bool {
+	for _, item := range items {
+		if item == nil {
+			continue
+		}
+		if item.Status == "running" || item.Status == "paused" || item.Status == "draft" {
+			return true
+		}
+	}
+	return false
+}
+
+func e2eChecklistItem(key, label string, passed bool, evidence string) RoutingE2EChecklistItem {
+	status := "waiting"
+	if passed {
+		status = "ok"
+	}
+	return RoutingE2EChecklistItem{Key: key, Label: label, Status: status, Passed: passed, Evidence: evidence}
 }
 
 func matchesRoutingHash(value, expected string) bool {

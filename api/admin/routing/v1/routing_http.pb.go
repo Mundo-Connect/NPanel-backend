@@ -33,7 +33,10 @@ const OperationRoutingServiceDeleteRouteRule = "/api.admin.routing.v1.RoutingSer
 const OperationRoutingServiceDeleteRoutingGrayRelease = "/api.admin.routing.v1.RoutingService/DeleteRoutingGrayRelease"
 const OperationRoutingServiceDeleteUnlockService = "/api.admin.routing.v1.RoutingService/DeleteUnlockService"
 const OperationRoutingServiceGetRoutingAnalytics = "/api.admin.routing.v1.RoutingService/GetRoutingAnalytics"
+const OperationRoutingServiceGetRoutingCapabilityMatrix = "/api.admin.routing.v1.RoutingService/GetRoutingCapabilityMatrix"
+const OperationRoutingServiceGetRoutingE2EChecklist = "/api.admin.routing.v1.RoutingService/GetRoutingE2EChecklist"
 const OperationRoutingServiceGetRoutingOverview = "/api.admin.routing.v1.RoutingService/GetRoutingOverview"
+const OperationRoutingServiceGetRoutingReleaseGate = "/api.admin.routing.v1.RoutingService/GetRoutingReleaseGate"
 const OperationRoutingServiceListDnsResolvers = "/api.admin.routing.v1.RoutingService/ListDnsResolvers"
 const OperationRoutingServiceListRouteOutbounds = "/api.admin.routing.v1.RoutingService/ListRouteOutbounds"
 const OperationRoutingServiceListRouteProfiles = "/api.admin.routing.v1.RoutingService/ListRouteProfiles"
@@ -65,7 +68,10 @@ type RoutingServiceHTTPServer interface {
 	DeleteRoutingGrayRelease(context.Context, *DeleteRoutingGrayReleaseRequest) (*DeleteRouteItemReply, error)
 	DeleteUnlockService(context.Context, *DeleteUnlockServiceRequest) (*DeleteRouteItemReply, error)
 	GetRoutingAnalytics(context.Context, *GetRoutingAnalyticsRequest) (*GetRoutingAnalyticsReply, error)
+	GetRoutingCapabilityMatrix(context.Context, *GetRoutingCapabilityMatrixRequest) (*GetRoutingCapabilityMatrixReply, error)
+	GetRoutingE2EChecklist(context.Context, *GetRoutingE2EChecklistRequest) (*GetRoutingE2EChecklistReply, error)
 	GetRoutingOverview(context.Context, *GetRoutingOverviewRequest) (*GetRoutingOverviewReply, error)
+	GetRoutingReleaseGate(context.Context, *GetRoutingReleaseGateRequest) (*GetRoutingReleaseGateReply, error)
 	ListDnsResolvers(context.Context, *ListDnsResolversRequest) (*ListDnsResolversReply, error)
 	ListRouteOutbounds(context.Context, *ListRouteOutboundsRequest) (*ListRouteOutboundsReply, error)
 	ListRouteProfiles(context.Context, *ListRouteProfilesRequest) (*ListRouteProfilesReply, error)
@@ -115,6 +121,9 @@ func RegisterRoutingServiceHTTPServer(s *http.Server, srv RoutingServiceHTTPServ
 	r.PUT("/v1/admin/routing/gray_release", _RoutingService_UpdateRoutingGrayRelease0_HTTP_Handler(srv))
 	r.DELETE("/v1/admin/routing/gray_release", _RoutingService_DeleteRoutingGrayRelease0_HTTP_Handler(srv))
 	r.POST("/v1/admin/routing/gray_release/action", _RoutingService_ActRoutingGrayRelease0_HTTP_Handler(srv))
+	r.GET("/v1/admin/routing/release_gate", _RoutingService_GetRoutingReleaseGate0_HTTP_Handler(srv))
+	r.GET("/v1/admin/routing/e2e_checklist", _RoutingService_GetRoutingE2EChecklist0_HTTP_Handler(srv))
+	r.GET("/v1/admin/routing/capability_matrix", _RoutingService_GetRoutingCapabilityMatrix0_HTTP_Handler(srv))
 }
 
 func _RoutingService_ListRouteProfiles0_HTTP_Handler(srv RoutingServiceHTTPServer) func(ctx http.Context) error {
@@ -729,6 +738,63 @@ func _RoutingService_ActRoutingGrayRelease0_HTTP_Handler(srv RoutingServiceHTTPS
 	}
 }
 
+func _RoutingService_GetRoutingReleaseGate0_HTTP_Handler(srv RoutingServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GetRoutingReleaseGateRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationRoutingServiceGetRoutingReleaseGate)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetRoutingReleaseGate(ctx, req.(*GetRoutingReleaseGateRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*GetRoutingReleaseGateReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _RoutingService_GetRoutingE2EChecklist0_HTTP_Handler(srv RoutingServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GetRoutingE2EChecklistRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationRoutingServiceGetRoutingE2EChecklist)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetRoutingE2EChecklist(ctx, req.(*GetRoutingE2EChecklistRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*GetRoutingE2EChecklistReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _RoutingService_GetRoutingCapabilityMatrix0_HTTP_Handler(srv RoutingServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GetRoutingCapabilityMatrixRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationRoutingServiceGetRoutingCapabilityMatrix)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetRoutingCapabilityMatrix(ctx, req.(*GetRoutingCapabilityMatrixRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*GetRoutingCapabilityMatrixReply)
+		return ctx.Result(200, reply)
+	}
+}
+
 type RoutingServiceHTTPClient interface {
 	ActRoutingGrayRelease(ctx context.Context, req *ActRoutingGrayReleaseRequest, opts ...http.CallOption) (rsp *RoutingGrayReleaseReply, err error)
 	CreateDnsResolver(ctx context.Context, req *CreateDnsResolverRequest, opts ...http.CallOption) (rsp *DnsResolverReply, err error)
@@ -744,7 +810,10 @@ type RoutingServiceHTTPClient interface {
 	DeleteRoutingGrayRelease(ctx context.Context, req *DeleteRoutingGrayReleaseRequest, opts ...http.CallOption) (rsp *DeleteRouteItemReply, err error)
 	DeleteUnlockService(ctx context.Context, req *DeleteUnlockServiceRequest, opts ...http.CallOption) (rsp *DeleteRouteItemReply, err error)
 	GetRoutingAnalytics(ctx context.Context, req *GetRoutingAnalyticsRequest, opts ...http.CallOption) (rsp *GetRoutingAnalyticsReply, err error)
+	GetRoutingCapabilityMatrix(ctx context.Context, req *GetRoutingCapabilityMatrixRequest, opts ...http.CallOption) (rsp *GetRoutingCapabilityMatrixReply, err error)
+	GetRoutingE2EChecklist(ctx context.Context, req *GetRoutingE2EChecklistRequest, opts ...http.CallOption) (rsp *GetRoutingE2EChecklistReply, err error)
 	GetRoutingOverview(ctx context.Context, req *GetRoutingOverviewRequest, opts ...http.CallOption) (rsp *GetRoutingOverviewReply, err error)
+	GetRoutingReleaseGate(ctx context.Context, req *GetRoutingReleaseGateRequest, opts ...http.CallOption) (rsp *GetRoutingReleaseGateReply, err error)
 	ListDnsResolvers(ctx context.Context, req *ListDnsResolversRequest, opts ...http.CallOption) (rsp *ListDnsResolversReply, err error)
 	ListRouteOutbounds(ctx context.Context, req *ListRouteOutboundsRequest, opts ...http.CallOption) (rsp *ListRouteOutboundsReply, err error)
 	ListRouteProfiles(ctx context.Context, req *ListRouteProfilesRequest, opts ...http.CallOption) (rsp *ListRouteProfilesReply, err error)
@@ -952,11 +1021,50 @@ func (c *RoutingServiceHTTPClientImpl) GetRoutingAnalytics(ctx context.Context, 
 	return &out, nil
 }
 
+func (c *RoutingServiceHTTPClientImpl) GetRoutingCapabilityMatrix(ctx context.Context, in *GetRoutingCapabilityMatrixRequest, opts ...http.CallOption) (*GetRoutingCapabilityMatrixReply, error) {
+	var out GetRoutingCapabilityMatrixReply
+	pattern := "/v1/admin/routing/capability_matrix"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationRoutingServiceGetRoutingCapabilityMatrix))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *RoutingServiceHTTPClientImpl) GetRoutingE2EChecklist(ctx context.Context, in *GetRoutingE2EChecklistRequest, opts ...http.CallOption) (*GetRoutingE2EChecklistReply, error) {
+	var out GetRoutingE2EChecklistReply
+	pattern := "/v1/admin/routing/e2e_checklist"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationRoutingServiceGetRoutingE2EChecklist))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
 func (c *RoutingServiceHTTPClientImpl) GetRoutingOverview(ctx context.Context, in *GetRoutingOverviewRequest, opts ...http.CallOption) (*GetRoutingOverviewReply, error) {
 	var out GetRoutingOverviewReply
 	pattern := "/v1/admin/routing/overview"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationRoutingServiceGetRoutingOverview))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *RoutingServiceHTTPClientImpl) GetRoutingReleaseGate(ctx context.Context, in *GetRoutingReleaseGateRequest, opts ...http.CallOption) (*GetRoutingReleaseGateReply, error) {
+	var out GetRoutingReleaseGateReply
+	pattern := "/v1/admin/routing/release_gate"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationRoutingServiceGetRoutingReleaseGate))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {
