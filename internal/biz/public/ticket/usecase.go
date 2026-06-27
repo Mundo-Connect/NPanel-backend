@@ -133,6 +133,9 @@ func (uc *ticketUseCase) CreateTicketFollow(ctx context.Context, params *CreateT
 			ticket.UserID, int(params.UserID))
 		return errors.Forbidden("INVALID_ACCESS", "无权操作该工单")
 	}
+	if ticket.Status == StatusClosed {
+		return errors.BadRequest("TICKET_CLOSED", "工单已关闭，无法继续回复")
+	}
 
 	// 2. 创建跟进记录
 	err = uc.repo.CreateTicketFollow(ctx, params.TicketID,

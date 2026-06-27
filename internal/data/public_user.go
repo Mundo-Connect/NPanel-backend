@@ -912,6 +912,9 @@ func (r *publicUserRepo) calculateRemainingAmount(ctx context.Context, userID, u
 	if !expireTime.After(userSub.StartTime) {
 		return 0, nil
 	}
+	if !expireTime.After(time.Now()) {
+		return 0, nil
+	}
 
 	remainingAmount, err := deduction.CalculateRemainingAmount(
 		deduction.Subscribe{
@@ -953,13 +956,16 @@ func (r *publicUserRepo) Unsubscribe(ctx context.Context, userID, id int) error 
 	if userSub.UserID != int64(userID) {
 		return responsecode.NewKratosError(responsecode.ErrInvalidAccess)
 	}
-	if userSub.Status == nil || (*userSub.Status != 0 && *userSub.Status != 1 && *userSub.Status != 2) {
+	if userSub.Status == nil || *userSub.Status != 1 {
 		return kratoserrors.BadRequest("INVALID_STATUS", "Subscription status invalid for cancellation")
 	}
 
 	remainingAmount, err := r.calculateRemainingAmount(ctx, userID, id)
 	if err != nil {
 		return err
+	}
+	if remainingAmount <= 0 {
+		return kratoserrors.BadRequest("NO_REFUNDABLE_VALUE", "The remaining subscription value is zero and cannot be cancelled")
 	}
 
 	var updatedSub *ent.ProxyUserSubscribe
