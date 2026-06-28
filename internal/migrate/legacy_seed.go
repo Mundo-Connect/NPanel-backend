@@ -50,6 +50,7 @@ var legacySQLMigrations = []legacySQLMigration{
 	{version: 2150, path: "legacy_sql/02150_subscribe_price_option_version.up.sql"},
 	{version: 2151, path: "legacy_sql/02151_archive_duplicate_duration_price_options.up.sql"},
 	{version: 2152, path: "legacy_sql/02152_unwrap_subscribe_description_json.up.sql"},
+	{version: 2153, path: "legacy_sql/02153_cleanup_inactive_unreferenced_price_options.up.sql"},
 }
 
 func (m *Migrator) initLegacyDefaultData(ctx context.Context) error {

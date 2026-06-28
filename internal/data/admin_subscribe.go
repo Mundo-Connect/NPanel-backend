@@ -246,7 +246,11 @@ func (r *subscribeRepo) GetSubscribePriceOptionsBySubscribeIDs(ctx context.Conte
 		return result, nil
 	}
 	items, err := r.data.db.ProxySubscribePriceOption.Query().
-		Where(proxysubscribepriceoption.SubscribeIDIn(ids...)).
+		Where(
+			proxysubscribepriceoption.SubscribeIDIn(ids...),
+			proxysubscribepriceoption.Show(true),
+			proxysubscribepriceoption.Sell(true),
+		).
 		Order(ent.Desc(proxysubscribepriceoption.FieldSort), ent.Asc(proxysubscribepriceoption.FieldID)).
 		All(ctx)
 	if err != nil {
@@ -337,6 +341,9 @@ func (r *subscribeRepo) syncSubscribePriceOptions(ctx context.Context, tx *ent.T
 	archiveIDs := make([]int64, 0)
 	for _, item := range existing {
 		if _, ok := submittedIDs[item.ID]; !ok {
+			if !item.Show && !item.Sell && !item.IsDefault {
+				continue
+			}
 			archiveIDs = append(archiveIDs, item.ID)
 		}
 	}
