@@ -39,6 +39,41 @@ func TestLegacySQLMigrationsIncludeSyncedLatestVersions(t *testing.T) {
 	}
 }
 
+func TestLegacyCompatibilityMigrationVersionsAvoidDestructiveGroupMigration(t *testing.T) {
+	if _, ok := legacyCompatibilityMigrationVersions[2131]; ok {
+		t.Fatal("02131_add_groups must not run as a repeatable compatibility migration because it drops group tables")
+	}
+	if _, ok := legacyCompatibilityMigrationVersions[2141]; !ok {
+		t.Fatal("expected subscribe category migration to remain in compatibility migration set")
+	}
+}
+
+func TestLegacyRequiredSchemaPatchesCoverServerAndNodeListColumns(t *testing.T) {
+	want := map[string]bool{
+		"servers.last_reported_at": false,
+		"servers.longitude":        false,
+		"servers.latitude":         false,
+		"servers.longitude_center": false,
+		"servers.latitude_center":  false,
+		"nodes.node_group_ids":     false,
+		"nodes.node_type":          false,
+		"nodes.is_hidden":          false,
+	}
+
+	for _, patch := range legacyRequiredSchemaPatches {
+		key := patch.table + "." + patch.column
+		if _, ok := want[key]; ok {
+			want[key] = true
+		}
+	}
+
+	for key, found := range want {
+		if !found {
+			t.Fatalf("missing legacy required schema patch for %s", key)
+		}
+	}
+}
+
 func TestShouldIgnoreLegacySQLErrorAllowsRepeatableSubscribeDefaultConstraint(t *testing.T) {
 	path := "legacy_sql/02143_subscribe_defaults_and_language_normalization.up.sql"
 	if !shouldIgnoreLegacySQLError(path, "ALTER TABLE `subscribe_application` ADD COLUMN `default_unique_key` TINYINT", &mysql.MySQLError{Number: 1060}) {
