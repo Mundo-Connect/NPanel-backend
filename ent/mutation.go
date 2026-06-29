@@ -33852,6 +33852,7 @@ type ProxyUserMutation struct {
 	password                  *string
 	algo                      *string
 	salt                      *string
+	source_panel              *string
 	avatar                    *string
 	balance                   *int64
 	addbalance                *int64
@@ -34117,6 +34118,42 @@ func (m *ProxyUserMutation) SaltCleared() bool {
 func (m *ProxyUserMutation) ResetSalt() {
 	m.salt = nil
 	delete(m.clearedFields, proxyuser.FieldSalt)
+}
+
+// SetSourcePanel sets the "source_panel" field.
+func (m *ProxyUserMutation) SetSourcePanel(s string) {
+	m.source_panel = &s
+}
+
+// SourcePanel returns the value of the "source_panel" field in the mutation.
+func (m *ProxyUserMutation) SourcePanel() (r string, exists bool) {
+	v := m.source_panel
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSourcePanel returns the old "source_panel" field's value of the ProxyUser entity.
+// If the ProxyUser object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProxyUserMutation) OldSourcePanel(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSourcePanel is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSourcePanel requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSourcePanel: %w", err)
+	}
+	return oldValue.SourcePanel, nil
+}
+
+// ResetSourcePanel resets all changes to the "source_panel" field.
+func (m *ProxyUserMutation) ResetSourcePanel() {
+	m.source_panel = nil
 }
 
 // SetAvatar sets the "avatar" field.
@@ -35365,7 +35402,7 @@ func (m *ProxyUserMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ProxyUserMutation) Fields() []string {
-	fields := make([]string, 0, 26)
+	fields := make([]string, 0, 27)
 	if m.password != nil {
 		fields = append(fields, proxyuser.FieldPassword)
 	}
@@ -35374,6 +35411,9 @@ func (m *ProxyUserMutation) Fields() []string {
 	}
 	if m.salt != nil {
 		fields = append(fields, proxyuser.FieldSalt)
+	}
+	if m.source_panel != nil {
+		fields = append(fields, proxyuser.FieldSourcePanel)
 	}
 	if m.avatar != nil {
 		fields = append(fields, proxyuser.FieldAvatar)
@@ -35458,6 +35498,8 @@ func (m *ProxyUserMutation) Field(name string) (ent.Value, bool) {
 		return m.Algo()
 	case proxyuser.FieldSalt:
 		return m.Salt()
+	case proxyuser.FieldSourcePanel:
+		return m.SourcePanel()
 	case proxyuser.FieldAvatar:
 		return m.Avatar()
 	case proxyuser.FieldBalance:
@@ -35519,6 +35561,8 @@ func (m *ProxyUserMutation) OldField(ctx context.Context, name string) (ent.Valu
 		return m.OldAlgo(ctx)
 	case proxyuser.FieldSalt:
 		return m.OldSalt(ctx)
+	case proxyuser.FieldSourcePanel:
+		return m.OldSourcePanel(ctx)
 	case proxyuser.FieldAvatar:
 		return m.OldAvatar(ctx)
 	case proxyuser.FieldBalance:
@@ -35594,6 +35638,13 @@ func (m *ProxyUserMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetSalt(v)
+		return nil
+	case proxyuser.FieldSourcePanel:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSourcePanel(v)
 		return nil
 	case proxyuser.FieldAvatar:
 		v, ok := value.(string)
@@ -35969,6 +36020,9 @@ func (m *ProxyUserMutation) ResetField(name string) error {
 		return nil
 	case proxyuser.FieldSalt:
 		m.ResetSalt()
+		return nil
+	case proxyuser.FieldSourcePanel:
+		m.ResetSourcePanel()
 		return nil
 	case proxyuser.FieldAvatar:
 		m.ResetAvatar()
