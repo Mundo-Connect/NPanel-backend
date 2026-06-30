@@ -615,6 +615,9 @@ func (r *publicUserRepo) QueryUserAffiliate(ctx context.Context, userID int) (in
 		if err := content.Unmarshal([]byte(datum.Content)); err != nil {
 			continue
 		}
+		if content.Type != systemlog.CommissionTypePurchase && content.Type != systemlog.CommissionTypeRenewal {
+			continue
+		}
 		totalCommission += content.Amount
 	}
 
