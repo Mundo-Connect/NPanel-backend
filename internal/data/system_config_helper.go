@@ -132,6 +132,18 @@ func normalizeSystemConfigKey(key string) string {
 		return "NodeMultiplierConfig"
 	case "web_ad":
 		return "WebAD"
+	case "enabled", "tawk_enabled":
+		return "Enabled"
+	case "property_id", "tawk_property_id":
+		return "PropertyID"
+	case "widget_id", "tawk_widget_id":
+		return "WidgetID"
+	case "identify_user", "tawk_identify_user":
+		return "IdentifyUser"
+	case "secure_mode", "tawk_secure_mode":
+		return "SecureMode"
+	case "secret_key", "tawk_secret_key":
+		return "SecretKey"
 	default:
 		return key
 	}

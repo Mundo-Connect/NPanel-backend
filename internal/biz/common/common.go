@@ -6,9 +6,9 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/go-kratos/kratos/v2/log"
 	"github.com/npanel-dev/NPanel-backend/internal/conf"
 	"github.com/npanel-dev/NPanel-backend/internal/responsecode"
-	"github.com/go-kratos/kratos/v2/log"
 )
 
 // CommonRepo defines repository interface for common operations
@@ -148,6 +148,7 @@ type GlobalConfig struct {
 	Invite       *conf.Invite
 	Currency     map[string]string
 	Subscribe    *conf.Subscribe
+	Tawk         *TawkConfig
 	VerifyCode   map[string]string
 	OAuthMethods []string
 	WebAd        bool
@@ -177,6 +178,14 @@ type DeviceAuthConfig struct {
 	OnlyRealDevice bool
 }
 
+type TawkConfig struct {
+	Enabled      bool
+	PropertyID   string
+	WidgetID     string
+	IdentifyUser bool
+	SecureMode   bool
+}
+
 // GetGlobalConfig gets global configuration
 func (uc *CommonUsecase) GetGlobalConfig(ctx context.Context) (*GlobalConfig, error) {
 	// Query currency config from database
@@ -199,6 +208,12 @@ func (uc *CommonUsecase) GetGlobalConfig(ctx context.Context) (*GlobalConfig, er
 	if err != nil {
 		uc.log.Errorw("GetSystemConfigByCategory verify error", "error", err)
 		verifyConfigMap = make(map[string]string)
+	}
+
+	tawkConfigMap, err := uc.repo.GetSystemConfigByCategory(ctx, "tawk")
+	if err != nil {
+		uc.log.Errorw("GetSystemConfigByCategory tawk error", "error", err)
+		tawkConfigMap = make(map[string]string)
 	}
 
 	// Get enabled auth methods from database
@@ -239,6 +254,7 @@ func (uc *CommonUsecase) GetGlobalConfig(ctx context.Context) (*GlobalConfig, er
 		Invite:       buildInviteConfig(uc.conf, nil),
 		Currency:     currency,
 		Subscribe:    buildSubscribeConfig(uc.conf, nil),
+		Tawk:         buildTawkConfig(tawkConfigMap),
 		VerifyCode:   verifyCode,
 		OAuthMethods: oauthMethods,
 		WebAd:        webAd,
@@ -315,6 +331,16 @@ func buildSubscribeConfig(app *conf.Application, values map[string]string) *conf
 		result.UserAgentList = value
 	}
 	return &result
+}
+
+func buildTawkConfig(values map[string]string) *TawkConfig {
+	return &TawkConfig{
+		Enabled:      boolFromMap(values, false, "Enabled", "enabled", "TawkEnabled", "tawk_enabled"),
+		PropertyID:   stringFromMap(values, "PropertyID", "property_id", "TawkPropertyID", "tawk_property_id"),
+		WidgetID:     stringFromMap(values, "WidgetID", "widget_id", "TawkWidgetID", "tawk_widget_id"),
+		IdentifyUser: boolFromMap(values, false, "IdentifyUser", "identify_user", "TawkIdentifyUser", "tawk_identify_user"),
+		SecureMode:   boolFromMap(values, false, "SecureMode", "secure_mode", "TawkSecureMode", "tawk_secure_mode"),
+	}
 }
 
 // GetStat gets system statistics

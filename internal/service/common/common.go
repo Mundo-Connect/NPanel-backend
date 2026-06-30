@@ -220,6 +220,19 @@ func (s *CommonService) GetGlobalConfig(ctx context.Context, req *pb.GetGlobalCo
 		configData.Subscribe = &pb.SubscribeConfig{}
 	}
 
+	// Tawk config. Secret key is intentionally not exposed in public config.
+	if config.Tawk != nil {
+		configData.Tawk = &pb.PublicTawkConfig{
+			Enabled:      config.Tawk.Enabled,
+			PropertyId:   config.Tawk.PropertyID,
+			WidgetId:     config.Tawk.WidgetID,
+			IdentifyUser: config.Tawk.IdentifyUser,
+			SecureMode:   config.Tawk.SecureMode,
+		}
+	} else {
+		configData.Tawk = &pb.PublicTawkConfig{}
+	}
+
 	// Verify code config
 	configData.VerifyCode = &pb.PublicVerifyCodeConfig{
 		VerifyCodeInterval: 60, // Default 60 seconds

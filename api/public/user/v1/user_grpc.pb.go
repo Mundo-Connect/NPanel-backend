@@ -21,6 +21,7 @@ const _ = grpc.SupportPackageIsVersion9
 
 const (
 	PublicUser_QueryUserInfo_FullMethodName             = "/api.public.user.v1.PublicUser/QueryUserInfo"
+	PublicUser_GetTawkIdentity_FullMethodName           = "/api.public.user.v1.PublicUser/GetTawkIdentity"
 	PublicUser_GetLoginLog_FullMethodName               = "/api.public.user.v1.PublicUser/GetLoginLog"
 	PublicUser_QueryUserBalanceLog_FullMethodName       = "/api.public.user.v1.PublicUser/QueryUserBalanceLog"
 	PublicUser_QueryUserCommissionLog_FullMethodName    = "/api.public.user.v1.PublicUser/QueryUserCommissionLog"
@@ -63,6 +64,8 @@ const (
 type PublicUserClient interface {
 	// QueryUserInfo 查询用户信息
 	QueryUserInfo(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*User, error)
+	// GetTawkIdentity 获取Tawk访客身份签名
+	GetTawkIdentity(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*TawkIdentityReply, error)
 	// GetLoginLog 获取登录日志
 	GetLoginLog(ctx context.Context, in *GetLoginLogRequest, opts ...grpc.CallOption) (*GetLoginLogReply, error)
 	// QueryUserBalanceLog 查询用户余额日志
@@ -139,6 +142,16 @@ func (c *publicUserClient) QueryUserInfo(ctx context.Context, in *emptypb.Empty,
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(User)
 	err := c.cc.Invoke(ctx, PublicUser_QueryUserInfo_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *publicUserClient) GetTawkIdentity(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*TawkIdentityReply, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(TawkIdentityReply)
+	err := c.cc.Invoke(ctx, PublicUser_GetTawkIdentity_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -464,6 +477,8 @@ func (c *publicUserClient) GetUserTrafficStats(ctx context.Context, in *GetUserT
 type PublicUserServer interface {
 	// QueryUserInfo 查询用户信息
 	QueryUserInfo(context.Context, *emptypb.Empty) (*User, error)
+	// GetTawkIdentity 获取Tawk访客身份签名
+	GetTawkIdentity(context.Context, *emptypb.Empty) (*TawkIdentityReply, error)
 	// GetLoginLog 获取登录日志
 	GetLoginLog(context.Context, *GetLoginLogRequest) (*GetLoginLogReply, error)
 	// QueryUserBalanceLog 查询用户余额日志
@@ -538,6 +553,9 @@ type UnimplementedPublicUserServer struct{}
 
 func (UnimplementedPublicUserServer) QueryUserInfo(context.Context, *emptypb.Empty) (*User, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method QueryUserInfo not implemented")
+}
+func (UnimplementedPublicUserServer) GetTawkIdentity(context.Context, *emptypb.Empty) (*TawkIdentityReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetTawkIdentity not implemented")
 }
 func (UnimplementedPublicUserServer) GetLoginLog(context.Context, *GetLoginLogRequest) (*GetLoginLogReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetLoginLog not implemented")
@@ -667,6 +685,24 @@ func _PublicUser_QueryUserInfo_Handler(srv interface{}, ctx context.Context, dec
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(PublicUserServer).QueryUserInfo(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _PublicUser_GetTawkIdentity_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PublicUserServer).GetTawkIdentity(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PublicUser_GetTawkIdentity_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PublicUserServer).GetTawkIdentity(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1239,6 +1275,10 @@ var PublicUser_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "QueryUserInfo",
 			Handler:    _PublicUser_QueryUserInfo_Handler,
+		},
+		{
+			MethodName: "GetTawkIdentity",
+			Handler:    _PublicUser_GetTawkIdentity_Handler,
 		},
 		{
 			MethodName: "GetLoginLog",

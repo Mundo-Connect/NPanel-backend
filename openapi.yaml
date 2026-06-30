@@ -3856,6 +3856,37 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/api.admin.system.v1.UpdateSubscribeConfigReply'
+    /v1/admin/system/tawk_config:
+        get:
+            tags:
+                - SystemService
+            description: GetTawkConfig 获取Tawk客服配置
+            operationId: SystemService_GetTawkConfig
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.admin.system.v1.GetTawkConfigReply'
+        put:
+            tags:
+                - SystemService
+            description: UpdateTawkConfig 更新Tawk客服配置
+            operationId: SystemService_UpdateTawkConfig
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.admin.system.v1.UpdateTawkConfigRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.admin.system.v1.UpdateTawkConfigReply'
     /v1/admin/system/tos_config:
         get:
             tags:
@@ -6328,6 +6359,19 @@ paths:
                 "200":
                     description: OK
                     content: {}
+    /v1/public/user/tawk_identity:
+        get:
+            tags:
+                - PublicUser
+            description: GetTawkIdentity 获取Tawk访客身份签名
+            operationId: PublicUser_GetTawkIdentity
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.public.user.v1.TawkIdentityReply'
     /v1/public/user/traffic_stats:
         get:
             tags:
@@ -12553,6 +12597,22 @@ components:
                 detailContent:
                     type: string
             description: UpdateSubscribeRequest 更新订阅套餐请求
+        api.admin.system.v1.AdminTawkConfig:
+            type: object
+            properties:
+                enabled:
+                    type: boolean
+                propertyId:
+                    type: string
+                widgetId:
+                    type: string
+                identifyUser:
+                    type: boolean
+                secureMode:
+                    type: boolean
+                secretKey:
+                    type: string
+            description: AdminTawkConfig Tawk客服配置
         api.admin.system.v1.CurrencyConfig:
             type: object
             properties:
@@ -12660,6 +12720,16 @@ components:
                     type: string
                 data:
                     $ref: '#/components/schemas/api.admin.system.v1.SystemModule'
+        api.admin.system.v1.GetTawkConfigReply:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/api.admin.system.v1.AdminTawkConfig'
         api.admin.system.v1.GetTosConfigReply:
             type: object
             properties:
@@ -13125,6 +13195,37 @@ components:
                 userAgentList:
                     type: string
             description: UpdateSubscribeConfig
+        api.admin.system.v1.UpdateTawkConfigData:
+            type: object
+            properties:
+                success:
+                    type: boolean
+        api.admin.system.v1.UpdateTawkConfigReply:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/api.admin.system.v1.UpdateTawkConfigData'
+        api.admin.system.v1.UpdateTawkConfigRequest:
+            type: object
+            properties:
+                enabled:
+                    type: boolean
+                propertyId:
+                    type: string
+                widgetId:
+                    type: string
+                identifyUser:
+                    type: boolean
+                secureMode:
+                    type: boolean
+                secretKey:
+                    type: string
+            description: UpdateTawkConfig
         api.admin.system.v1.UpdateTosConfigData:
             type: object
             properties:
@@ -15047,6 +15148,8 @@ components:
                         type: string
                 webAd:
                     type: boolean
+                tawk:
+                    $ref: '#/components/schemas/api.public.common.v1.PublicTawkConfig'
             description: GetGlobalConfig Reply
         api.public.common.v1.GetPrivacyPolicyReply:
             type: object
@@ -15106,6 +15209,20 @@ components:
                     items:
                         type: string
             description: Mobile auth configuration
+        api.public.common.v1.PublicTawkConfig:
+            type: object
+            properties:
+                enabled:
+                    type: boolean
+                propertyId:
+                    type: string
+                widgetId:
+                    type: string
+                identifyUser:
+                    type: boolean
+                secureMode:
+                    type: boolean
+            description: Public tawk customer service configuration
         api.public.common.v1.PublicVerifyCodeConfig:
             type: object
             properties:
@@ -16759,6 +16876,17 @@ components:
                 code:
                     type: string
                 type:
+                    type: string
+        api.public.user.v1.TawkIdentityReply:
+            type: object
+            properties:
+                name:
+                    type: string
+                email:
+                    type: string
+                userId:
+                    type: string
+                hash:
                     type: string
         api.public.user.v1.TrafficLimit:
             type: object

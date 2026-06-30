@@ -108,6 +108,23 @@ func (s *UserService) QueryUserInfo(ctx context.Context, req *emptypb.Empty) (*v
 	}, nil
 }
 
+// GetTawkIdentity 获取Tawk访客身份签名
+func (s *UserService) GetTawkIdentity(ctx context.Context, req *emptypb.Empty) (*v1.TawkIdentityReply, error) {
+	userID := middleware.GetUserID(ctx)
+
+	identity, err := s.uc.GetTawkIdentity(ctx, int(userID))
+	if err != nil {
+		return nil, err
+	}
+
+	return &v1.TawkIdentityReply{
+		Name:   identity.Name,
+		Email:  identity.Email,
+		UserId: identity.UserID,
+		Hash:   identity.Hash,
+	}, nil
+}
+
 // GetLoginLog 获取登录日志
 func (s *UserService) GetLoginLog(ctx context.Context, req *v1.GetLoginLogRequest) (*v1.GetLoginLogReply, error) {
 	userID := middleware.GetUserID(ctx)

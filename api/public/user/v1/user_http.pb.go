@@ -31,6 +31,7 @@ const OperationPublicUserGetDeviceOnlineStatistics = "/api.public.user.v1.Public
 const OperationPublicUserGetLoginLog = "/api.public.user.v1.PublicUser/GetLoginLog"
 const OperationPublicUserGetOAuthMethods = "/api.public.user.v1.PublicUser/GetOAuthMethods"
 const OperationPublicUserGetSubscribeLog = "/api.public.user.v1.PublicUser/GetSubscribeLog"
+const OperationPublicUserGetTawkIdentity = "/api.public.user.v1.PublicUser/GetTawkIdentity"
 const OperationPublicUserGetUserTrafficStats = "/api.public.user.v1.PublicUser/GetUserTrafficStats"
 const OperationPublicUserPreUnsubscribe = "/api.public.user.v1.PublicUser/PreUnsubscribe"
 const OperationPublicUserQueryUserAffiliate = "/api.public.user.v1.PublicUser/QueryUserAffiliate"
@@ -76,6 +77,8 @@ type PublicUserHTTPServer interface {
 	GetOAuthMethods(context.Context, *emptypb.Empty) (*GetOAuthMethodsReply, error)
 	// GetSubscribeLog GetSubscribeLog 获取订阅日志
 	GetSubscribeLog(context.Context, *GetSubscribeLogRequest) (*GetSubscribeLogReply, error)
+	// GetTawkIdentity GetTawkIdentity 获取Tawk访客身份签名
+	GetTawkIdentity(context.Context, *emptypb.Empty) (*TawkIdentityReply, error)
 	// GetUserTrafficStats GetUserTrafficStats 获取用户流量统计
 	GetUserTrafficStats(context.Context, *GetUserTrafficStatsRequest) (*GetUserTrafficStatsReply, error)
 	// PreUnsubscribe PreUnsubscribe 预退订
@@ -123,6 +126,7 @@ type PublicUserHTTPServer interface {
 func RegisterPublicUserHTTPServer(s *http.Server, srv PublicUserHTTPServer) {
 	r := s.Route("/")
 	r.GET("/v1/public/user/info", _PublicUser_QueryUserInfo0_HTTP_Handler(srv))
+	r.GET("/v1/public/user/tawk_identity", _PublicUser_GetTawkIdentity0_HTTP_Handler(srv))
 	r.GET("/v1/public/user/login_log", _PublicUser_GetLoginLog0_HTTP_Handler(srv))
 	r.GET("/v1/public/user/balance_log", _PublicUser_QueryUserBalanceLog0_HTTP_Handler(srv))
 	r.GET("/v1/public/user/commission_log", _PublicUser_QueryUserCommissionLog0_HTTP_Handler(srv))
@@ -171,6 +175,25 @@ func _PublicUser_QueryUserInfo0_HTTP_Handler(srv PublicUserHTTPServer) func(ctx 
 			return err
 		}
 		reply := out.(*User)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _PublicUser_GetTawkIdentity0_HTTP_Handler(srv PublicUserHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in emptypb.Empty
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationPublicUserGetTawkIdentity)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetTawkIdentity(ctx, req.(*emptypb.Empty))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*TawkIdentityReply)
 		return ctx.Result(200, reply)
 	}
 }
@@ -826,6 +849,8 @@ type PublicUserHTTPClient interface {
 	GetOAuthMethods(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *GetOAuthMethodsReply, err error)
 	// GetSubscribeLog GetSubscribeLog 获取订阅日志
 	GetSubscribeLog(ctx context.Context, req *GetSubscribeLogRequest, opts ...http.CallOption) (rsp *GetSubscribeLogReply, err error)
+	// GetTawkIdentity GetTawkIdentity 获取Tawk访客身份签名
+	GetTawkIdentity(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *TawkIdentityReply, err error)
 	// GetUserTrafficStats GetUserTrafficStats 获取用户流量统计
 	GetUserTrafficStats(ctx context.Context, req *GetUserTrafficStatsRequest, opts ...http.CallOption) (rsp *GetUserTrafficStatsReply, err error)
 	// PreUnsubscribe PreUnsubscribe 预退订
@@ -1024,6 +1049,20 @@ func (c *PublicUserHTTPClientImpl) GetSubscribeLog(ctx context.Context, in *GetS
 	pattern := "/v1/public/user/subscribe_log"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationPublicUserGetSubscribeLog))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+// GetTawkIdentity GetTawkIdentity 获取Tawk访客身份签名
+func (c *PublicUserHTTPClientImpl) GetTawkIdentity(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*TawkIdentityReply, error) {
+	var out TawkIdentityReply
+	pattern := "/v1/public/user/tawk_identity"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationPublicUserGetTawkIdentity))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {
