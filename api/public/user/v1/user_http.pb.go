@@ -42,6 +42,7 @@ const OperationPublicUserQueryUserInfo = "/api.public.user.v1.PublicUser/QueryUs
 const OperationPublicUserQueryUserSubscribe = "/api.public.user.v1.PublicUser/QueryUserSubscribe"
 const OperationPublicUserQueryWithdrawalLog = "/api.public.user.v1.PublicUser/QueryWithdrawalLog"
 const OperationPublicUserResetUserSubscribeToken = "/api.public.user.v1.PublicUser/ResetUserSubscribeToken"
+const OperationPublicUserTransferCommissionToBalance = "/api.public.user.v1.PublicUser/TransferCommissionToBalance"
 const OperationPublicUserUnbindDevice = "/api.public.user.v1.PublicUser/UnbindDevice"
 const OperationPublicUserUnbindOAuth = "/api.public.user.v1.PublicUser/UnbindOAuth"
 const OperationPublicUserUnbindTelegram = "/api.public.user.v1.PublicUser/UnbindTelegram"
@@ -99,6 +100,8 @@ type PublicUserHTTPServer interface {
 	QueryWithdrawalLog(context.Context, *QueryWithdrawalLogRequest) (*QueryWithdrawalLogReply, error)
 	// ResetUserSubscribeToken ResetUserSubscribeToken 重置订阅令牌
 	ResetUserSubscribeToken(context.Context, *ResetUserSubscribeTokenRequest) (*emptypb.Empty, error)
+	// TransferCommissionToBalance TransferCommissionToBalance 佣金划转到余额
+	TransferCommissionToBalance(context.Context, *TransferCommissionToBalanceRequest) (*emptypb.Empty, error)
 	// UnbindDevice UnbindDevice 解绑设备
 	UnbindDevice(context.Context, *UnbindDeviceRequest) (*emptypb.Empty, error)
 	// UnbindOAuth UnbindOAuth 解绑OAuth
@@ -153,6 +156,7 @@ func RegisterPublicUserHTTPServer(s *http.Server, srv PublicUserHTTPServer) {
 	r.GET("/v1/public/user/device_online_statistics", _PublicUser_GetDeviceOnlineStatistics0_HTTP_Handler(srv))
 	r.GET("/v1/public/user/device_ws_connect", _PublicUser_DeviceWSConnect0_HTTP_Handler(srv))
 	r.POST("/v1/public/user/commission_withdraw", _PublicUser_CommissionWithdraw0_HTTP_Handler(srv))
+	r.POST("/v1/public/user/commission/transfer_balance", _PublicUser_TransferCommissionToBalance0_HTTP_Handler(srv))
 	r.GET("/v1/public/user/withdrawal_log", _PublicUser_QueryWithdrawalLog0_HTTP_Handler(srv))
 	r.PUT("/v1/public/user/subscribe_note", _PublicUser_UpdateUserSubscribeNote0_HTTP_Handler(srv))
 	r.PUT("/v1/public/user/rules", _PublicUser_UpdateUserRules0_HTTP_Handler(srv))
@@ -725,6 +729,28 @@ func _PublicUser_CommissionWithdraw0_HTTP_Handler(srv PublicUserHTTPServer) func
 	}
 }
 
+func _PublicUser_TransferCommissionToBalance0_HTTP_Handler(srv PublicUserHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in TransferCommissionToBalanceRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationPublicUserTransferCommissionToBalance)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.TransferCommissionToBalance(ctx, req.(*TransferCommissionToBalanceRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*emptypb.Empty)
+		return ctx.Result(200, reply)
+	}
+}
+
 func _PublicUser_QueryWithdrawalLog0_HTTP_Handler(srv PublicUserHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in QueryWithdrawalLogRequest
@@ -871,6 +897,8 @@ type PublicUserHTTPClient interface {
 	QueryWithdrawalLog(ctx context.Context, req *QueryWithdrawalLogRequest, opts ...http.CallOption) (rsp *QueryWithdrawalLogReply, err error)
 	// ResetUserSubscribeToken ResetUserSubscribeToken 重置订阅令牌
 	ResetUserSubscribeToken(ctx context.Context, req *ResetUserSubscribeTokenRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
+	// TransferCommissionToBalance TransferCommissionToBalance 佣金划转到余额
+	TransferCommissionToBalance(ctx context.Context, req *TransferCommissionToBalanceRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
 	// UnbindDevice UnbindDevice 解绑设备
 	UnbindDevice(ctx context.Context, req *UnbindDeviceRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
 	// UnbindOAuth UnbindOAuth 解绑OAuth
@@ -1205,6 +1233,20 @@ func (c *PublicUserHTTPClientImpl) ResetUserSubscribeToken(ctx context.Context, 
 	opts = append(opts, http.Operation(OperationPublicUserResetUserSubscribeToken))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "PUT", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+// TransferCommissionToBalance TransferCommissionToBalance 佣金划转到余额
+func (c *PublicUserHTTPClientImpl) TransferCommissionToBalance(ctx context.Context, in *TransferCommissionToBalanceRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
+	var out emptypb.Empty
+	pattern := "/v1/public/user/commission/transfer_balance"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationPublicUserTransferCommissionToBalance))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {
 		return nil, err
 	}

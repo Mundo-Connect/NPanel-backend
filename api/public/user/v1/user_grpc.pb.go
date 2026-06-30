@@ -20,39 +20,40 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	PublicUser_QueryUserInfo_FullMethodName             = "/api.public.user.v1.PublicUser/QueryUserInfo"
-	PublicUser_GetTawkIdentity_FullMethodName           = "/api.public.user.v1.PublicUser/GetTawkIdentity"
-	PublicUser_GetLoginLog_FullMethodName               = "/api.public.user.v1.PublicUser/GetLoginLog"
-	PublicUser_QueryUserBalanceLog_FullMethodName       = "/api.public.user.v1.PublicUser/QueryUserBalanceLog"
-	PublicUser_QueryUserCommissionLog_FullMethodName    = "/api.public.user.v1.PublicUser/QueryUserCommissionLog"
-	PublicUser_QueryUserAffiliate_FullMethodName        = "/api.public.user.v1.PublicUser/QueryUserAffiliate"
-	PublicUser_QueryUserAffiliateList_FullMethodName    = "/api.public.user.v1.PublicUser/QueryUserAffiliateList"
-	PublicUser_GetOAuthMethods_FullMethodName           = "/api.public.user.v1.PublicUser/GetOAuthMethods"
-	PublicUser_QueryUserSubscribe_FullMethodName        = "/api.public.user.v1.PublicUser/QueryUserSubscribe"
-	PublicUser_GetSubscribeLog_FullMethodName           = "/api.public.user.v1.PublicUser/GetSubscribeLog"
-	PublicUser_ResetUserSubscribeToken_FullMethodName   = "/api.public.user.v1.PublicUser/ResetUserSubscribeToken"
-	PublicUser_PreUnsubscribe_FullMethodName            = "/api.public.user.v1.PublicUser/PreUnsubscribe"
-	PublicUser_Unsubscribe_FullMethodName               = "/api.public.user.v1.PublicUser/Unsubscribe"
-	PublicUser_UpdateUserNotify_FullMethodName          = "/api.public.user.v1.PublicUser/UpdateUserNotify"
-	PublicUser_UpdateUserPassword_FullMethodName        = "/api.public.user.v1.PublicUser/UpdateUserPassword"
-	PublicUser_BindTelegram_FullMethodName              = "/api.public.user.v1.PublicUser/BindTelegram"
-	PublicUser_UnbindTelegram_FullMethodName            = "/api.public.user.v1.PublicUser/UnbindTelegram"
-	PublicUser_BindOAuth_FullMethodName                 = "/api.public.user.v1.PublicUser/BindOAuth"
-	PublicUser_BindOAuthCallback_FullMethodName         = "/api.public.user.v1.PublicUser/BindOAuthCallback"
-	PublicUser_UnbindOAuth_FullMethodName               = "/api.public.user.v1.PublicUser/UnbindOAuth"
-	PublicUser_VerifyEmail_FullMethodName               = "/api.public.user.v1.PublicUser/VerifyEmail"
-	PublicUser_UpdateBindMobile_FullMethodName          = "/api.public.user.v1.PublicUser/UpdateBindMobile"
-	PublicUser_UpdateBindEmail_FullMethodName           = "/api.public.user.v1.PublicUser/UpdateBindEmail"
-	PublicUser_GetDeviceList_FullMethodName             = "/api.public.user.v1.PublicUser/GetDeviceList"
-	PublicUser_UnbindDevice_FullMethodName              = "/api.public.user.v1.PublicUser/UnbindDevice"
-	PublicUser_GetDeviceOnlineStatistics_FullMethodName = "/api.public.user.v1.PublicUser/GetDeviceOnlineStatistics"
-	PublicUser_DeviceWSConnect_FullMethodName           = "/api.public.user.v1.PublicUser/DeviceWSConnect"
-	PublicUser_CommissionWithdraw_FullMethodName        = "/api.public.user.v1.PublicUser/CommissionWithdraw"
-	PublicUser_QueryWithdrawalLog_FullMethodName        = "/api.public.user.v1.PublicUser/QueryWithdrawalLog"
-	PublicUser_UpdateUserSubscribeNote_FullMethodName   = "/api.public.user.v1.PublicUser/UpdateUserSubscribeNote"
-	PublicUser_UpdateUserRules_FullMethodName           = "/api.public.user.v1.PublicUser/UpdateUserRules"
-	PublicUser_DeleteCurrentUserAccount_FullMethodName  = "/api.public.user.v1.PublicUser/DeleteCurrentUserAccount"
-	PublicUser_GetUserTrafficStats_FullMethodName       = "/api.public.user.v1.PublicUser/GetUserTrafficStats"
+	PublicUser_QueryUserInfo_FullMethodName               = "/api.public.user.v1.PublicUser/QueryUserInfo"
+	PublicUser_GetTawkIdentity_FullMethodName             = "/api.public.user.v1.PublicUser/GetTawkIdentity"
+	PublicUser_GetLoginLog_FullMethodName                 = "/api.public.user.v1.PublicUser/GetLoginLog"
+	PublicUser_QueryUserBalanceLog_FullMethodName         = "/api.public.user.v1.PublicUser/QueryUserBalanceLog"
+	PublicUser_QueryUserCommissionLog_FullMethodName      = "/api.public.user.v1.PublicUser/QueryUserCommissionLog"
+	PublicUser_QueryUserAffiliate_FullMethodName          = "/api.public.user.v1.PublicUser/QueryUserAffiliate"
+	PublicUser_QueryUserAffiliateList_FullMethodName      = "/api.public.user.v1.PublicUser/QueryUserAffiliateList"
+	PublicUser_GetOAuthMethods_FullMethodName             = "/api.public.user.v1.PublicUser/GetOAuthMethods"
+	PublicUser_QueryUserSubscribe_FullMethodName          = "/api.public.user.v1.PublicUser/QueryUserSubscribe"
+	PublicUser_GetSubscribeLog_FullMethodName             = "/api.public.user.v1.PublicUser/GetSubscribeLog"
+	PublicUser_ResetUserSubscribeToken_FullMethodName     = "/api.public.user.v1.PublicUser/ResetUserSubscribeToken"
+	PublicUser_PreUnsubscribe_FullMethodName              = "/api.public.user.v1.PublicUser/PreUnsubscribe"
+	PublicUser_Unsubscribe_FullMethodName                 = "/api.public.user.v1.PublicUser/Unsubscribe"
+	PublicUser_UpdateUserNotify_FullMethodName            = "/api.public.user.v1.PublicUser/UpdateUserNotify"
+	PublicUser_UpdateUserPassword_FullMethodName          = "/api.public.user.v1.PublicUser/UpdateUserPassword"
+	PublicUser_BindTelegram_FullMethodName                = "/api.public.user.v1.PublicUser/BindTelegram"
+	PublicUser_UnbindTelegram_FullMethodName              = "/api.public.user.v1.PublicUser/UnbindTelegram"
+	PublicUser_BindOAuth_FullMethodName                   = "/api.public.user.v1.PublicUser/BindOAuth"
+	PublicUser_BindOAuthCallback_FullMethodName           = "/api.public.user.v1.PublicUser/BindOAuthCallback"
+	PublicUser_UnbindOAuth_FullMethodName                 = "/api.public.user.v1.PublicUser/UnbindOAuth"
+	PublicUser_VerifyEmail_FullMethodName                 = "/api.public.user.v1.PublicUser/VerifyEmail"
+	PublicUser_UpdateBindMobile_FullMethodName            = "/api.public.user.v1.PublicUser/UpdateBindMobile"
+	PublicUser_UpdateBindEmail_FullMethodName             = "/api.public.user.v1.PublicUser/UpdateBindEmail"
+	PublicUser_GetDeviceList_FullMethodName               = "/api.public.user.v1.PublicUser/GetDeviceList"
+	PublicUser_UnbindDevice_FullMethodName                = "/api.public.user.v1.PublicUser/UnbindDevice"
+	PublicUser_GetDeviceOnlineStatistics_FullMethodName   = "/api.public.user.v1.PublicUser/GetDeviceOnlineStatistics"
+	PublicUser_DeviceWSConnect_FullMethodName             = "/api.public.user.v1.PublicUser/DeviceWSConnect"
+	PublicUser_CommissionWithdraw_FullMethodName          = "/api.public.user.v1.PublicUser/CommissionWithdraw"
+	PublicUser_TransferCommissionToBalance_FullMethodName = "/api.public.user.v1.PublicUser/TransferCommissionToBalance"
+	PublicUser_QueryWithdrawalLog_FullMethodName          = "/api.public.user.v1.PublicUser/QueryWithdrawalLog"
+	PublicUser_UpdateUserSubscribeNote_FullMethodName     = "/api.public.user.v1.PublicUser/UpdateUserSubscribeNote"
+	PublicUser_UpdateUserRules_FullMethodName             = "/api.public.user.v1.PublicUser/UpdateUserRules"
+	PublicUser_DeleteCurrentUserAccount_FullMethodName    = "/api.public.user.v1.PublicUser/DeleteCurrentUserAccount"
+	PublicUser_GetUserTrafficStats_FullMethodName         = "/api.public.user.v1.PublicUser/GetUserTrafficStats"
 )
 
 // PublicUserClient is the client API for PublicUser service.
@@ -118,6 +119,8 @@ type PublicUserClient interface {
 	DeviceWSConnect(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// CommissionWithdraw 佣金提现
 	CommissionWithdraw(ctx context.Context, in *CommissionWithdrawRequest, opts ...grpc.CallOption) (*WithdrawalLog, error)
+	// TransferCommissionToBalance 佣金划转到余额
+	TransferCommissionToBalance(ctx context.Context, in *TransferCommissionToBalanceRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// QueryWithdrawalLog 查询提现日志
 	QueryWithdrawalLog(ctx context.Context, in *QueryWithdrawalLogRequest, opts ...grpc.CallOption) (*QueryWithdrawalLogReply, error)
 	// UpdateUserSubscribeNote 更新用户订阅备注
@@ -418,6 +421,16 @@ func (c *publicUserClient) CommissionWithdraw(ctx context.Context, in *Commissio
 	return out, nil
 }
 
+func (c *publicUserClient) TransferCommissionToBalance(ctx context.Context, in *TransferCommissionToBalanceRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, PublicUser_TransferCommissionToBalance_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *publicUserClient) QueryWithdrawalLog(ctx context.Context, in *QueryWithdrawalLogRequest, opts ...grpc.CallOption) (*QueryWithdrawalLogReply, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(QueryWithdrawalLogReply)
@@ -531,6 +544,8 @@ type PublicUserServer interface {
 	DeviceWSConnect(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
 	// CommissionWithdraw 佣金提现
 	CommissionWithdraw(context.Context, *CommissionWithdrawRequest) (*WithdrawalLog, error)
+	// TransferCommissionToBalance 佣金划转到余额
+	TransferCommissionToBalance(context.Context, *TransferCommissionToBalanceRequest) (*emptypb.Empty, error)
 	// QueryWithdrawalLog 查询提现日志
 	QueryWithdrawalLog(context.Context, *QueryWithdrawalLogRequest) (*QueryWithdrawalLogReply, error)
 	// UpdateUserSubscribeNote 更新用户订阅备注
@@ -634,6 +649,9 @@ func (UnimplementedPublicUserServer) DeviceWSConnect(context.Context, *emptypb.E
 }
 func (UnimplementedPublicUserServer) CommissionWithdraw(context.Context, *CommissionWithdrawRequest) (*WithdrawalLog, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CommissionWithdraw not implemented")
+}
+func (UnimplementedPublicUserServer) TransferCommissionToBalance(context.Context, *TransferCommissionToBalanceRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method TransferCommissionToBalance not implemented")
 }
 func (UnimplementedPublicUserServer) QueryWithdrawalLog(context.Context, *QueryWithdrawalLogRequest) (*QueryWithdrawalLogReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method QueryWithdrawalLog not implemented")
@@ -1175,6 +1193,24 @@ func _PublicUser_CommissionWithdraw_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _PublicUser_TransferCommissionToBalance_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TransferCommissionToBalanceRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PublicUserServer).TransferCommissionToBalance(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PublicUser_TransferCommissionToBalance_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PublicUserServer).TransferCommissionToBalance(ctx, req.(*TransferCommissionToBalanceRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _PublicUser_QueryWithdrawalLog_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(QueryWithdrawalLogRequest)
 	if err := dec(in); err != nil {
@@ -1383,6 +1419,10 @@ var PublicUser_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CommissionWithdraw",
 			Handler:    _PublicUser_CommissionWithdraw_Handler,
+		},
+		{
+			MethodName: "TransferCommissionToBalance",
+			Handler:    _PublicUser_TransferCommissionToBalance_Handler,
 		},
 		{
 			MethodName: "QueryWithdrawalLog",

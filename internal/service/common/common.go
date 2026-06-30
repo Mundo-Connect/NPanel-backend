@@ -192,9 +192,11 @@ func (s *CommonService) GetGlobalConfig(ctx context.Context, req *pb.GetGlobalCo
 	// Invite config
 	if config.Invite != nil {
 		configData.Invite = &pb.InviteConfig{
-			ForcedInvite:       config.Invite.ForcedInvite,
-			ReferralPercentage: config.Invite.ReferralPercentage,
-			OnlyFirstPurchase:  config.Invite.OnlyFirstPurchase,
+			ForcedInvite:        config.Invite.ForcedInvite,
+			ReferralPercentage:  config.Invite.ReferralPercentage,
+			OnlyFirstPurchase:   config.Invite.OnlyFirstPurchase,
+			WithdrawalMinAmount: config.Invite.WithdrawalMinAmount,
+			WithdrawalMethods:   config.Invite.WithdrawalMethods,
 		}
 	} else {
 		configData.Invite = &pb.InviteConfig{}

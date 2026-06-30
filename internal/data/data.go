@@ -53,6 +53,7 @@ var ProviderSet = wire.NewSet(
 	NewTicketRepo,
 	NewAdminRedemptionRepo,
 	NewAdminGroupRepo,
+	NewAdminWithdrawalRepo,
 	// Admin User模块仓储
 	NewAdminUserRepo,
 	NewAdminUserAuthMethodRepo,

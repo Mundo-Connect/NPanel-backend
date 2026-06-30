@@ -511,6 +511,10 @@ func (m *InviteConfig) validate(all bool) error {
 
 	// no validation rules for OnlyFirstPurchase
 
+	// no validation rules for WithdrawalMinAmount
+
+	// no validation rules for WithdrawalMethods
+
 	if len(errors) > 0 {
 		return InviteConfigMultiError(errors)
 	}
@@ -1437,6 +1441,10 @@ func (m *UpdateInviteConfigRequest) validate(all bool) error {
 	// no validation rules for ReferralPercentage
 
 	// no validation rules for OnlyFirstPurchase
+
+	// no validation rules for WithdrawalMinAmount
+
+	// no validation rules for WithdrawalMethods
 
 	if len(errors) > 0 {
 		return UpdateInviteConfigRequestMultiError(errors)

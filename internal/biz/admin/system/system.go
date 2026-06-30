@@ -21,9 +21,11 @@ type CurrencyConfig struct {
 
 // InviteConfig 邀请配置
 type InviteConfig struct {
-	ForcedInvite       bool `json:"ForcedInvite"`
-	ReferralPercentage int  `json:"ReferralPercentage"`
-	OnlyFirstPurchase  bool `json:"OnlyFirstPurchase"`
+	ForcedInvite        bool   `json:"ForcedInvite"`
+	ReferralPercentage  int    `json:"ReferralPercentage"`
+	OnlyFirstPurchase   bool   `json:"OnlyFirstPurchase"`
+	WithdrawalMinAmount int64  `json:"WithdrawalMinAmount"`
+	WithdrawalMethods   string `json:"WithdrawalMethods"`
 }
 
 // NodeDNS 节点DNS配置

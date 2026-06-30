@@ -97,9 +97,11 @@ func (s *SystemService) GetInviteConfig(ctx context.Context, req *pb.GetInviteCo
 		Code:    responsecode.AdminGetInviteConfigSuccess,
 		Message: responsecode.CodeMessages[responsecode.AdminGetInviteConfigSuccess],
 		Data: &pb.InviteConfig{
-			ForcedInvite:       config.ForcedInvite,
-			ReferralPercentage: int64(config.ReferralPercentage),
-			OnlyFirstPurchase:  config.OnlyFirstPurchase,
+			ForcedInvite:        config.ForcedInvite,
+			ReferralPercentage:  int64(config.ReferralPercentage),
+			OnlyFirstPurchase:   config.OnlyFirstPurchase,
+			WithdrawalMinAmount: config.WithdrawalMinAmount,
+			WithdrawalMethods:   config.WithdrawalMethods,
 		},
 	}, nil
 }
@@ -108,9 +110,11 @@ func (s *SystemService) GetInviteConfig(ctx context.Context, req *pb.GetInviteCo
 func (s *SystemService) UpdateInviteConfig(ctx context.Context, req *pb.UpdateInviteConfigRequest) (*pb.UpdateInviteConfigReply, error) {
 
 	config := &systembiz.InviteConfig{
-		ForcedInvite:       req.ForcedInvite,
-		ReferralPercentage: int(req.ReferralPercentage),
-		OnlyFirstPurchase:  req.OnlyFirstPurchase,
+		ForcedInvite:        req.ForcedInvite,
+		ReferralPercentage:  int(req.ReferralPercentage),
+		OnlyFirstPurchase:   req.OnlyFirstPurchase,
+		WithdrawalMinAmount: req.WithdrawalMinAmount,
+		WithdrawalMethods:   req.WithdrawalMethods,
 	}
 
 	if err := s.uc.UpdateInviteConfig(ctx, config); err != nil {

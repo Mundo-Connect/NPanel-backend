@@ -238,6 +238,8 @@ message InviteConfig {
   bool forced_invite = 1;         // 是否强制邀请
   int64 referral_percentage = 2;  // 返利百分比
   bool only_first_purchase = 3;   // 是否仅首次购买
+  int64 withdrawal_min_amount = 4; // 最低提现金额（分）
+  string withdrawal_methods = 5;   // 提现方式配置 JSON
 }
 
 // GetCurrencyConfig
@@ -280,6 +282,8 @@ message UpdateInviteConfigRequest {
   bool forced_invite = 1;
   int64 referral_percentage = 2;
   bool only_first_purchase = 3;
+  int64 withdrawal_min_amount = 4;
+  string withdrawal_methods = 5;
 }
 
 message UpdateInviteConfigData {

@@ -2347,20 +2347,24 @@ func init() {
 	proxyusersubscribe.IDValidator = proxyusersubscribeDescID.Validators[0].(func(int64) error)
 	proxyuserwithdrawalFields := schema.ProxyUserWithdrawal{}.Fields()
 	_ = proxyuserwithdrawalFields
+	// proxyuserwithdrawalDescMethod is the schema descriptor for method field.
+	proxyuserwithdrawalDescMethod := proxyuserwithdrawalFields[3].Descriptor()
+	// proxyuserwithdrawal.MethodValidator is a validator for the "method" field. It is called by the builders before save.
+	proxyuserwithdrawal.MethodValidator = proxyuserwithdrawalDescMethod.Validators[0].(func(string) error)
 	// proxyuserwithdrawalDescStatus is the schema descriptor for status field.
-	proxyuserwithdrawalDescStatus := proxyuserwithdrawalFields[4].Descriptor()
+	proxyuserwithdrawalDescStatus := proxyuserwithdrawalFields[5].Descriptor()
 	// proxyuserwithdrawal.DefaultStatus holds the default value on creation for the status field.
 	proxyuserwithdrawal.DefaultStatus = proxyuserwithdrawalDescStatus.Default.(int8)
 	// proxyuserwithdrawalDescReason is the schema descriptor for reason field.
-	proxyuserwithdrawalDescReason := proxyuserwithdrawalFields[5].Descriptor()
+	proxyuserwithdrawalDescReason := proxyuserwithdrawalFields[6].Descriptor()
 	// proxyuserwithdrawal.ReasonValidator is a validator for the "reason" field. It is called by the builders before save.
 	proxyuserwithdrawal.ReasonValidator = proxyuserwithdrawalDescReason.Validators[0].(func(string) error)
 	// proxyuserwithdrawalDescCreatedAt is the schema descriptor for created_at field.
-	proxyuserwithdrawalDescCreatedAt := proxyuserwithdrawalFields[6].Descriptor()
+	proxyuserwithdrawalDescCreatedAt := proxyuserwithdrawalFields[8].Descriptor()
 	// proxyuserwithdrawal.DefaultCreatedAt holds the default value on creation for the created_at field.
 	proxyuserwithdrawal.DefaultCreatedAt = proxyuserwithdrawalDescCreatedAt.Default.(func() time.Time)
 	// proxyuserwithdrawalDescUpdatedAt is the schema descriptor for updated_at field.
-	proxyuserwithdrawalDescUpdatedAt := proxyuserwithdrawalFields[7].Descriptor()
+	proxyuserwithdrawalDescUpdatedAt := proxyuserwithdrawalFields[9].Descriptor()
 	// proxyuserwithdrawal.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	proxyuserwithdrawal.DefaultUpdatedAt = proxyuserwithdrawalDescUpdatedAt.Default.(func() time.Time)
 	// proxyuserwithdrawal.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.

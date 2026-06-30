@@ -216,6 +216,12 @@ func (uc *CommonUsecase) GetGlobalConfig(ctx context.Context) (*GlobalConfig, er
 		tawkConfigMap = make(map[string]string)
 	}
 
+	inviteConfigMap, err := uc.repo.GetSystemConfigByCategory(ctx, "invite")
+	if err != nil {
+		uc.log.Errorw("GetSystemConfigByCategory invite error", "error", err)
+		inviteConfigMap = make(map[string]string)
+	}
+
 	// Get enabled auth methods from database
 	oauthMethods, err := uc.repo.GetEnabledAuthMethods(ctx)
 	if err != nil {
@@ -245,13 +251,13 @@ func (uc *CommonUsecase) GetGlobalConfig(ctx context.Context) (*GlobalConfig, er
 	authConfig.Register = buildRegisterConfig(uc.conf, nil)
 
 	// Old /site/config behavior relies on the runtime config snapshot for
-	// site/register/invite/subscribe, while verify/currency/verify_code are still
-	// layered from database values.
+	// site/register/subscribe, while invite/verify/currency/verify_code are
+	// layered from database values so user-facing settings refresh immediately.
 	return &GlobalConfig{
 		Site:         buildSiteConfig(uc.conf, nil),
 		Verify:       buildVerifyConfig(uc.conf, verifyConfigMap),
 		Auth:         authConfig,
-		Invite:       buildInviteConfig(uc.conf, nil),
+		Invite:       buildInviteConfig(uc.conf, inviteConfigMap),
 		Currency:     currency,
 		Subscribe:    buildSubscribeConfig(uc.conf, nil),
 		Tawk:         buildTawkConfig(tawkConfigMap),
@@ -417,6 +423,10 @@ func buildInviteConfig(app *conf.Application, values map[string]string) *conf.In
 	result.ForcedInvite = boolFromMap(values, result.ForcedInvite, "ForcedInvite", "forced_invite")
 	result.OnlyFirstPurchase = boolFromMap(values, result.OnlyFirstPurchase, "OnlyFirstPurchase", "only_first_purchase")
 	result.ReferralPercentage = int64FromMap(values, result.ReferralPercentage, "ReferralPercentage", "referral_percentage")
+	result.WithdrawalMinAmount = int64FromMap(values, result.WithdrawalMinAmount, "WithdrawalMinAmount", "withdrawal_min_amount")
+	if value := stringFromMap(values, "WithdrawalMethods", "withdrawal_methods", "WithdrawalMethod"); value != "" {
+		result.WithdrawalMethods = value
+	}
 	return &result
 }
 

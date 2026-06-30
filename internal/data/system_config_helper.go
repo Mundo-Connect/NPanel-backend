@@ -108,6 +108,10 @@ func normalizeSystemConfigKey(key string) string {
 		return "ReferralPercentage"
 	case "only_first_purchase":
 		return "OnlyFirstPurchase"
+	case "withdrawal_min_amount":
+		return "WithdrawalMinAmount"
+	case "withdrawal_methods", "WithdrawalMethod":
+		return "WithdrawalMethods"
 	case "node_secret":
 		return "NodeSecret"
 	case "node_pull_interval":

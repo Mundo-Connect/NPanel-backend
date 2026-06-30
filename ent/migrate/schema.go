@@ -897,9 +897,11 @@ var (
 	UserWithdrawalColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "提现ID"},
 		{Name: "amount", Type: field.TypeInt64, Comment: "提现金额"},
+		{Name: "method", Type: field.TypeString, Nullable: true, Size: 32, Comment: "提现方式"},
 		{Name: "content", Type: field.TypeString, Nullable: true, Size: 2147483647, Comment: "提现内容"},
 		{Name: "status", Type: field.TypeInt8, Comment: "提现状态", Default: 0},
 		{Name: "reason", Type: field.TypeString, Nullable: true, Size: 500, Comment: "拒绝原因"},
+		{Name: "processed_at", Type: field.TypeTime, Nullable: true, Comment: "处理时间"},
 		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间"},
 		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间"},
 		{Name: "user_id", Type: field.TypeInt64, Comment: "用户ID"},
@@ -912,7 +914,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "user_withdrawal_user_withdrawals",
-				Columns:    []*schema.Column{UserWithdrawalColumns[7]},
+				Columns:    []*schema.Column{UserWithdrawalColumns[9]},
 				RefColumns: []*schema.Column{UserColumns[0]},
 				OnDelete:   schema.NoAction,
 			},

@@ -40514,10 +40514,12 @@ type ProxyUserWithdrawalMutation struct {
 	id            *int64
 	amount        *int64
 	addamount     *int64
+	method        *string
 	content       *string
 	status        *int8
 	addstatus     *int8
 	reason        *string
+	processed_at  *time.Time
 	created_at    *time.Time
 	updated_at    *time.Time
 	clearedFields map[string]struct{}
@@ -40724,6 +40726,55 @@ func (m *ProxyUserWithdrawalMutation) ResetAmount() {
 	m.addamount = nil
 }
 
+// SetMethod sets the "method" field.
+func (m *ProxyUserWithdrawalMutation) SetMethod(s string) {
+	m.method = &s
+}
+
+// Method returns the value of the "method" field in the mutation.
+func (m *ProxyUserWithdrawalMutation) Method() (r string, exists bool) {
+	v := m.method
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMethod returns the old "method" field's value of the ProxyUserWithdrawal entity.
+// If the ProxyUserWithdrawal object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProxyUserWithdrawalMutation) OldMethod(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldMethod is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldMethod requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMethod: %w", err)
+	}
+	return oldValue.Method, nil
+}
+
+// ClearMethod clears the value of the "method" field.
+func (m *ProxyUserWithdrawalMutation) ClearMethod() {
+	m.method = nil
+	m.clearedFields[proxyuserwithdrawal.FieldMethod] = struct{}{}
+}
+
+// MethodCleared returns if the "method" field was cleared in this mutation.
+func (m *ProxyUserWithdrawalMutation) MethodCleared() bool {
+	_, ok := m.clearedFields[proxyuserwithdrawal.FieldMethod]
+	return ok
+}
+
+// ResetMethod resets all changes to the "method" field.
+func (m *ProxyUserWithdrawalMutation) ResetMethod() {
+	m.method = nil
+	delete(m.clearedFields, proxyuserwithdrawal.FieldMethod)
+}
+
 // SetContent sets the "content" field.
 func (m *ProxyUserWithdrawalMutation) SetContent(s string) {
 	m.content = &s
@@ -40878,6 +40929,55 @@ func (m *ProxyUserWithdrawalMutation) ResetReason() {
 	delete(m.clearedFields, proxyuserwithdrawal.FieldReason)
 }
 
+// SetProcessedAt sets the "processed_at" field.
+func (m *ProxyUserWithdrawalMutation) SetProcessedAt(t time.Time) {
+	m.processed_at = &t
+}
+
+// ProcessedAt returns the value of the "processed_at" field in the mutation.
+func (m *ProxyUserWithdrawalMutation) ProcessedAt() (r time.Time, exists bool) {
+	v := m.processed_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldProcessedAt returns the old "processed_at" field's value of the ProxyUserWithdrawal entity.
+// If the ProxyUserWithdrawal object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProxyUserWithdrawalMutation) OldProcessedAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldProcessedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldProcessedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldProcessedAt: %w", err)
+	}
+	return oldValue.ProcessedAt, nil
+}
+
+// ClearProcessedAt clears the value of the "processed_at" field.
+func (m *ProxyUserWithdrawalMutation) ClearProcessedAt() {
+	m.processed_at = nil
+	m.clearedFields[proxyuserwithdrawal.FieldProcessedAt] = struct{}{}
+}
+
+// ProcessedAtCleared returns if the "processed_at" field was cleared in this mutation.
+func (m *ProxyUserWithdrawalMutation) ProcessedAtCleared() bool {
+	_, ok := m.clearedFields[proxyuserwithdrawal.FieldProcessedAt]
+	return ok
+}
+
+// ResetProcessedAt resets all changes to the "processed_at" field.
+func (m *ProxyUserWithdrawalMutation) ResetProcessedAt() {
+	m.processed_at = nil
+	delete(m.clearedFields, proxyuserwithdrawal.FieldProcessedAt)
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (m *ProxyUserWithdrawalMutation) SetCreatedAt(t time.Time) {
 	m.created_at = &t
@@ -41011,12 +41111,15 @@ func (m *ProxyUserWithdrawalMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ProxyUserWithdrawalMutation) Fields() []string {
-	fields := make([]string, 0, 7)
+	fields := make([]string, 0, 9)
 	if m.user != nil {
 		fields = append(fields, proxyuserwithdrawal.FieldUserID)
 	}
 	if m.amount != nil {
 		fields = append(fields, proxyuserwithdrawal.FieldAmount)
+	}
+	if m.method != nil {
+		fields = append(fields, proxyuserwithdrawal.FieldMethod)
 	}
 	if m.content != nil {
 		fields = append(fields, proxyuserwithdrawal.FieldContent)
@@ -41026,6 +41129,9 @@ func (m *ProxyUserWithdrawalMutation) Fields() []string {
 	}
 	if m.reason != nil {
 		fields = append(fields, proxyuserwithdrawal.FieldReason)
+	}
+	if m.processed_at != nil {
+		fields = append(fields, proxyuserwithdrawal.FieldProcessedAt)
 	}
 	if m.created_at != nil {
 		fields = append(fields, proxyuserwithdrawal.FieldCreatedAt)
@@ -41045,12 +41151,16 @@ func (m *ProxyUserWithdrawalMutation) Field(name string) (ent.Value, bool) {
 		return m.UserID()
 	case proxyuserwithdrawal.FieldAmount:
 		return m.Amount()
+	case proxyuserwithdrawal.FieldMethod:
+		return m.Method()
 	case proxyuserwithdrawal.FieldContent:
 		return m.Content()
 	case proxyuserwithdrawal.FieldStatus:
 		return m.Status()
 	case proxyuserwithdrawal.FieldReason:
 		return m.Reason()
+	case proxyuserwithdrawal.FieldProcessedAt:
+		return m.ProcessedAt()
 	case proxyuserwithdrawal.FieldCreatedAt:
 		return m.CreatedAt()
 	case proxyuserwithdrawal.FieldUpdatedAt:
@@ -41068,12 +41178,16 @@ func (m *ProxyUserWithdrawalMutation) OldField(ctx context.Context, name string)
 		return m.OldUserID(ctx)
 	case proxyuserwithdrawal.FieldAmount:
 		return m.OldAmount(ctx)
+	case proxyuserwithdrawal.FieldMethod:
+		return m.OldMethod(ctx)
 	case proxyuserwithdrawal.FieldContent:
 		return m.OldContent(ctx)
 	case proxyuserwithdrawal.FieldStatus:
 		return m.OldStatus(ctx)
 	case proxyuserwithdrawal.FieldReason:
 		return m.OldReason(ctx)
+	case proxyuserwithdrawal.FieldProcessedAt:
+		return m.OldProcessedAt(ctx)
 	case proxyuserwithdrawal.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
 	case proxyuserwithdrawal.FieldUpdatedAt:
@@ -41101,6 +41215,13 @@ func (m *ProxyUserWithdrawalMutation) SetField(name string, value ent.Value) err
 		}
 		m.SetAmount(v)
 		return nil
+	case proxyuserwithdrawal.FieldMethod:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMethod(v)
+		return nil
 	case proxyuserwithdrawal.FieldContent:
 		v, ok := value.(string)
 		if !ok {
@@ -41121,6 +41242,13 @@ func (m *ProxyUserWithdrawalMutation) SetField(name string, value ent.Value) err
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetReason(v)
+		return nil
+	case proxyuserwithdrawal.FieldProcessedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetProcessedAt(v)
 		return nil
 	case proxyuserwithdrawal.FieldCreatedAt:
 		v, ok := value.(time.Time)
@@ -41193,11 +41321,17 @@ func (m *ProxyUserWithdrawalMutation) AddField(name string, value ent.Value) err
 // mutation.
 func (m *ProxyUserWithdrawalMutation) ClearedFields() []string {
 	var fields []string
+	if m.FieldCleared(proxyuserwithdrawal.FieldMethod) {
+		fields = append(fields, proxyuserwithdrawal.FieldMethod)
+	}
 	if m.FieldCleared(proxyuserwithdrawal.FieldContent) {
 		fields = append(fields, proxyuserwithdrawal.FieldContent)
 	}
 	if m.FieldCleared(proxyuserwithdrawal.FieldReason) {
 		fields = append(fields, proxyuserwithdrawal.FieldReason)
+	}
+	if m.FieldCleared(proxyuserwithdrawal.FieldProcessedAt) {
+		fields = append(fields, proxyuserwithdrawal.FieldProcessedAt)
 	}
 	return fields
 }
@@ -41213,11 +41347,17 @@ func (m *ProxyUserWithdrawalMutation) FieldCleared(name string) bool {
 // error if the field is not defined in the schema.
 func (m *ProxyUserWithdrawalMutation) ClearField(name string) error {
 	switch name {
+	case proxyuserwithdrawal.FieldMethod:
+		m.ClearMethod()
+		return nil
 	case proxyuserwithdrawal.FieldContent:
 		m.ClearContent()
 		return nil
 	case proxyuserwithdrawal.FieldReason:
 		m.ClearReason()
+		return nil
+	case proxyuserwithdrawal.FieldProcessedAt:
+		m.ClearProcessedAt()
 		return nil
 	}
 	return fmt.Errorf("unknown ProxyUserWithdrawal nullable field %s", name)
@@ -41233,6 +41373,9 @@ func (m *ProxyUserWithdrawalMutation) ResetField(name string) error {
 	case proxyuserwithdrawal.FieldAmount:
 		m.ResetAmount()
 		return nil
+	case proxyuserwithdrawal.FieldMethod:
+		m.ResetMethod()
+		return nil
 	case proxyuserwithdrawal.FieldContent:
 		m.ResetContent()
 		return nil
@@ -41241,6 +41384,9 @@ func (m *ProxyUserWithdrawalMutation) ResetField(name string) error {
 		return nil
 	case proxyuserwithdrawal.FieldReason:
 		m.ResetReason()
+		return nil
+	case proxyuserwithdrawal.FieldProcessedAt:
+		m.ResetProcessedAt()
 		return nil
 	case proxyuserwithdrawal.FieldCreatedAt:
 		m.ResetCreatedAt()
