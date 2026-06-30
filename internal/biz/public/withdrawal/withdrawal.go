@@ -132,6 +132,16 @@ func (uc *WithdrawalUsecase) TransferCommissionToBalance(ctx context.Context, us
 
 // QueryWithdrawalLog 查询提现日志
 func (uc *WithdrawalUsecase) QueryWithdrawalLog(ctx context.Context, userID int64, page, pageSize int32) ([]*Withdrawal, int32, error) {
+	if page <= 0 {
+		page = 1
+	}
+	if pageSize <= 0 {
+		pageSize = 10
+	}
+	if pageSize > 100 {
+		pageSize = 100
+	}
+
 	withdrawals, total, err := uc.repo.GetUserWithdrawals(ctx, userID, page, pageSize)
 	if err != nil {
 		uc.logger.WithContext(ctx).Errorf("query withdrawal log failed: userID=%d, error=%v", userID, err)

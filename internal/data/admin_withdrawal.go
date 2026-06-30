@@ -88,12 +88,17 @@ func (r *adminWithdrawalRepo) RejectWithdrawal(ctx context.Context, id int64, re
 			return err
 		}
 
-		if err := tx.ProxyUserWithdrawal.UpdateOneID(record.ID).
+		affected, err := tx.ProxyUserWithdrawal.Update().
+			Where(proxyuserwithdrawal.IDEQ(record.ID), proxyuserwithdrawal.StatusEQ(withdrawalbiz.StatusPending)).
 			SetStatus(withdrawalbiz.StatusRejected).
 			SetReason(reason).
 			SetProcessedAt(now).
-			Exec(ctx); err != nil {
+			Save(ctx)
+		if err != nil {
 			return err
+		}
+		if affected == 0 {
+			return responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 		}
 
 		if err := tx.ProxyUser.UpdateOneID(record.UserID).
